@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "Perfil de Usuario",
+      "description": "Configuración y estadísticas espirituales del usuario",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "description": "Nombre visible del usuario" },
+        "email": { "type": "string", "description": "Correo electrónico del usuario" },
+        "liturgicalRegion": { "type": "string", "description": "Región litúrgica configurada" },
+        "bibleFontSize": { "type": "number", "description": "Tamaño de fuente de la Biblia" },
+        "audioEnabled": { "type": "boolean", "description": "Preferencia de audio y voz" },
+        "currentStreak": { "type": "number", "description": "Días consecutivos de oración" },
+        "totalRosaries": { "type": "number", "description": "Total de rosarios completados" },
+        "updatedAt": { "type": "string", "description": "Fecha de última actualización ISO" }
+      },
+      "required": ["liturgicalRegion", "updatedAt"]
+    },
+    "spiritualRoutine": {
+      "title": "Rutina Espiritual",
+      "description": "Rutinas y momentos de oración programados",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID del usuario propietario" },
+        "title": { "type": "string", "description": "Nombre de la rutina o momento de oración" },
+        "time": { "type": "string", "description": "Hora programada en formato HH:MM" },
+        "enabled": { "type": "boolean", "description": "Si la rutina está activa" },
+        "category": { "type": "string", "description": "Categoría (Liturgia, Rosario, Meditación, etc.)" },
+        "completedDates": { "type": "array", "description": "Fechas en formato YYYY-MM-DD en que se completó" }
+      },
+      "required": ["userId", "title", "time", "enabled"]
+    },
+    "meditationNote": {
+      "title": "Nota de Meditación",
+      "description": "Reflexiones y notas personales de oración del usuario",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID del usuario propietario" },
+        "title": { "type": "string", "description": "Título de la meditación" },
+        "content": { "type": "string", "description": "Texto de la meditación" },
+        "date": { "type": "string", "description": "Fecha de la nota en formato YYYY-MM-DD" },
+        "createdAt": { "type": "string", "description": "Marca de tiempo de creación" }
+      },
+      "required": ["userId", "title", "content", "date"]
+    },
+    "favoriteVerse": {
+      "title": "Versículo Favorito",
+      "description": "Pasaje bíblico guardado por el usuario",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID del usuario propietario" },
+        "bookName": { "type": "string", "description": "Nombre del libro bíblico" },
+        "chapter": { "type": "number", "description": "Número de capítulo" },
+        "verse": { "type": "number", "description": "Número de versículo" },
+        "text": { "type": "string", "description": "Texto sagrado" },
+        "createdAt": { "type": "string", "description": "Fecha de guardado" }
+      },
+      "required": ["userId", "bookName", "chapter", "verse", "text"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/userProfile" },
+      "description": "Datos de perfil y configuración del usuario"
+    },
+    "/users/{userId}/routines/{routineId}": {
+      "schema": { "$ref": "#/entities/spiritualRoutine" },
+      "description": "Rutinas espirituales programadas por el usuario"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/meditationNote" },
+      "description": "Notas y meditaciones espirituales personales"
+    },
+    "/users/{userId}/favorites/{favId}": {
+      "schema": { "$ref": "#/entities/favoriteVerse" },
+      "description": "Versículos bíblicos favoritos del usuario"
+    }
+  }
+}

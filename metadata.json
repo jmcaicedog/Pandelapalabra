@@ -1,0 +1,6 @@
+{
+  "name": "Lumen - Liturgia y Oración Católica",
+  "description": "Aplicación católica con liturgia diaria, reflexiones con IA sacerdotal, Biblia católica, santo rosario y devocionario interactivo, y calendario espiritual.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

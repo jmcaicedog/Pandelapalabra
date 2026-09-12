@@ -1,0 +1,709 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Volume2,
+  VolumeX,
+  Sparkles,
+  ChevronRight,
+  RefreshCw,
+  Share2,
+  BookOpen,
+  MessageCircle,
+  X,
+  Send,
+  Check,
+  BookmarkPlus
+} from 'lucide-react';
+import { getLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
+import { speechService } from '../lib/speech.ts';
+import { saveNote } from '../lib/firebase.ts';
+import type { User } from 'firebase/auth';
+
+interface LiturgyViewProps {
+  user: User | null;
+  onNavigateTab?: (tab: 'biblia' | 'oraciones' | 'calendario' | 'ajustes') => void;
+}
+
+export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
+  // Today is 2026-09-11 in the environment
+  const [selectedDate, setSelectedDate] = useState('2026-09-11');
+  const [dayData, setDayData] = useState<LiturgicalDay>(getLiturgicalDay('2026-09-11'));
+  const [expandedSection, setExpandedSection] = useState<'reading1' | 'psalm' | 'gospel' | null>(null);
+  const [saintModalOpen, setSaintModalOpen] = useState(false);
+
+  // Audio speech states
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentPlayingSection, setCurrentPlayingSection] = useState<string | null>(null);
+
+  // AI Reflection
+  const [reflection, setReflection] = useState<string | null>(null);
+  const [priestName, setPriestName] = useState('Padre Mateo');
+  const [loadingReflection, setLoadingReflection] = useState(false);
+  const [reflectionError, setReflectionError] = useState<string | null>(null);
+
+  // Pastoral Counsel dialog
+  const [counselOpen, setCounselOpen] = useState(false);
+  const [counselQuery, setCounselQuery] = useState('');
+  const [counselMessages, setCounselMessages] = useState<Array<{ role: 'user' | 'priest'; text: string }>>([]);
+  const [counselLoading, setCounselLoading] = useState(false);
+
+  const [copiedNotification, setCopiedNotification] = useState(false);
+  const [savedNotification, setSavedNotification] = useState(false);
+
+  // Sync speech state
+  useEffect(() => {
+    const unsub = speechService.subscribe((speaking) => {
+      setIsPlaying(speaking);
+      if (!speaking) setCurrentPlayingSection(null);
+    });
+    return () => {
+      unsub();
+      speechService.stop();
+    };
+  }, []);
+
+  // Update day data when date changes
+  useEffect(() => {
+    const data = getLiturgicalDay(selectedDate);
+    setDayData(data);
+    fetchReflection(data);
+  }, [selectedDate]);
+
+  const fetchReflection = async (data: LiturgicalDay) => {
+    setLoadingReflection(true);
+    setReflectionError(null);
+    try {
+      const res = await fetch('/api/reflection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: data.formattedDate,
+          liturgicalTitle: data.title,
+          saint: `${data.saint.name}, ${data.saint.title}`,
+          reading1: `${data.firstReading.citation} - ${data.firstReading.text.slice(0, 300)}...`,
+          psalm: `${data.psalm.citation}: ${data.psalm.response}`,
+          gospel: data.gospel.text,
+          gospelQuote: data.gospel.citation,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Error al conectar con la reflexión');
+      const json = await res.json();
+      setReflection(json.reflection);
+      if (json.priestName) setPriestName(json.priestName);
+    } catch (err: any) {
+      console.warn('Error fetching homily reflection, providing canonical homily:', err);
+      setReflection(
+        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día, el Señor Jesús en el Santo Evangelio (${data.gospel.citation}) nos llama a la autenticidad evangélica: "¿Acaso puede un ciego guiar a otro ciego?". ¡Cuántas veces nos precipitamos a juzgar la mota en el ojo ajeno, olvidando la viga que nubla nuestra propia mirada!\n\nLa verdadera caridad cristiana no nace de creernos superiores ni jueces de los demás, sino de reconocernos pobres pecadores necesitados de la infinita misericordia divina. Como San Pafnucio en el siglo IV, quien soportó la mutilación por confesar a Cristo sin guardar rencor, estamos llamados a edificar antes que condenar.\n\nPropósito para hoy: Antes de criticar mentalmente o de palabra a un hermano o familiar, detengámonos un instante, recemos un Avemaría por él o ella, y pidámosle al Señor la gracia de la humildad.\n\nOremos: Señor Jesús, Maestro de los humildes, limpia los ojos de nuestro corazón de toda soberbia y llénanos de tu luz salvadora.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`
+      );
+    } finally {
+      setLoadingReflection(false);
+    }
+  };
+
+  const playAudio = (sectionId: string, textToPlay: string) => {
+    if (currentPlayingSection === sectionId && isPlaying) {
+      speechService.stop();
+      setCurrentPlayingSection(null);
+    } else {
+      setCurrentPlayingSection(sectionId);
+      speechService.speak(textToPlay, () => setCurrentPlayingSection(null));
+    }
+  };
+
+  const handleSendCounsel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!counselQuery.trim() || counselLoading) return;
+
+    const userQ = counselQuery.trim();
+    setCounselQuery('');
+    setCounselMessages((prev) => [...prev, { role: 'user', text: userQ }]);
+    setCounselLoading(true);
+
+    try {
+      const res = await fetch('/api/spiritual-counsel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: userQ,
+          context: `Evangelio del día: ${dayData.gospel.citation} - "${dayData.gospel.text}"`,
+        }),
+      });
+      const data = await res.json();
+      setCounselMessages((prev) => [
+        ...prev,
+        { role: 'priest', text: data.counsel || 'Que el Señor te conceda su paz y fortaleza.' },
+      ]);
+    } catch {
+      setCounselMessages((prev) => [
+        ...prev,
+        {
+          role: 'priest',
+          text: 'Querido hermano: persevera en la oración diaria y acércate al sacramento de la Reconciliación y a la Santa Eucaristía, donde hallarás la paz que el mundo no puede dar. Te bendigo en el nombre del Padre, del Hijo y del Espíritu Santo. Amén.',
+        },
+      ]);
+    } finally {
+      setCounselLoading(false);
+    }
+  };
+
+  const handleSaveToNotes = async () => {
+    if (!reflection) return;
+    const note = {
+      id: 'note_' + Date.now(),
+      userId: user?.uid || 'guest',
+      title: `Homilía - ${dayData.title}`,
+      content: `${dayData.gospel.citation}\n\n${reflection}`,
+      date: dayData.date,
+      createdAt: new Date().toISOString(),
+    };
+    await saveNote(user?.uid || 'guest', note);
+    setSavedNotification(true);
+    setTimeout(() => setSavedNotification(false), 3000);
+  };
+
+  const handleShare = async () => {
+    const text = `🕊️ Liturgia de hoy - ${dayData.title}\n\n📖 Evangelio (${dayData.gospel.citation}):\n${dayData.gospel.text}\n\n✨ Reflexión del ${priestName}:\n${reflection?.slice(0, 400)}...\n\nReza con Lumen App.`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: dayData.title, text });
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(text);
+      setCopiedNotification(true);
+      setTimeout(() => setCopiedNotification(false), 3000);
+    }
+  };
+
+  return (
+    <div id="liturgy-container" className="min-h-screen pb-28 text-slate-100">
+      {/* Top Hero Banner with Sacred Light, Altar & Bread */}
+      <div className="relative h-60 w-full overflow-hidden bg-slate-950">
+        <img
+          src="https://images.unsplash.com/photo-1544830208-87a32bb58409?auto=format&fit=crop&w=1000&q=80"
+          alt="Luz Sagrada y Altar"
+          className="w-full h-full object-cover object-center opacity-40 brightness-75 scale-105 transition-transform duration-700 hover:scale-100"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-transparent"></div>
+
+        {/* Top bar controls */}
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-amber-500/20 text-xs text-amber-300 font-serif">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Lumen Liturgia</span>
+          </div>
+
+          {/* Quick toggle: Hoy / Mañana */}
+          <div className="flex items-center bg-black/50 backdrop-blur-md p-1 rounded-full border border-white/10 text-xs">
+            <button
+              id="btn-date-today"
+              onClick={() => setSelectedDate('2026-09-11')}
+              className={`px-3 py-1 rounded-full font-medium transition-all ${
+                selectedDate === '2026-09-11'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              Hoy
+            </button>
+            <button
+              id="btn-date-tomorrow"
+              onClick={() => setSelectedDate('2026-09-12')}
+              className={`px-3 py-1 rounded-full font-medium transition-all ${
+                selectedDate === '2026-09-12'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm font-semibold'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              Mañana
+            </button>
+          </div>
+        </div>
+
+        {/* Liturgical Title & Date in Hero */}
+        <div className="absolute bottom-4 left-4 right-4 text-center">
+          <p className="text-xs uppercase tracking-wider text-amber-300/90 font-medium mb-1">
+            {dayData.formattedDate}
+          </p>
+          <h1 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight drop-shadow-md">
+            {dayData.title}
+          </h1>
+          <div className="flex items-center justify-center gap-2 mt-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              {dayData.colorName}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Stream */}
+      <div className="px-4 py-4 space-y-4 max-w-xl mx-auto">
+        {/* Toast alerts */}
+        {copiedNotification && (
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white px-4 py-2 rounded-full text-xs font-medium shadow-lg flex items-center gap-2">
+            <Check className="w-4 h-4" /> Liturgia copiada al portapapeles
+          </div>
+        )}
+        {savedNotification && (
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-amber-600 text-slate-950 px-4 py-2 rounded-full text-xs font-semibold shadow-lg flex items-center gap-2">
+            <Check className="w-4 h-4" /> Homilía guardada en tus notas de meditación
+          </div>
+        )}
+
+        {/* 1. Card: Santo del Día */}
+        <div
+          id="card-santo-del-dia"
+          onClick={() => setSaintModalOpen(true)}
+          className="group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800/90 rounded-2xl p-4 transition-all duration-200 cursor-pointer shadow-md hover:border-amber-500/30"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2.5 text-xs text-amber-400 font-medium mb-1">
+              <div className="w-6 h-6 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <span className="text-sm">👤</span>
+              </div>
+              <span className="tracking-wide uppercase text-[11px]">Santo del Día</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
+          </div>
+
+          <h3 className="text-base font-serif font-bold text-slate-100 mt-1">
+            {dayData.saint.name}
+            <span className="block text-xs font-sans font-normal text-slate-400 mt-0.5">
+              {dayData.saint.title}
+            </span>
+          </h3>
+
+          <p className="text-xs text-slate-300 mt-2 line-clamp-2 leading-relaxed">
+            {dayData.saint.shortBio}
+          </p>
+
+          <div className="mt-3 flex items-center justify-between text-[11px] text-amber-400/90 font-medium">
+            <span>Toca para leer biografía y oración</span>
+            <span className="text-slate-500 text-[10px]">Leer más →</span>
+          </div>
+        </div>
+
+        {/* 2. Card: Primera Lectura */}
+        <div
+          id="card-primera-lectura"
+          className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold flex items-center justify-center">
+                1
+              </span>
+              <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Primera Lectura
+              </span>
+            </div>
+
+            <button
+              id="btn-audio-primera-lectura"
+              onClick={() =>
+                playAudio('reading1', `Primera Lectura. De la ${dayData.firstReading.citation}. ${dayData.firstReading.text}`)
+              }
+              className={`p-2 rounded-full transition-all ${
+                currentPlayingSection === 'reading1' && isPlaying
+                  ? 'bg-amber-500 text-slate-950 scale-105'
+                  : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+              }`}
+              title="Escuchar lectura"
+            >
+              {currentPlayingSection === 'reading1' && isPlaying ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          <p className="text-xs font-semibold text-amber-400 font-serif mb-2">
+            {dayData.firstReading.citation}
+          </p>
+
+          <p
+            className={`text-xs text-slate-200 leading-relaxed font-sans ${
+              expandedSection === 'reading1' ? '' : 'line-clamp-4'
+            }`}
+          >
+            {dayData.firstReading.text}
+          </p>
+
+          <button
+            onClick={() =>
+              setExpandedSection(expandedSection === 'reading1' ? null : 'reading1')
+            }
+            className="mt-2 text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
+          >
+            {expandedSection === 'reading1' ? 'Mostrar menos' : 'Toca para leer completo'}
+          </button>
+        </div>
+
+        {/* 3. Card: Salmo Responsorial */}
+        <div
+          id="card-salmo-responsorial"
+          className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">🎵</span>
+              <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Salmo Responsorial
+              </span>
+            </div>
+
+            <button
+              id="btn-audio-salmo"
+              onClick={() =>
+                playAudio(
+                  'psalm',
+                  `Salmo Responsorial. ${dayData.psalm.citation}. Respuesta: ${dayData.psalm.response}. ${dayData.psalm.verses.join('. ')}`
+                )
+              }
+              className={`p-2 rounded-full transition-all ${
+                currentPlayingSection === 'psalm' && isPlaying
+                  ? 'bg-amber-500 text-slate-950 scale-105'
+                  : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+              }`}
+              title="Escuchar salmo"
+            >
+              {currentPlayingSection === 'psalm' && isPlaying ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          <p className="text-xs font-semibold text-slate-400 mb-2">
+            {dayData.psalm.citation}
+          </p>
+
+          {/* Antiphon Callout */}
+          <div className="bg-amber-950/30 border-l-2 border-amber-500 px-3 py-2 rounded-r-xl my-2">
+            <p className="text-xs text-amber-300 font-serif font-medium italic">
+              R/. {dayData.psalm.response}
+            </p>
+          </div>
+
+          <div
+            className={`space-y-2 text-xs text-slate-300 leading-relaxed font-sans ${
+              expandedSection === 'psalm' ? '' : 'line-clamp-3'
+            }`}
+          >
+            {dayData.psalm.verses.map((verse, i) => (
+              <p key={i}>{verse}</p>
+            ))}
+          </div>
+
+          <button
+            onClick={() =>
+              setExpandedSection(expandedSection === 'psalm' ? null : 'psalm')
+            }
+            className="mt-2 text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
+          >
+            {expandedSection === 'psalm' ? 'Mostrar menos' : 'Toca para leer estrofas completas'}
+          </button>
+        </div>
+
+        {/* 4. Card: Santo Evangelio (Golden Accent) */}
+        <div
+          id="card-evangelio"
+          className="relative bg-gradient-to-b from-amber-950/30 to-slate-900 border border-amber-500/30 rounded-2xl p-4 shadow-lg"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-amber-400" />
+              <span className="text-xs font-bold text-amber-300 uppercase tracking-wider font-serif">
+                Santo Evangelio
+              </span>
+            </div>
+
+            <button
+              id="btn-audio-evangelio"
+              onClick={() =>
+                playAudio(
+                  'gospel',
+                  `Proclamación del Santo Evangelio según ${dayData.gospel.citation}. ${dayData.gospel.text}. Palabra del Señor. Gloria a ti, Señor Jesús.`
+                )
+              }
+              className={`p-2 rounded-full transition-all ${
+                currentPlayingSection === 'gospel' && isPlaying
+                  ? 'bg-amber-400 text-slate-950 scale-105'
+                  : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20'
+              }`}
+              title="Escuchar Evangelio"
+            >
+              {currentPlayingSection === 'gospel' && isPlaying ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          <p className="text-sm font-bold text-amber-200 font-serif mb-1">
+            {dayData.gospel.citation}
+          </p>
+
+          <p className="text-[11px] text-slate-400 italic mb-3">
+            {dayData.gospel.acclamation}
+          </p>
+
+          <div className="text-xs sm:text-sm text-slate-100 leading-relaxed font-serif space-y-2 border-l border-amber-500/20 pl-3">
+            <p>{dayData.gospel.text}</p>
+          </div>
+
+          <div className="mt-3 pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] text-amber-300/80 font-serif">
+            <span>Palabra del Señor</span>
+            <span className="font-semibold text-amber-200">Gloria a ti, Señor Jesús</span>
+          </div>
+        </div>
+
+        {/* 5. Card: Reflexión Sacerdotal con IA (Padre Mateo) */}
+        <div
+          id="card-reflexion-sacerdotal"
+          className="relative bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl overflow-hidden"
+        >
+          {/* Subtle warm glow inside */}
+          <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-amber-300 font-serif block">
+                  Reflexión Sacerdotal
+                </span>
+                <span className="text-[11px] text-slate-400 font-sans">
+                  {priestName} • Guía Espiritual
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                id="btn-reload-reflection"
+                onClick={() => fetchReflection(dayData)}
+                disabled={loadingReflection}
+                className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors disabled:opacity-50"
+                title="Nueva meditación del sacerdote"
+              >
+                <RefreshCw className={`w-4 h-4 ${loadingReflection ? 'animate-spin text-amber-400' : ''}`} />
+              </button>
+
+              <button
+                id="btn-listen-reflection"
+                onClick={() => reflection && playAudio('reflection', reflection)}
+                disabled={!reflection}
+                className={`p-2 rounded-full transition-all ${
+                  currentPlayingSection === 'reflection' && isPlaying
+                    ? 'bg-amber-400 text-slate-950 scale-105'
+                    : 'bg-slate-800 text-amber-400 hover:bg-slate-750'
+                }`}
+                title="Escuchar homilía del sacerdote"
+              >
+                {currentPlayingSection === 'reflection' && isPlaying ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {loadingReflection ? (
+            <div className="py-8 flex flex-col items-center justify-center text-center space-y-3">
+              <div className="w-8 h-8 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
+              <p className="text-xs text-slate-400 font-serif">
+                El Padre Mateo está meditando la Palabra para ti...
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="text-xs sm:text-sm text-slate-200 font-serif leading-relaxed whitespace-pre-line bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80">
+                {reflection}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+                <button
+                  id="btn-ask-priest"
+                  onClick={() => setCounselOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition-colors"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>Preguntar al Padre Mateo</span>
+                </button>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    id="btn-save-reflection"
+                    onClick={handleSaveToNotes}
+                    className="p-2 text-slate-400 hover:text-amber-300 rounded-lg hover:bg-slate-800 transition-colors"
+                    title="Guardar en mis notas espirituales"
+                  >
+                    <BookmarkPlus className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    id="btn-share-liturgy"
+                    onClick={handleShare}
+                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    title="Compartir reflexión y Evangelio"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Modal: Biografía y Oración del Santo del Día */}
+      {saintModalOpen && (
+        <div
+          id="modal-santo-details"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+        >
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl text-slate-100 relative">
+            <button
+              id="btn-close-saint-modal"
+              onClick={() => setSaintModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-4">
+              <span className="text-3xl mb-1 block">👤</span>
+              <h2 className="text-xl font-serif font-bold text-amber-300">{dayData.saint.name}</h2>
+              <p className="text-xs text-slate-400">{dayData.saint.title}</p>
+              {dayData.saint.patronage && (
+                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                  Patrono de: {dayData.saint.patronage}
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+              <div>
+                <h4 className="font-semibold text-white uppercase text-xs tracking-wider mb-1">
+                  Vida y Testimonio
+                </h4>
+                <p>{dayData.saint.fullBio}</p>
+              </div>
+
+              <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4">
+                <h4 className="font-serif font-bold text-amber-300 text-xs tracking-wide uppercase mb-1">
+                  Oración de Intercesión
+                </h4>
+                <p className="font-serif italic text-slate-200 leading-relaxed">
+                  «{dayData.saint.prayer}»
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSaintModalOpen(false)}
+              className="w-full mt-6 bg-slate-800 hover:bg-slate-750 text-slate-200 py-2.5 rounded-xl text-xs font-semibold"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Drawer/Modal: Diálogo Espiritual con el Padre Mateo */}
+      {counselOpen && (
+        <div
+          id="modal-pastoral-counsel"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+        >
+          <div className="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-w-lg w-full h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 text-sm">
+                  ✝️
+                </div>
+                <div>
+                  <h3 className="text-sm font-serif font-bold text-amber-300">
+                    Consejería Espiritual
+                  </h3>
+                  <p className="text-[10px] text-slate-400">Padre Mateo • Respuestas Católicas</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setCounselOpen(false)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Chat Messages Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs sm:text-sm">
+              <div className="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-slate-200 font-serif">
+                «La paz del Señor esté contigo. Soy el Padre Mateo. Si tienes alguna duda sobre el Evangelio de hoy, una prueba espiritual o necesitas un consejo pastoral, con amor en Cristo estoy aquí para escucharte.»
+              </div>
+
+              {counselMessages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`p-3 rounded-2xl max-w-[85%] leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-amber-500 text-slate-950 font-medium rounded-br-none'
+                        : 'bg-slate-800/80 border border-slate-700/60 text-slate-200 font-serif rounded-tl-none whitespace-pre-line'
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+
+              {counselLoading && (
+                <div className="flex justify-start">
+                  <div className="p-3 bg-slate-800/60 rounded-2xl rounded-tl-none text-slate-400 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"></span>
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce delay-150"></span>
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce delay-300"></span>
+                    <span className="text-xs">El Padre Mateo está respondiendo...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Chat Input */}
+            <form
+              onSubmit={handleSendCounsel}
+              className="p-3 border-t border-slate-800 bg-slate-950 flex items-center gap-2"
+            >
+              <input
+                type="text"
+                value={counselQuery}
+                onChange={(e) => setCounselQuery(e.target.value)}
+                placeholder="Escribe tu consulta espiritual o inquietud..."
+                className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400/80"
+              />
+              <button
+                type="submit"
+                disabled={!counselQuery.trim() || counselLoading}
+                className="p-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl disabled:opacity-40 transition-colors"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

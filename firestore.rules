@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidId(userId);
+      allow delete: if isOwner(userId);
+
+      match /routines/{routineId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(routineId) && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      match /notes/{noteId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(noteId) && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      match /favorites/{favId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(favId) && request.resource.data.userId == userId;
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}
