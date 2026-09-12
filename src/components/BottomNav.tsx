@@ -12,7 +12,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
   return (
     <nav
       id="bottom-navigation-bar"
-      className="fixed bottom-0 left-0 right-0 z-50 bg-[#111827]/95 backdrop-blur-md border-t border-slate-800/80 px-3 py-2 max-w-md mx-auto sm:max-w-lg md:max-w-xl transition-all"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-[#140e09]/95 backdrop-blur-md border-t border-amber-950/60 px-3 py-2 max-w-md mx-auto sm:max-w-lg md:max-w-xl transition-all"
     >
       <div className="flex items-center justify-between relative">
         {/* 1. Liturgia */}
@@ -57,7 +57,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
             className={`w-10 h-10 rounded-full flex items-center justify-center -mt-4 shadow-lg transition-transform active:scale-95 ${
               currentTab === 'oraciones'
                 ? 'bg-amber-500 text-slate-950 shadow-amber-500/25 ring-2 ring-amber-400/40'
-                : 'bg-slate-800 text-amber-400 border border-slate-700/80 hover:bg-slate-750'
+                : 'bg-[#221911] text-amber-400 border border-amber-900/40 hover:bg-[#2b1f16]'
             }`}
           >
             <Plus className="w-6 h-6 stroke-[2.5]" />

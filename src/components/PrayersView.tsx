@@ -29,11 +29,12 @@ import type { User } from 'firebase/auth';
 interface PrayersViewProps {
   user: User | null;
   onSelectTab?: (tab: string) => void;
+  prayerStyle?: 'sacred' | 'minimal';
 }
 
 type PrayerCategory = 'rosario' | 'coronillas' | 'letanias' | 'devocionario';
 
-export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
+export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 'sacred' }) => {
   const [activeCategory, setActiveCategory] = useState<PrayerCategory>('rosario');
   const todayGroup = getTodayMysteries();
 
@@ -143,14 +144,11 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
 
   return (
     <div id="prayers-container" className="min-h-screen pb-28 text-slate-100">
-      {/* Top Hero Banner with Sacred Art (Image 6) */}
+      {/* Top Hero Banner with Sacred Art */}
       <div className="relative h-52 w-full overflow-hidden bg-slate-950">
-        <img
-          src="https://images.unsplash.com/photo-1548625361-195fe5795df5?auto=format&fit=crop&w=1000&q=80"
-          alt="Altar y Devocionario"
-          className="w-full h-full object-cover object-center opacity-35 brightness-75 scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.28),rgba(255,255,255,0))]"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[440px] h-[200px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="absolute bottom-4 left-4 right-4 text-center">
           <h1 className="text-2xl font-serif font-bold text-white tracking-tight drop-shadow-md">
@@ -303,7 +301,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
         {activeCategory === 'coronillas' && (
           <div className="space-y-4">
             {/* Coronilla de la Divina Misericordia Card */}
-            <div className="bg-gradient-to-r from-red-950/30 via-slate-900 to-blue-950/30 border border-slate-800 rounded-3xl p-5 shadow-lg">
+            <div className="bg-gradient-to-r from-red-950/30 via-slate-900 to-amber-950/30 border border-slate-800 rounded-3xl p-5 shadow-lg">
               <div className="flex items-center gap-2 text-xs font-semibold text-red-400 mb-1">
                 <span>🔴 ⚪</span>
                 <span>Hora de la Misericordia (15:00)</span>
@@ -400,7 +398,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
               className="bg-slate-900/80 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl cursor-pointer transition-colors flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                   <Shield className="w-5 h-5" />
                 </div>
                 <div>
@@ -464,15 +462,15 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
       {isPrayingRosary && (
         <div
           id="interactive-rosary-modal"
-          className="fixed inset-0 z-50 bg-[#0b0f19] flex flex-col text-slate-100 animate-fade-in overflow-hidden"
+          className="fixed inset-0 z-[75] bg-[#0c0805] flex flex-col text-slate-100 animate-fade-in overflow-hidden"
         >
           {/* Top Bar */}
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80 backdrop-blur-md">
+          <div className="p-4 border-b border-amber-950/60 flex items-center justify-between bg-[#140e09]/95 backdrop-blur-md shrink-0">
             <div>
               <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400">
                 {activeMysteryGroup.title}
               </span>
-              <h2 className="text-sm font-serif font-bold text-white">
+              <h2 className="text-sm font-serif font-bold text-amber-200">
                 Misterio {currentDecadeIndex + 1} de 5
               </h2>
             </div>
@@ -483,7 +481,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   `${currentMystery.numberTitle}: ${currentMystery.name}. ${currentMystery.scriptureText}. Meditación: ${currentMystery.meditation}`
                 )}
                 className={`p-2 rounded-full transition-colors ${
-                  isSpeaking ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                  isSpeaking ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-[#221810] text-amber-200 hover:text-white'
                 }`}
                 title="Voz asistida"
               >
@@ -496,7 +494,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   speechService.stop();
                   setIsPrayingRosary(false);
                 }}
-                className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+                className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -504,7 +502,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
           </div>
 
           {/* Progress Bar of the 5 Decades */}
-          <div className="w-full bg-slate-800 h-1.5">
+          <div className="w-full bg-[#1c130b] h-1.5 shrink-0">
             <div
               className="bg-amber-500 h-1.5 transition-all duration-300"
               style={{
@@ -513,10 +511,10 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
             ></div>
           </div>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto w-full flex flex-col justify-between">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 max-w-md mx-auto w-full overscroll-contain">
             {rosaryFinished ? (
-              <div className="my-auto text-center space-y-4 py-8">
+              <div className="text-center space-y-4 py-8">
                 <div className="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-500 flex items-center justify-center mx-auto text-amber-400">
                   <CheckCircle className="w-9 h-9" />
                 </div>
@@ -527,7 +525,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   Has meditado y orado los 5 misterios. Tu fidelidad ha sido registrada en tu camino espiritual.
                 </p>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-xs font-serif text-slate-200">
+                <div className="bg-[#140e09] border border-amber-950/60 rounded-2xl p-4 text-xs font-serif text-[#ece4d8] text-left">
                   <p className="font-bold text-amber-400 mb-1">Salve Regina</p>
                   <p className="italic leading-relaxed">{COMMON_PRAYERS.salveRegina}</p>
                 </div>
@@ -536,15 +534,27 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   onClick={() => {
                     setIsPrayingRosary(false);
                   }}
-                  className="bg-amber-500 text-slate-950 font-bold px-6 py-3 rounded-2xl text-xs shadow-lg shadow-amber-500/30"
+                  className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-2xl text-xs shadow-lg shadow-amber-500/30 transition-colors"
                 >
                   Concluir Oración
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 my-auto">
+              <div className="space-y-4 pb-24">
                 {/* Mystery Header Card */}
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl text-center relative overflow-hidden">
+                <div className="bg-[#140e09] border border-amber-950/60 rounded-3xl p-5 shadow-xl text-center relative overflow-hidden">
+                  {prayerStyle === 'sacred' && currentMystery.image && (
+                    <div className="mb-4 rounded-2xl overflow-hidden max-h-44 w-full relative border border-amber-900/40 shadow-inner">
+                      <img
+                        src={currentMystery.image}
+                        alt={currentMystery.name}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-44 object-cover object-center"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#140e09] via-transparent to-black/20" />
+                    </div>
+                  )}
+
                   <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wide">
                     {currentMystery.numberTitle}
                   </span>
@@ -552,11 +562,11 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                     {currentMystery.name}
                   </h3>
 
-                  <p className="text-xs font-serif text-amber-300/90 italic mt-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                  <p className="text-xs font-serif text-amber-200/90 italic mt-2.5 bg-[#1b120a] p-3 rounded-xl border border-amber-900/40 leading-relaxed">
                     «{currentMystery.scriptureText}» ({currentMystery.scriptureRef})
                   </p>
 
-                  <div className="mt-3 text-[11px] text-slate-300">
+                  <div className="mt-3 text-[11px] text-stone-300">
                     <span className="text-amber-400 font-semibold">Fruto del misterio: </span>
                     {currentMystery.fruit}
                   </div>
@@ -564,8 +574,8 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
 
                 {/* Bead Tracker String Visual (10 Beads) */}
                 {decadeStep === 'avemaria' && (
-                  <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                  <div className="bg-[#140e09] border border-amber-950/60 rounded-2xl p-3 shadow-md">
+                    <div className="flex items-center justify-between text-[11px] text-amber-200/70 mb-2">
                       <span>Cuenta Ave María</span>
                       <span className="font-bold text-amber-400 font-mono text-xs">
                         {beadCount} / 10
@@ -578,10 +588,10 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                         return (
                           <div
                             key={i}
-                            className={`w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center text-[9px] font-bold ${
+                            className={`w-6 h-6 rounded-full transition-all duration-300 flex items-center justify-center text-[10px] font-bold ${
                               active
-                                ? 'bg-amber-400 text-slate-950 scale-110 shadow-md shadow-amber-400/30'
-                                : 'bg-slate-800 text-slate-500'
+                                ? 'bg-amber-400 text-slate-950 scale-110 shadow-md shadow-amber-400/40'
+                                : 'bg-[#221810] text-amber-200/40 border border-amber-900/30'
                             }`}
                           >
                             {i + 1}
@@ -593,10 +603,10 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                 )}
 
                 {/* Current Active Prayer Text Card */}
-                <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-center">
-                  <span className="text-[10px] uppercase font-bold text-amber-400/90 tracking-wider">
+                <div className="bg-[#140e09] border border-amber-950/60 rounded-2xl p-5 text-center shadow-lg">
+                  <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
                     {decadeStep === 'intro'
-                      ? 'Meditación'
+                      ? 'Meditación del Misterio'
                       : decadeStep === 'padrenuestro'
                       ? 'Padre Nuestro (1)'
                       : decadeStep === 'avemaria'
@@ -606,7 +616,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                       : 'Jaculatoria de Fátima'}
                   </span>
 
-                  <p className="text-xs sm:text-sm text-slate-200 font-serif leading-relaxed mt-2">
+                  <p className="text-xs sm:text-sm text-[#ece4d8] font-serif leading-relaxed mt-2.5">
                     {decadeStep === 'intro'
                       ? currentMystery.meditation
                       : decadeStep === 'padrenuestro'
@@ -620,10 +630,12 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                 </div>
               </div>
             )}
+          </div>
 
-            {/* Bottom Giant Tactile Action Button */}
-            {!rosaryFinished && (
-              <div className="pt-4 pb-2">
+          {/* Sticky Bottom Action Button */}
+          {!rosaryFinished && (
+            <div className="p-4 bg-[#140e09]/95 border-t border-amber-950/60 backdrop-blur-md shrink-0">
+              <div className="max-w-md mx-auto w-full">
                 <button
                   id="btn-next-rosary-bead"
                   onClick={handleNextRosaryBead}
@@ -647,55 +659,55 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   <ChevronRight className="w-5 h-5 stroke-[2.5]" />
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* ================= INTERACTIVE CORONILLA MODAL ================= */}
       {isPrayingCoronilla && (
-        <div className="fixed inset-0 z-50 bg-[#0b0f19] flex flex-col text-slate-100 animate-fade-in overflow-hidden">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+        <div className="fixed inset-0 z-[75] bg-[#0c0805] flex flex-col text-slate-100 animate-fade-in overflow-hidden">
+          <div className="p-4 border-b border-red-950/60 flex items-center justify-between bg-[#140e09]/95 backdrop-blur-md shrink-0">
             <div>
               <span className="text-[10px] uppercase font-bold tracking-wider text-red-400">
                 Divina Misericordia
               </span>
-              <h2 className="text-sm font-serif font-bold text-white">
+              <h2 className="text-sm font-serif font-bold text-red-200">
                 Decena {coronillaDecade + 1} de 5
               </h2>
             </div>
             <button
               onClick={() => setIsPrayingCoronilla(false)}
-              className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+              className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 max-w-md mx-auto w-full flex flex-col justify-between">
+          <div className="flex-1 overflow-y-auto px-4 py-4 sm:py-6 max-w-md mx-auto w-full overscroll-contain">
             {coronillaFinished ? (
-              <div className="my-auto text-center space-y-4 py-8">
+              <div className="text-center space-y-4 py-8">
                 <div className="w-16 h-16 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center mx-auto text-red-400">
                   <CheckCircle className="w-9 h-9" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-red-300">
                   ¡Coronilla Completada!
                 </h3>
-                <p className="text-xs text-slate-300 max-w-xs mx-auto leading-relaxed">
+                <p className="text-xs text-stone-300 max-w-xs mx-auto leading-relaxed">
                   «Jesús, en ti confío». Has ofrecido la Dolorosa Pasión de Cristo por los pecados del mundo entero.
                 </p>
                 <button
                   onClick={() => setIsPrayingCoronilla(false)}
-                  className="bg-red-600 text-white font-bold px-6 py-3 rounded-2xl text-xs shadow-lg shadow-red-600/30"
+                  className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-2xl text-xs shadow-lg shadow-red-600/30 transition-colors"
                 >
                   Finalizar
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 my-auto">
+              <div className="space-y-4 pb-24">
                 {coronillaStep === 'decena' && (
-                  <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                  <div className="bg-[#140e09] border border-red-950/60 rounded-2xl p-3 shadow-md">
+                    <div className="flex items-center justify-between text-[11px] text-stone-300 mb-2">
                       <span>Cuenta de la Pasión</span>
                       <span className="font-bold text-red-400 font-mono text-xs">
                         {coronillaBead} / 10
@@ -705,10 +717,10 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                       {Array.from({ length: 10 }).map((_, i) => (
                         <div
                           key={i}
-                          className={`w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center text-[9px] font-bold ${
+                          className={`w-6 h-6 rounded-full transition-all duration-300 flex items-center justify-center text-[10px] font-bold ${
                             i + 1 <= coronillaBead
-                              ? 'bg-red-500 text-white scale-110 shadow-md shadow-red-500/30'
-                              : 'bg-slate-800 text-slate-500'
+                              ? 'bg-red-500 text-white scale-110 shadow-md shadow-red-500/40'
+                              : 'bg-[#221810] text-red-200/40 border border-red-900/30'
                           }`}
                         >
                           {i + 1}
@@ -718,7 +730,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   </div>
                 )}
 
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-xl">
+                <div className="bg-[#140e09] border border-red-950/60 rounded-3xl p-6 text-center shadow-xl">
                   <span className="text-[10px] uppercase font-bold text-red-400 tracking-wider">
                     {coronillaStep === 'intro'
                       ? 'Inicio'
@@ -729,7 +741,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                       : 'Trisagio Final'}
                   </span>
 
-                  <p className="text-sm text-slate-100 font-serif leading-relaxed mt-3">
+                  <p className="text-sm text-[#ece4d8] font-serif leading-relaxed mt-3">
                     {coronillaStep === 'intro'
                       ? 'Señal de la Cruz, Padre Nuestro, Ave María y Credo de los Apóstoles.'
                       : coronillaStep === 'padre_eterno'
@@ -741,9 +753,11 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                 </div>
               </div>
             )}
+          </div>
 
-            {!coronillaFinished && (
-              <div className="pt-4 pb-2">
+          {!coronillaFinished && (
+            <div className="p-4 bg-[#140e09]/95 border-t border-red-950/60 backdrop-blur-md shrink-0">
+              <div className="max-w-md mx-auto w-full">
                 <button
                   onClick={handleNextCoronillaBead}
                   className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 px-6 rounded-2xl text-sm shadow-xl shadow-red-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
@@ -764,36 +778,45 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
                   <ChevronRight className="w-5 h-5 stroke-[2.5]" />
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* Devotion detail modal */}
       {selectedDevotion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl relative">
-            <button
-              onClick={() => setSelectedDevotion(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div
+          onClick={() => setSelectedDevotion(null)}
+          className="fixed inset-0 z-[75] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#17110b] border border-amber-950/60 rounded-3xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl relative p-6"
+          >
+            <div className="flex items-start justify-between mb-2 shrink-0">
+              <div>
+                <h3 className="text-lg font-serif font-bold text-amber-300">
+                  {selectedDevotion.title}
+                </h3>
+                {selectedDevotion.subtitle && (
+                  <p className="text-xs text-amber-200/60 mt-0.5">{selectedDevotion.subtitle}</p>
+                )}
+              </div>
+              <button
+                onClick={() => setSelectedDevotion(null)}
+                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-[#221810]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <h3 className="text-lg font-serif font-bold text-amber-300">
-              {selectedDevotion.title}
-            </h3>
-            {selectedDevotion.subtitle && (
-              <p className="text-xs text-slate-400 mt-0.5">{selectedDevotion.subtitle}</p>
-            )}
-
-            <div className="mt-4 p-4 bg-slate-950/60 rounded-2xl border border-slate-800 text-xs sm:text-sm font-serif text-slate-200 leading-relaxed whitespace-pre-line">
+            <div className="flex-1 overflow-y-auto mt-3 p-4 bg-[#140e09] rounded-2xl border border-amber-950/60 text-xs sm:text-sm font-serif text-[#ece4d8] leading-relaxed whitespace-pre-line">
               {selectedDevotion.text}
             </div>
 
             <button
               onClick={() => setSelectedDevotion(null)}
-              className="w-full mt-4 bg-slate-800 hover:bg-slate-750 text-slate-200 py-2.5 rounded-xl text-xs font-semibold"
+              className="w-full mt-4 bg-[#221810] hover:bg-[#2c1f15] text-amber-200 py-2.5 rounded-xl text-xs font-semibold border border-amber-900/40 transition-colors shrink-0"
             >
               Cerrar
             </button>

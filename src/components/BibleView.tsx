@@ -12,7 +12,9 @@ import {
   Copy,
   Check,
   Type,
-  X
+  X,
+  AlignLeft,
+  List
 } from 'lucide-react';
 import {
   CATHOLIC_BOOKS,
@@ -41,6 +43,8 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
   const [selectedChapter, setSelectedChapter] = useState<BibleChapter | null>(null);
   const [verses, setVerses] = useState<BibleVerse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [readingLayout, setReadingLayout] = useState<'continuous' | 'list'>('continuous');
+  const [selectedVerseNumber, setSelectedVerseNumber] = useState<number | null>(null);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -98,6 +102,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
 
   const handleSelectChapter = async (chap: BibleChapter) => {
     setSelectedChapter(chap);
+    setSelectedVerseNumber(null);
     setLoading(true);
     speechService.stop();
     try {
@@ -217,25 +222,22 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
         </div>
       )}
 
-      {/* --- 1. Top Hero Section with Holy Cross & Linen (Image 3) --- */}
+      {/* --- 1. Top Hero Section with Holy Cross & Linen --- */}
       {!selectedChapter && (
         <div className="relative h-56 w-full overflow-hidden bg-slate-950">
-          <img
-            src="https://images.unsplash.com/photo-1520697830682-bbb6e85e2b0b?auto=format&fit=crop&w=1000&q=80"
-            alt="Cruz y Lienzo Sagrado"
-            className="w-full h-full object-cover object-center opacity-30 brightness-75 scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.28),rgba(255,255,255,0))]"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[440px] h-[200px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
           {/* Top toolbar */}
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full border border-amber-500/20 text-xs text-amber-300 font-serif">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#17100a]/80 backdrop-blur-md rounded-full border border-amber-500/30 text-xs text-amber-300 font-serif shadow-md">
               <span>Biblia de Jerusalén (Católica)</span>
             </div>
 
             <button
               onClick={() => setShowFavoritesModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1 bg-slate-900/80 backdrop-blur-md rounded-full border border-slate-700 text-xs text-slate-300 hover:text-amber-300 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 bg-[#17100a]/80 backdrop-blur-md rounded-full border border-amber-900/40 text-xs text-slate-300 hover:text-amber-300 transition-colors shadow-md"
             >
               <Bookmark className="w-3.5 h-3.5 text-amber-400" />
               <span>Favoritos ({favoriteVerses.length})</span>
@@ -258,11 +260,14 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
       {selectedChapter && selectedBook ? (
         <div className="px-4 py-4 max-w-xl mx-auto space-y-4">
           {/* Header toolbar for Chapter reading */}
-          <div className="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-3 rounded-2xl sticky top-2 z-30 backdrop-blur-md shadow-md">
+          <div className="flex items-center justify-between bg-[#140e09]/90 border border-amber-950/60 p-3 rounded-2xl sticky top-2 z-30 backdrop-blur-md shadow-lg">
             <button
               id="btn-back-to-books"
-              onClick={() => setSelectedChapter(null)}
-              className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-amber-400 font-medium py-1 px-2 rounded-lg hover:bg-slate-800"
+              onClick={() => {
+                setSelectedChapter(null);
+                setSelectedVerseNumber(null);
+              }}
+              className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-amber-400 font-medium py-1 px-2 rounded-lg hover:bg-amber-950/40"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Libros</span>
@@ -272,10 +277,23 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
               <h2 className="text-sm font-serif font-bold text-amber-300">
                 {selectedBook.nombre} {selectedChapter.numero}
               </h2>
-              <span className="text-[10px] text-slate-400">Biblia de Jerusalén</span>
+              <span className="text-[10px] text-amber-200/60 font-serif">Biblia de Jerusalén</span>
             </div>
 
             <div className="flex items-center gap-1">
+              {/* Toggle Continuous / List Layout */}
+              <button
+                onClick={() => setReadingLayout(readingLayout === 'continuous' ? 'list' : 'continuous')}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  readingLayout === 'continuous'
+                    ? 'text-amber-400 bg-amber-500/15 border border-amber-500/30'
+                    : 'text-slate-400 hover:text-amber-300 hover:bg-slate-800'
+                }`}
+                title={readingLayout === 'continuous' ? 'Modo Texto Continuo activo (toca para ver en lista)' : 'Modo Lista activo (toca para ver texto corrido)'}
+              >
+                {readingLayout === 'continuous' ? <AlignLeft className="w-4 h-4" /> : <List className="w-4 h-4" />}
+              </button>
+
               {/* Font size button */}
               <button
                 onClick={() => onUpdateFontSize(fontSize >= 26 ? 16 : fontSize + 2)}
@@ -293,59 +311,100 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
                     ? 'bg-amber-500 text-slate-950 font-bold'
                     : 'text-slate-400 hover:text-amber-300 hover:bg-slate-800'
                 }`}
-                title="Escuchar capítulo"
+                title="Escuchar capítulo completo"
               >
                 {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          {/* Chapter Verses List */}
+          {/* Chapter Verses Section */}
           {loading ? (
             <div className="py-16 flex flex-col items-center justify-center space-y-3">
               <div className="w-8 h-8 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
               <p className="text-xs text-slate-400 font-serif">Cargando Sagradas Escrituras...</p>
             </div>
-          ) : (
+          ) : readingLayout === 'continuous' ? (
+            /* --- Continuous Prose Reading Mode (Versículos Seguidos / Texto Corrido) --- */
             <div
-              className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-5 sm:p-6 shadow-xl space-y-3"
+              className="bg-[#140e09]/80 border border-amber-950/60 rounded-2xl p-4 sm:p-6 shadow-xl"
+              style={{ fontSize: `${fontSize}px` }}
+            >
+              <div className="leading-[1.65] text-[#ece4d8] font-serif tracking-normal text-left select-text">
+                {verses.map((v) => {
+                  const isSelected = selectedVerseNumber === v.numero;
+                  const fav = isVerseFavorite(v.numero);
+                  return (
+                    <span
+                      key={v.id || v.numero}
+                      onClick={() => setSelectedVerseNumber(isSelected ? null : v.numero)}
+                      className={`cursor-pointer transition-colors duration-150 rounded px-0.5 py-0.5 inline ${
+                        isSelected
+                          ? 'bg-amber-500/25 text-amber-100 ring-1 ring-amber-400/60 font-medium'
+                          : fav
+                          ? 'bg-amber-950/40 text-amber-200 border-b border-amber-500/50'
+                          : 'hover:bg-amber-500/15'
+                      }`}
+                      title={`Versículo ${v.numero} • Toca para opciones`}
+                    >
+                      <sup className="font-sans font-bold text-amber-400 text-[0.68em] mr-1 ml-0.5 select-none align-baseline relative -top-1">
+                        {v.numero}
+                      </sup>
+                      <span>{v.texto}</span>{' '}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            /* --- Compact List Mode --- */
+            <div
+              className="bg-[#140e09]/80 border border-amber-950/60 rounded-3xl p-4 sm:p-5 shadow-xl space-y-2"
               style={{ fontSize: `${fontSize}px` }}
             >
               {verses.map((v) => {
+                const isSelected = selectedVerseNumber === v.numero;
                 const fav = isVerseFavorite(v.numero);
                 return (
                   <div
                     key={v.id || v.numero}
-                    className="group relative flex items-start gap-3 py-1.5 hover:bg-slate-800/30 rounded-xl px-2 transition-colors"
+                    onClick={() => setSelectedVerseNumber(isSelected ? null : v.numero)}
+                    className={`flex items-start gap-2.5 py-1.5 px-2.5 rounded-xl border transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'bg-amber-500/20 border-amber-500/50'
+                        : fav
+                        ? 'bg-[#17110b] border-amber-900/40'
+                        : 'bg-transparent hover:bg-amber-950/20 border-transparent hover:border-amber-950/40'
+                    }`}
                   >
-                    <span className="text-[11px] font-bold text-amber-400/80 select-none shrink-0 w-6 text-right pt-0.5 font-mono">
+                    <span className="text-[11px] font-mono font-bold text-amber-400 select-none shrink-0 w-6 pt-0.5 text-right">
                       {v.numero}
                     </span>
-
-                    <p className="flex-1 text-slate-200 leading-relaxed font-serif tracking-normal">
+                    <p className="flex-1 text-[#ece4d8] font-serif leading-relaxed">
                       {v.texto}
                     </p>
-
-                    {/* Quick actions on hover / mobile tap */}
-                    <div className="shrink-0 flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <div className="shrink-0 flex items-center gap-1">
                       <button
-                        onClick={() => handleToggleFavorite(v)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(v);
+                        }}
                         className={`p-1 rounded hover:bg-slate-800 transition-colors ${
                           fav ? 'text-amber-400' : 'text-slate-500 hover:text-amber-400'
                         }`}
                         title={fav ? 'Quitar favorito' : 'Marcar versículo favorito'}
                       >
-                        {fav ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                        {fav ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
                       </button>
-
                       <button
-                        onClick={() =>
-                          handleCopyVerse(v.texto, `${selectedBook.nombre} ${selectedChapter.numero}:${v.numero}`)
-                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopyVerse(v.texto, `${selectedBook.nombre} ${selectedChapter.numero}:${v.numero}`);
+                        }}
                         className="p-1 rounded text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition-colors"
                         title="Copiar versículo"
                       >
-                        <Copy className="w-3.5 h-3.5" />
+                        <Copy className="w-3 h-3" />
                       </button>
                     </div>
                   </div>
@@ -354,24 +413,91 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
             </div>
           )}
 
+          {/* Floating Action Pill for selected verse */}
+          {selectedVerseNumber !== null && (() => {
+            const activeVerse = verses.find((v) => v.numero === selectedVerseNumber);
+            if (!activeVerse) return null;
+            const fav = isVerseFavorite(activeVerse.numero);
+            return (
+              <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 max-w-sm w-[92%] bg-[#17110b]/95 backdrop-blur-md border border-amber-500/40 rounded-2xl shadow-2xl p-2.5 flex items-center justify-between text-xs animate-fade-in">
+                <div className="flex items-center gap-2 pl-1 truncate">
+                  <span className="font-serif font-bold text-amber-300">
+                    {selectedBook.nombre} {selectedChapter.numero}:{activeVerse.numero}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => handleToggleFavorite(activeVerse)}
+                    className={`px-2.5 py-1 rounded-xl flex items-center gap-1 font-medium transition-colors ${
+                      fav
+                        ? 'bg-amber-500 text-slate-950'
+                        : 'bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 border border-amber-800/40'
+                    }`}
+                  >
+                    {fav ? (
+                      <BookmarkCheck className="w-3.5 h-3.5" />
+                    ) : (
+                      <Bookmark className="w-3.5 h-3.5" />
+                    )}
+                    <span>{fav ? 'Favorito' : 'Guardar'}</span>
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleCopyVerse(
+                        activeVerse.texto,
+                        `${selectedBook.nombre} ${selectedChapter.numero}:${activeVerse.numero}`
+                      )
+                    }
+                    className="p-1.5 rounded-xl bg-[#221810] hover:bg-[#2e2016] text-slate-300 hover:text-white border border-amber-900/30"
+                    title="Copiar versículo"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      speechService.speak(
+                        `${selectedBook.nombre}, capítulo ${selectedChapter.numero}, versículo ${activeVerse.numero}. ${activeVerse.texto}`
+                      );
+                    }}
+                    className="p-1.5 rounded-xl bg-[#221810] hover:bg-[#2e2016] text-slate-300 hover:text-amber-300 border border-amber-900/30"
+                    title="Escuchar este versículo"
+                  >
+                    <Volume2 className="w-3.5 h-3.5" />
+                  </button>
+
+                  <button
+                    onClick={() => setSelectedVerseNumber(null)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 ml-0.5"
+                    title="Cerrar selección"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Chapter Navigation footer */}
           <div className="flex items-center justify-between pt-2">
             <button
               onClick={handlePrevChapter}
               disabled={selectedChapter.numero <= 1}
-              className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-medium text-slate-300 hover:text-white disabled:opacity-40 transition-colors"
+              className="px-4 py-2 bg-[#140e09] border border-amber-950/60 rounded-xl text-xs font-medium text-slate-300 hover:text-white disabled:opacity-40 transition-colors"
             >
               ← Cap. {selectedChapter.numero - 1}
             </button>
 
-            <span className="text-xs text-slate-400 font-serif">
+            <span className="text-xs text-amber-200/70 font-serif">
               Capítulo {selectedChapter.numero} de {selectedBook.capitulosTotales}
             </span>
 
             <button
               onClick={handleNextChapter}
               disabled={selectedChapter.numero >= selectedBook.capitulosTotales}
-              className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-medium text-slate-300 hover:text-white disabled:opacity-40 transition-colors"
+              className="px-4 py-2 bg-[#140e09] border border-amber-950/60 rounded-xl text-xs font-medium text-slate-300 hover:text-white disabled:opacity-40 transition-colors"
             >
               Cap. {selectedChapter.numero + 1} →
             </button>
@@ -516,33 +642,39 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
 
       {/* Chapter Selection Drawer / Modal */}
       {selectedBook && !selectedChapter && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-w-md w-full max-h-[75vh] flex flex-col shadow-2xl p-5 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+        <div
+          onClick={() => setSelectedBook(null)}
+          className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-sm animate-fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#17110b] border border-amber-950/60 rounded-t-3xl sm:rounded-3xl max-w-md w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-2xl p-5 overflow-hidden"
+          >
+            <div className="flex items-center justify-between border-b border-amber-950/60 pb-3 mb-4 shrink-0">
               <div>
                 <h3 className="text-base font-serif font-bold text-amber-300">
                   {selectedBook.nombre}
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-amber-200/60">
                   {selectedBook.capitulosTotales} Capítulos • Selecciona uno
                 </p>
               </div>
               <button
                 onClick={() => setSelectedBook(null)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-1">
+            <div className="flex-1 overflow-y-auto pr-1.5 pb-24 overscroll-contain touch-pan-y">
               <div className="grid grid-cols-5 gap-2.5">
                 {chapters.map((chap) => (
                   <button
                     key={chap.id}
                     id={`btn-chapter-${chap.numero}`}
                     onClick={() => handleSelectChapter(chap)}
-                    className="h-12 rounded-xl bg-slate-800/80 hover:bg-amber-500 hover:text-slate-950 border border-slate-700/60 font-serif font-bold text-sm text-slate-200 transition-all flex items-center justify-center active:scale-95 shadow-sm"
+                    className="h-12 rounded-xl bg-[#221810] hover:bg-amber-500 hover:text-slate-950 border border-amber-900/40 font-serif font-bold text-sm text-amber-100 transition-all flex items-center justify-center active:scale-95 shadow-sm"
                   >
                     {chap.numero}
                   </button>
@@ -555,9 +687,15 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
 
       {/* Favorites Modal */}
       {showFavoritesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl p-6 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <div
+          onClick={() => setShowFavoritesModal(false)}
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#17110b] border border-amber-950/60 rounded-3xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl p-6 overflow-hidden"
+          >
+            <div className="flex items-center justify-between border-b border-amber-950/60 pb-3 mb-3 shrink-0">
               <div className="flex items-center gap-2">
                 <Bookmark className="w-5 h-5 text-amber-400" />
                 <h3 className="text-base font-serif font-bold text-amber-300">
@@ -566,23 +704,22 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
               </div>
               <button
                 onClick={() => setShowFavoritesModal(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1 pb-4">
               {favoriteVerses.length === 0 ? (
-                <div className="py-12 text-center text-slate-500 text-xs">
-                  Aún no has marcado ningún versículo como favorito. Al leer un capítulo, toca el
-                  ícono del marcador en cualquier versículo para guardarlo aquí.
+                <div className="py-12 text-center text-amber-200/50 text-xs font-serif">
+                  Aún no has marcado ningún versículo como favorito. Al leer un capítulo, toca cualquier versículo para guardarlo aquí.
                 </div>
               ) : (
                 favoriteVerses.map((fav) => (
                   <div
                     key={fav.id}
-                    className="p-3.5 bg-slate-950/60 border border-slate-800/80 rounded-2xl text-xs space-y-1.5"
+                    className="p-3.5 bg-[#140e09] border border-amber-950/60 rounded-2xl text-xs space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-amber-400 font-serif">
@@ -592,12 +729,12 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
                         onClick={() =>
                           handleCopyVerse(fav.text, `${fav.bookName} ${fav.chapter}:${fav.verse}`)
                         }
-                        className="text-slate-500 hover:text-slate-200"
+                        className="text-slate-500 hover:text-amber-300 transition-colors p-1"
                       >
                         <Copy className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-slate-200 font-serif leading-relaxed">«{fav.text}»</p>
+                    <p className="text-[#ece4d8] font-serif leading-relaxed">«{fav.text}»</p>
                   </div>
                 ))
               )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, LogIn, UserPlus, Sparkles, AlertCircle } from 'lucide-react';
+import { X, LogIn, UserPlus, AlertCircle } from 'lucide-react';
 import { loginWithEmail, registerWithEmail, loginWithGoogle, loginAnonymously } from '../lib/firebase.ts';
+import { PanVivoEmblem } from './PanVivoLogo.tsx';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -97,14 +98,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 text-amber-400">
-            <Sparkles className="w-6 h-6" />
+          <div className="flex justify-center mb-3">
+            <PanVivoEmblem size={44} />
           </div>
-          <h2 className="text-xl font-serif font-bold text-amber-300">
-            {isRegister ? 'Crear Cuenta Espiritual' : 'Iniciar Sesión en Lumen'}
+          <h2 className="text-xl font-serif font-bold text-white">
+            {isRegister ? 'Crear Cuenta Espiritual' : 'Iniciar Sesión en '}
+            {!isRegister && <span className="text-amber-400">Pan Vivo</span>}
           </h2>
           <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-            Sincroniza tus oraciones, rutinas diarias, notas espirituales y versículos en todos tus dispositivos.
+            Sincroniza tus oraciones, lecturas del día, notas espirituales y versículos favoritos.
           </p>
         </div>
 

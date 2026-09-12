@@ -1,16 +1,64 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-cinzel: 'Cinzel', serif;
+  --font-biblical: 'Roboto', system-ui, -apple-system, sans-serif;
+
+  --color-slate-50: #faf8f5;
+  --color-slate-100: #f5f0e8;
+  --color-slate-200: #e6ded3;
+  --color-slate-300: #d3c4b3;
+  --color-slate-400: #b39f8a;
+  --color-slate-500: #8a745f;
+  --color-slate-600: #665241;
+  --color-slate-700: #46372a;
+  --color-slate-750: #35291e;
+  --color-slate-800: #251c14;
+  --color-slate-850: #1c150e;
+  --color-slate-900: #140e09;
+  --color-slate-950: #0c0805;
+}
+
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
   }
 
-  .font-serif {
-    font-family: 'Lora', Georgia, Cambria, serif;
+  /* Headings and text use clean Roboto */
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Compact and balanced line-height for readings and devotionals */
+  p {
+    line-height: 1.55;
+  }
+
+  .leading-relaxed {
+    line-height: 1.55 !important;
+  }
+
+  .leading-loose {
+    line-height: 1.65 !important;
   }
 
   .font-cinzel {
-    font-family: 'Cinzel', Georgia, serif;
+    font-family: var(--font-cinzel);
+    letter-spacing: 0.04em;
+  }
+
+  .font-biblical {
+    font-family: var(--font-biblical);
+    line-height: 1.55;
+  }
+
+  .font-sans {
+    font-family: var(--font-sans);
   }
 }
 
@@ -20,12 +68,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: #120d08;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #35291e;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #523f2f;
 }

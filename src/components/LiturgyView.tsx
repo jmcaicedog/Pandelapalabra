@@ -14,19 +14,33 @@ import {
   BookmarkPlus
 } from 'lucide-react';
 import { getLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
+import { getTodayDateStr, getTomorrowDateStr } from '../lib/dateUtils.ts';
 import { speechService } from '../lib/speech.ts';
 import { saveNote } from '../lib/firebase.ts';
 import type { User } from 'firebase/auth';
+import { PanVivoLogo } from './PanVivoLogo.tsx';
+
+const reflectionClientCache = new Map<string, { reflection: string; priestName: string }>();
 
 interface LiturgyViewProps {
   user: User | null;
+  initialDate?: string;
   onNavigateTab?: (tab: 'biblia' | 'oraciones' | 'calendario' | 'ajustes') => void;
 }
 
-export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
-  // Today is 2026-09-11 in the environment
-  const [selectedDate, setSelectedDate] = useState('2026-09-11');
-  const [dayData, setDayData] = useState<LiturgicalDay>(getLiturgicalDay('2026-09-11'));
+export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onNavigateTab }) => {
+  const todayDateStr = getTodayDateStr();
+  const tomorrowDateStr = getTomorrowDateStr();
+
+  const [selectedDate, setSelectedDate] = useState(() => initialDate || todayDateStr);
+  const [dayData, setDayData] = useState<LiturgicalDay>(() => getLiturgicalDay(initialDate || todayDateStr));
+
+  // If initialDate prop changes from navigation, sync it
+  useEffect(() => {
+    if (initialDate && initialDate !== selectedDate) {
+      setSelectedDate(initialDate);
+    }
+  }, [initialDate]);
   const [expandedSection, setExpandedSection] = useState<'reading1' | 'psalm' | 'gospel' | null>(null);
   const [saintModalOpen, setSaintModalOpen] = useState(false);
 
@@ -69,6 +83,14 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
   }, [selectedDate]);
 
   const fetchReflection = async (data: LiturgicalDay) => {
+    const cached = reflectionClientCache.get(data.formattedDate);
+    if (cached) {
+      setReflection(cached.reflection);
+      if (cached.priestName) setPriestName(cached.priestName);
+      setLoadingReflection(false);
+      return;
+    }
+
     setLoadingReflection(true);
     setReflectionError(null);
     try {
@@ -88,13 +110,21 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
 
       if (!res.ok) throw new Error('Error al conectar con la reflexión');
       const json = await res.json();
+      if (!json.reflection) throw new Error(json.error || 'Respuesta de reflexión vacía');
       setReflection(json.reflection);
       if (json.priestName) setPriestName(json.priestName);
-    } catch (err: any) {
-      console.warn('Error fetching homily reflection, providing canonical homily:', err);
-      setReflection(
-        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día, el Señor Jesús en el Santo Evangelio (${data.gospel.citation}) nos llama a la autenticidad evangélica: "¿Acaso puede un ciego guiar a otro ciego?". ¡Cuántas veces nos precipitamos a juzgar la mota en el ojo ajeno, olvidando la viga que nubla nuestra propia mirada!\n\nLa verdadera caridad cristiana no nace de creernos superiores ni jueces de los demás, sino de reconocernos pobres pecadores necesitados de la infinita misericordia divina. Como San Pafnucio en el siglo IV, quien soportó la mutilación por confesar a Cristo sin guardar rencor, estamos llamados a edificar antes que condenar.\n\nPropósito para hoy: Antes de criticar mentalmente o de palabra a un hermano o familiar, detengámonos un instante, recemos un Avemaría por él o ella, y pidámosle al Señor la gracia de la humildad.\n\nOremos: Señor Jesús, Maestro de los humildes, limpia los ojos de nuestro corazón de toda soberbia y llénanos de tu luz salvadora.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`
-      );
+      reflectionClientCache.set(data.formattedDate, {
+        reflection: json.reflection,
+        priestName: json.priestName || 'Padre Mateo',
+      });
+    } catch {
+      const fallbackText =
+        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), el Señor Jesús en el Santo Evangelio (${data.gospel.citation}) nos llama a la autenticidad evangélica: "${data.gospel.text.slice(0, 160)}...".\n\nLa verdadera caridad cristiana no nace de juzgar a los demás, sino de reconocernos necesitados de la infinita misericordia divina. Como nos enseña el testimonio de ${data.saint.name}, estamos llamados a edificar antes que condenar y a confiar plenamente en la gracia redentora de Cristo.\n\nPropósito para hoy: Antes de criticar mentalmente o de palabra a un hermano o familiar, detengámonos un instante, recemos un Avemaría por él o ella, y pidámosle al Señor la gracia de la humildad.\n\nOremos: Señor Jesús, Maestro de los humildes, limpia los ojos de nuestro corazón de toda soberbia y llénanos de tu luz salvadora.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
+      setReflection(fallbackText);
+      reflectionClientCache.set(data.formattedDate, {
+        reflection: fallbackText,
+        priestName: 'Padre Mateo',
+      });
     } finally {
       setLoadingReflection(false);
     }
@@ -162,7 +192,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
   };
 
   const handleShare = async () => {
-    const text = `🕊️ Liturgia de hoy - ${dayData.title}\n\n📖 Evangelio (${dayData.gospel.citation}):\n${dayData.gospel.text}\n\n✨ Reflexión del ${priestName}:\n${reflection?.slice(0, 400)}...\n\nReza con Lumen App.`;
+    const text = `🕊️ Liturgia de hoy - ${dayData.title}\n\n📖 Evangelio (${dayData.gospel.citation}):\n${dayData.gospel.text}\n\n✨ Reflexión del ${priestName}:\n${reflection?.slice(0, 400)}...\n\nReza con Pan Vivo.`;
     if (navigator.share) {
       try {
         await navigator.share({ title: dayData.title, text });
@@ -176,29 +206,26 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
 
   return (
     <div id="liturgy-container" className="min-h-screen pb-28 text-slate-100">
-      {/* Top Hero Banner with Sacred Light, Altar & Bread */}
+      {/* Top Hero Banner with Sacred Light & Pan Vivo Brand */}
       <div className="relative h-60 w-full overflow-hidden bg-slate-950">
-        <img
-          src="https://images.unsplash.com/photo-1544830208-87a32bb58409?auto=format&fit=crop&w=1000&q=80"
-          alt="Luz Sagrada y Altar"
-          className="w-full h-full object-cover object-center opacity-40 brightness-75 scale-105 transition-transform duration-700 hover:scale-100"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-transparent"></div>
+        {/* Pure CSS Sacred Light & Altar Glow */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.28),rgba(255,255,255,0))]"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-[220px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Top bar controls */}
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-amber-500/20 text-xs text-amber-300 font-serif">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Lumen Liturgia</span>
+        <div className="absolute top-3.5 left-4 right-4 flex items-center justify-between z-10">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#17100a]/80 backdrop-blur-md rounded-2xl border border-amber-500/30 shadow-lg shadow-black/40">
+            <PanVivoLogo size="sm" showSubtitle={false} />
           </div>
 
           {/* Quick toggle: Hoy / Mañana */}
-          <div className="flex items-center bg-black/50 backdrop-blur-md p-1 rounded-full border border-white/10 text-xs">
+          <div className="flex items-center bg-[#17100a]/80 backdrop-blur-md p-1 rounded-2xl border border-amber-900/30 text-xs shadow-lg shadow-black/30">
             <button
               id="btn-date-today"
-              onClick={() => setSelectedDate('2026-09-11')}
-              className={`px-3 py-1 rounded-full font-medium transition-all ${
-                selectedDate === '2026-09-11'
+              onClick={() => setSelectedDate(todayDateStr)}
+              className={`px-3 py-1 rounded-xl font-medium transition-all ${
+                selectedDate === todayDateStr
                   ? 'bg-amber-500 text-slate-950 shadow-sm font-semibold'
                   : 'text-slate-300 hover:text-white'
               }`}
@@ -207,15 +234,20 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
             </button>
             <button
               id="btn-date-tomorrow"
-              onClick={() => setSelectedDate('2026-09-12')}
-              className={`px-3 py-1 rounded-full font-medium transition-all ${
-                selectedDate === '2026-09-12'
+              onClick={() => setSelectedDate(tomorrowDateStr)}
+              className={`px-3 py-1 rounded-xl font-medium transition-all ${
+                selectedDate === tomorrowDateStr
                   ? 'bg-amber-500 text-slate-950 shadow-sm font-semibold'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
               Mañana
             </button>
+            {selectedDate !== todayDateStr && selectedDate !== tomorrowDateStr && (
+              <span className="px-2.5 py-1 rounded-xl font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px]">
+                {selectedDate}
+              </span>
+            )}
           </div>
         </div>
 
@@ -268,7 +300,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
 
           <h3 className="text-base font-serif font-bold text-slate-100 mt-1">
             {dayData.saint.name}
-            <span className="block text-xs font-sans font-normal text-slate-400 mt-0.5">
+            <span className="block text-xs font-serif font-normal text-slate-400 mt-0.5">
               {dayData.saint.title}
             </span>
           </h3>
@@ -323,7 +355,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
           </p>
 
           <p
-            className={`text-xs text-slate-200 leading-relaxed font-sans ${
+            className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif ${
               expandedSection === 'reading1' ? '' : 'line-clamp-4'
             }`}
           >
@@ -388,7 +420,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
           </div>
 
           <div
-            className={`space-y-2 text-xs text-slate-300 leading-relaxed font-sans ${
+            className={`space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif ${
               expandedSection === 'psalm' ? '' : 'line-clamp-3'
             }`}
           >
@@ -478,7 +510,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
                 <span className="text-xs font-bold text-amber-300 font-serif block">
                   Reflexión Sacerdotal
                 </span>
-                <span className="text-[11px] text-slate-400 font-sans">
+                <span className="text-[11px] text-slate-400 font-serif">
                   {priestName} • Guía Espiritual
                 </span>
               </div>
@@ -536,7 +568,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition-colors"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Preguntar al Padre Mateo</span>
+                  <span>Pregúntale al Padre Mateo (Chat de Guía Espiritual)</span>
                 </button>
 
                 <div className="flex items-center gap-1">
@@ -590,7 +622,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
               )}
             </div>
 
-            <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+            <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif">
               <div>
                 <h4 className="font-semibold text-white uppercase text-xs tracking-wider mb-1">
                   Vida y Testimonio
@@ -622,25 +654,29 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
       {counselOpen && (
         <div
           id="modal-pastoral-counsel"
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+          onClick={() => setCounselOpen(false)}
+          className="fixed inset-0 z-[75] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-sm animate-fade-in"
         >
-          <div className="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-w-lg w-full h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#17110b] border border-amber-950/60 rounded-t-3xl sm:rounded-3xl max-w-lg w-full h-[85vh] sm:h-[78vh] flex flex-col shadow-2xl overflow-hidden"
+          >
             {/* Modal Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+            <div className="p-4 border-b border-amber-950/60 flex items-center justify-between bg-[#140e09] shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 text-sm">
+                <div className="w-9 h-9 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-300 text-sm shadow-sm">
                   ✝️
                 </div>
                 <div>
                   <h3 className="text-sm font-serif font-bold text-amber-300">
-                    Consejería Espiritual
+                    Chat de Acompañamiento Espiritual
                   </h3>
-                  <p className="text-[10px] text-slate-400">Padre Mateo • Respuestas Católicas</p>
+                  <p className="text-[11px] text-amber-200/60 font-serif">Padre Mateo • Asistente Pastoral Católico (IA)</p>
                 </div>
               </div>
               <button
                 onClick={() => setCounselOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800"
+                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -648,9 +684,35 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
 
             {/* Chat Messages Body */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs sm:text-sm">
-              <div className="bg-slate-800/80 border border-slate-700/60 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-slate-200 font-serif">
-                «La paz del Señor esté contigo. Soy el Padre Mateo. Si tienes alguna duda sobre el Evangelio de hoy, una prueba espiritual o necesitas un consejo pastoral, con amor en Cristo estoy aquí para escucharte.»
+              <div className="bg-[#221810] border border-amber-900/30 p-3.5 rounded-2xl rounded-tl-none max-w-[90%] text-[#ece4d8] font-serif shadow-sm">
+                <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">Padre Mateo</p>
+                «¡La paz del Señor esté contigo! Este es un espacio de diálogo y consejería católica. Puedes hacerme preguntas sobre las lecturas de hoy, dudas de fe, consejos para tu oración o cómo vivir el Evangelio en tu vida diaria.»
               </div>
+
+              {/* Sugerencias rápidas si aún no ha enviado mensajes */}
+              {counselMessages.length === 0 && (
+                <div className="pt-2 space-y-1.5">
+                  <p className="text-[11px] text-amber-200/50 font-serif px-1">Preguntas sugeridas:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      '¿Cómo aplicar el Evangelio de hoy a mi vida?',
+                      'Siento desánimo en mi oración, ¿qué me aconseja?',
+                      '¿Cómo prepararme para una buena confesión?',
+                    ].map((promptText, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          setCounselQuery(promptText);
+                        }}
+                        className="text-left text-xs bg-[#221810]/70 hover:bg-[#2c1f15] border border-amber-900/30 rounded-xl px-3 py-1.5 text-amber-200/80 hover:text-amber-100 transition-colors"
+                      >
+                        {promptText}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {counselMessages.map((msg, idx) => (
                 <div
@@ -658,12 +720,15 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`p-3 rounded-2xl max-w-[85%] leading-relaxed ${
+                    className={`p-3.5 rounded-2xl max-w-[88%] leading-relaxed shadow-sm ${
                       msg.role === 'user'
                         ? 'bg-amber-500 text-slate-950 font-medium rounded-br-none'
-                        : 'bg-slate-800/80 border border-slate-700/60 text-slate-200 font-serif rounded-tl-none whitespace-pre-line'
+                        : 'bg-[#221810] border border-amber-900/30 text-[#ece4d8] font-serif rounded-tl-none whitespace-pre-line'
                     }`}
                   >
+                    {msg.role !== 'user' && (
+                      <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">Padre Mateo</p>
+                    )}
                     {msg.text}
                   </div>
                 </div>
@@ -671,11 +736,11 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
 
               {counselLoading && (
                 <div className="flex justify-start">
-                  <div className="p-3 bg-slate-800/60 rounded-2xl rounded-tl-none text-slate-400 flex items-center gap-2">
+                  <div className="p-3 bg-[#221810] border border-amber-900/30 rounded-2xl rounded-tl-none text-amber-300 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"></span>
                     <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce delay-150"></span>
                     <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce delay-300"></span>
-                    <span className="text-xs">El Padre Mateo está respondiendo...</span>
+                    <span className="text-xs font-serif">El Padre Mateo está respondiendo...</span>
                   </div>
                 </div>
               )}
@@ -684,19 +749,20 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user }) => {
             {/* Chat Input */}
             <form
               onSubmit={handleSendCounsel}
-              className="p-3 border-t border-slate-800 bg-slate-950 flex items-center gap-2"
+              className="p-3 pb-8 sm:pb-3 border-t border-amber-950/60 bg-[#140e09] flex items-center gap-2 shrink-0"
             >
               <input
                 type="text"
                 value={counselQuery}
                 onChange={(e) => setCounselQuery(e.target.value)}
-                placeholder="Escribe tu consulta espiritual o inquietud..."
-                className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400/80"
+                placeholder="Escribe tu consulta o inquietud espiritual..."
+                className="flex-1 bg-[#1c130b] border border-amber-900/40 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#ece4d8] placeholder-stone-500 focus:outline-none focus:border-amber-400/80"
               />
               <button
                 type="submit"
                 disabled={!counselQuery.trim() || counselLoading}
-                className="p-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl disabled:opacity-40 transition-colors"
+                className="p-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl disabled:opacity-40 transition-colors shadow-sm"
+                title="Enviar consulta"
               >
                 <Send className="w-4 h-4" />
               </button>

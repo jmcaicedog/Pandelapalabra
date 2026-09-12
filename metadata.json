@@ -1,6 +1,8 @@
 {
-  "name": "Lumen - Liturgia y Oración Católica",
-  "description": "Aplicación católica con liturgia diaria, reflexiones con IA sacerdotal, Biblia católica, santo rosario y devocionario interactivo, y calendario espiritual.",
+  "name": "Pan Vivo - Liturgia y Oración Católica",
+  "description": "Aplicación católica Pan Vivo: liturgia diaria, reflexiones sacerdotales con el Padre Mateo, Sagrada Escritura, Santo Rosario y calendario litúrgico.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

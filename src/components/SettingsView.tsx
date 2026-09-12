@@ -8,6 +8,7 @@ import {
   Volume2,
   Trash2,
   Moon,
+  Sun,
   Info,
   Check,
   Flame,
@@ -28,6 +29,8 @@ interface SettingsViewProps {
   onUpdatePrayerStyle: (st: 'sacred' | 'minimal') => void;
   audioEnabled: boolean;
   onUpdateAudioEnabled: (val: boolean) => void;
+  darkMode?: boolean;
+  onUpdateDarkMode?: (val: boolean) => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -41,6 +44,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onUpdatePrayerStyle,
   audioEnabled,
   onUpdateAudioEnabled,
+  darkMode = true,
+  onUpdateDarkMode,
 }) => {
   const [clearedNotice, setClearedNotice] = useState<string | null>(null);
 
@@ -65,7 +70,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div id="settings-view-container" className="min-h-screen pb-28 text-slate-100">
+    <div id="settings-view-container" className={`min-h-screen pb-28 transition-colors duration-300 ${darkMode ? 'text-slate-100' : 'text-stone-800'}`}>
       {clearedNotice && (
         <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-slate-950 font-semibold px-4 py-2 rounded-full text-xs shadow-xl flex items-center gap-2">
           <Check className="w-4 h-4" /> {clearedNotice}
@@ -74,29 +79,37 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* Header */}
       <div className="px-4 pt-6 pb-2 max-w-xl mx-auto">
-        <h1 className="text-2xl font-serif font-bold text-white tracking-tight">Ajustes</h1>
-        <p className="text-xs text-slate-400 mt-0.5">
+        <h1 className={`text-2xl font-serif font-bold tracking-tight ${darkMode ? 'text-white' : 'text-stone-900'}`}>Ajustes</h1>
+        <p className={`text-xs mt-0.5 ${darkMode ? 'text-slate-400' : 'text-stone-600'}`}>
           Configuración personal, sincronización de cuenta y preferencias
         </p>
       </div>
 
       <div className="px-4 py-3 max-w-xl mx-auto space-y-4">
         {/* --- 1. Account & Cloud Sync Card (Image 4) --- */}
-        <div className="bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/30 rounded-3xl p-5 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <UserIcon className="w-6 h-6" />
+        <div className={`border rounded-3xl p-4 sm:p-5 shadow-xl overflow-hidden transition-colors duration-300 ${
+          darkMode
+            ? 'bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border-amber-500/30'
+            : 'bg-gradient-to-r from-amber-100/60 via-stone-50 to-stone-50 border-amber-300'
+        }`}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl border flex items-center justify-center shrink-0 ${
+                darkMode ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-amber-500/20 border-amber-400 text-amber-700'
+              }`}>
+                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
 
-              <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400">
+              <div className="min-w-0 flex-1">
+                <span className={`text-[10px] uppercase font-bold tracking-wider block truncate ${
+                  darkMode ? 'text-amber-400' : 'text-amber-700'
+                }`}>
                   {user ? 'Cuenta Sincronizada' : 'Modo Peregrino'}
                 </span>
-                <h3 className="text-base font-serif font-bold text-white">
+                <h3 className={`text-base font-serif font-bold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
                   {user ? user.displayName || user.email?.split('@')[0] || 'Fiel Cristiano' : 'Invitado'}
                 </h3>
-                <p className="text-xs text-slate-400 truncate max-w-[180px] sm:max-w-xs">
+                <p className={`text-xs truncate ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>
                   {user?.email || 'Guardado localmente en este dispositivo'}
                 </p>
               </div>
@@ -106,7 +119,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 id="btn-logout"
                 onClick={handleLogout}
-                className="p-2.5 text-slate-400 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-colors"
+                className={`p-2.5 rounded-xl transition-colors shrink-0 ${
+                  darkMode ? 'text-slate-400 hover:text-red-400 hover:bg-slate-800' : 'text-stone-500 hover:text-red-500 hover:bg-stone-200'
+                }`}
                 title="Cerrar sesión"
               >
                 <LogOut className="w-5 h-5" />
@@ -115,43 +130,51 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 id="btn-open-login"
                 onClick={onOpenAuth}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all"
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 sm:py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all shrink-0 whitespace-nowrap"
               >
-                <LogIn className="w-3.5 h-3.5" />
+                <LogIn className="w-3.5 h-3.5 shrink-0" />
                 <span>Iniciar Sesión</span>
               </button>
             )}
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-300">
-            <div className="flex items-center gap-1.5 text-emerald-400">
-              <ShieldCheck className="w-4 h-4" />
+          <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-2 text-xs ${
+            darkMode ? 'border-slate-800/80 text-slate-300' : 'border-stone-200 text-stone-600'
+          }`}>
+            <div className="flex items-center gap-1.5 text-emerald-500 text-[11px] sm:text-xs">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
               <span>Base de Datos Firestore Activa</span>
             </div>
-            <div className="flex items-center gap-1 text-amber-400">
-              <Flame className="w-4 h-4" />
+            <div className={`flex items-center gap-1 text-[11px] sm:text-xs ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>
+              <Flame className="w-4 h-4 shrink-0" />
               <span>Sincronización multi-dispositivo</span>
             </div>
           </div>
         </div>
 
         {/* --- 2. Liturgia y Calendario --- */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-md space-y-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 uppercase tracking-wider">
-            <Globe className="w-4 h-4 text-amber-400" />
+        <div className={`border rounded-3xl p-5 shadow-md space-y-4 transition-colors duration-300 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
+        }`}>
+          <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${
+            darkMode ? 'text-amber-300' : 'text-amber-700'
+          }`}>
+            <Globe className="w-4 h-4 text-amber-500" />
             <span>Calendario Litúrgico Regional</span>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs font-medium text-slate-200 block">Región Litúrgica</span>
-              <span className="text-[11px] text-slate-400">Adapta los santos y lecturas locales</span>
+              <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Región Litúrgica</span>
+              <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>Adapta los santos y lecturas locales</span>
             </div>
 
             <select
               value={calendarRegion}
               onChange={(e) => onUpdateCalendarRegion(e.target.value)}
-              className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-amber-400"
+              className={`border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-400 ${
+                darkMode ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-stone-100 border-stone-300 text-stone-800'
+              }`}
             >
               <option value="Universal">Universal (Vaticano)</option>
               <option value="Colombia">Colombia</option>
@@ -164,17 +187,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* --- 3. Sagrada Biblia Settings (Image 4) --- */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-md space-y-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 uppercase tracking-wider">
-            <Sliders className="w-4 h-4 text-amber-400" />
+        <div className={`border rounded-3xl p-5 shadow-md space-y-4 transition-colors duration-300 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
+        }`}>
+          <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${
+            darkMode ? 'text-amber-300' : 'text-amber-700'
+          }`}>
+            <Sliders className="w-4 h-4 text-amber-500" />
             <span>Sagrada Biblia Católica</span>
           </div>
 
           {/* Font Size Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-200">Tamaño de Fuente</span>
-              <span className="text-xs font-mono text-amber-400 font-bold">{fontSize} px</span>
+              <span className={`text-xs font-medium ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Tamaño de Fuente</span>
+              <span className="text-xs font-mono text-amber-500 font-bold">{fontSize} px</span>
             </div>
 
             <input
@@ -184,11 +211,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               step="1"
               value={fontSize}
               onChange={(e) => onUpdateFontSize(Number(e.target.value))}
-              className="w-full accent-amber-400 cursor-pointer"
+              className="w-full accent-amber-500 cursor-pointer"
             />
 
             <p
-              className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-slate-300 font-serif leading-relaxed"
+              className={`p-3 rounded-xl border font-serif leading-relaxed ${
+                darkMode ? 'bg-slate-950/60 border-slate-800/80 text-slate-300' : 'bg-stone-50 border-stone-200 text-stone-700'
+              }`}
               style={{ fontSize: `${fontSize}px` }}
             >
               «En el principio existía la Palabra y la Palabra estaba con Dios.» (Jn 1,1)
@@ -196,15 +225,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           {/* Clear Cache */}
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+          <div className={`pt-2 border-t flex items-center justify-between ${
+            darkMode ? 'border-slate-800' : 'border-stone-200'
+          }`}>
             <div>
-              <span className="text-xs font-medium text-slate-200 block">Caché de la Biblia</span>
-              <span className="text-[11px] text-slate-400">Libera espacio de capítulos descargados</span>
+              <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Caché de la Biblia</span>
+              <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>Libera espacio de capítulos descargados</span>
             </div>
 
             <button
               onClick={handleClearBibleCache}
-              className="bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+              className={`px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition-colors ${
+                darkMode
+                  ? 'bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white'
+                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700 hover:text-stone-900'
+              }`}
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Limpiar Caché</span>
@@ -213,24 +248,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* --- 4. Oración y Estilo (Image 4) --- */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-md space-y-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+        <div className={`border rounded-3xl p-5 shadow-md space-y-4 transition-colors duration-300 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
+        }`}>
+          <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${
+            darkMode ? 'text-amber-300' : 'text-amber-700'
+          }`}>
+            <Sparkles className="w-4 h-4 text-amber-500" />
             <span>Oración y Asistencia</span>
           </div>
 
           {/* Visual Style */}
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs font-medium text-slate-200 block">Estilo Visual</span>
-              <span className="text-[11px] text-slate-400">Iconografía del Rosario y Devocionario</span>
+              <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Estilo Visual</span>
+              <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>Iconografía del Rosario y Devocionario</span>
             </div>
 
-            <div className="flex items-center p-1 bg-slate-800 rounded-xl">
+            <div className={`flex items-center p-1 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-stone-100 border border-stone-200'}`}>
               <button
                 onClick={() => onUpdatePrayerStyle('sacred')}
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  prayerStyle === 'sacred' ? 'bg-amber-500 text-slate-950' : 'text-slate-400'
+                  prayerStyle === 'sacred'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : darkMode ? 'text-slate-400 hover:text-white' : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
                 Arte Sacro
@@ -238,7 +279,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 onClick={() => onUpdatePrayerStyle('minimal')}
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  prayerStyle === 'minimal' ? 'bg-amber-500 text-slate-950' : 'text-slate-400'
+                  prayerStyle === 'minimal'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : darkMode ? 'text-slate-400 hover:text-white' : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
                 Minimalista
@@ -247,12 +290,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           {/* Audio toggle */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+          <div className={`flex items-center justify-between pt-2 border-t ${darkMode ? 'border-slate-800' : 'border-stone-200'}`}>
             <div className="flex items-center gap-2.5">
-              <Volume2 className="w-4 h-4 text-slate-400" />
+              <Volume2 className={`w-4 h-4 ${darkMode ? 'text-slate-400' : 'text-stone-500'}`} />
               <div>
-                <span className="text-xs font-medium text-slate-200 block">Voz Asistida (TTS)</span>
-                <span className="text-[11px] text-slate-400">Lectura solemne en español</span>
+                <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Voz Asistida (TTS)</span>
+                <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>Lectura solemne en español</span>
               </div>
             </div>
 
@@ -269,27 +312,49 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
         {/* --- 5. Apariencia & Acerca de --- */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-md space-y-3">
+        <div className={`border rounded-3xl p-5 shadow-md space-y-3 transition-colors duration-300 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
+        }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <Moon className="w-4 h-4 text-amber-400" />
+              {darkMode ? (
+                <Moon className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Sun className="w-4 h-4 text-amber-500" />
+              )}
               <div>
-                <span className="text-xs font-medium text-slate-200 block">Modo Oscuro Místico</span>
-                <span className="text-[11px] text-slate-400">Diseñado para la contemplación y menor fatiga</span>
+                <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>
+                  {darkMode ? 'Modo Oscuro Místico' : 'Modo Claro Cálido'}
+                </span>
+                <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>
+                  {darkMode
+                    ? 'Tonalidad nocturna para la contemplación'
+                    : 'Luz natural inspirada en pergamino sagrado'}
+                </span>
               </div>
             </div>
-            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-400 font-semibold">
-              Activo
-            </span>
+
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                id="toggle-dark-mode"
+                type="checkbox"
+                checked={darkMode}
+                onChange={(e) => onUpdateDarkMode && onUpdateDarkMode(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 text-center text-[11px] text-slate-500 space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-slate-400">
-              <Info className="w-3.5 h-3.5 text-amber-400" />
-              <span className="font-serif font-bold text-amber-300/90">Lumen Católica v1.0.0</span>
+          <div className={`pt-3 border-t text-center text-[11px] space-y-1 ${
+            darkMode ? 'border-slate-800 text-slate-500' : 'border-stone-200 text-stone-500'
+          }`}>
+            <div className={`flex items-center justify-center gap-1.5 ${darkMode ? 'text-slate-400' : 'text-stone-600'}`}>
+              <Info className="w-3.5 h-3.5 text-amber-500" />
+              <span className={`font-serif font-bold ${darkMode ? 'text-amber-300/90' : 'text-amber-700'}`}>Pan Vivo v1.0.0</span>
             </div>
             <p>Liturgia Diaria • Biblia Católica (73 Libros) • Santo Rosario • Homilías con IA</p>
-            <p className="text-slate-600">«Ad maiorem Dei gloriam»</p>
+            <p className={darkMode ? 'text-slate-600' : 'text-stone-400'}>«Yo soy el pan vivo que ha bajado del cielo» (Jn 6, 51)</p>
           </div>
         </div>
       </div>

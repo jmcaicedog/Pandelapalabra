@@ -16,6 +16,7 @@ import type { User } from 'firebase/auth';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<TabType>('liturgia');
+  const [targetLiturgyDate, setTargetLiturgyDate] = useState<string | undefined>(undefined);
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
@@ -35,6 +36,11 @@ export default function App() {
 
   const [audioEnabled, setAudioEnabled] = useState<boolean>(() => {
     const saved = localStorage.getItem('lumen_audio_enabled');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('lumen_dark_mode');
     return saved !== null ? saved === 'true' : true;
   });
 
@@ -69,16 +75,42 @@ export default function App() {
     localStorage.setItem('lumen_audio_enabled', enabled.toString());
   };
 
+  const handleUpdateDarkMode = (val: boolean) => {
+    setDarkMode(val);
+    localStorage.setItem('lumen_dark_mode', val.toString());
+  };
+
+  const handleNavigateToLiturgyWithDate = (date?: string) => {
+    if (date) {
+      setTargetLiturgyDate(date);
+    }
+    setCurrentTab('liturgia');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div id="lumen-app-root" className="min-h-screen bg-[#070a10] text-slate-100 flex justify-center selection:bg-amber-500/30 selection:text-amber-200">
+    <div
+      id="pan-vivo-app-root"
+      className={`min-h-screen flex justify-center selection:bg-amber-500/30 selection:text-amber-200 transition-colors duration-300 ${
+        darkMode ? 'bg-[#0c0805] text-slate-100' : 'bg-[#f4efe8] text-stone-900'
+      }`}
+    >
       {/* Mobile-centric frame shell */}
-      <main className="w-full max-w-md sm:max-w-lg md:max-w-xl min-h-screen bg-[#0b0f19] border-x border-slate-850 shadow-2xl relative flex flex-col">
+      <main
+        className={`w-full max-w-md sm:max-w-lg md:max-w-xl min-h-screen border-x shadow-2xl relative flex flex-col transition-colors duration-300 ${
+          darkMode ? 'bg-[#110c08] border-amber-950/40' : 'bg-[#faf7f2] border-stone-300'
+        }`}
+      >
         {/* Active Tab View */}
         <div className="flex-1">
           {currentTab === 'liturgia' && (
             <LiturgyView
               user={user}
-              onNavigateTab={(tab) => setCurrentTab(tab)}
+              initialDate={targetLiturgyDate}
+              onNavigateTab={(tab) => {
+                setCurrentTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           )}
 
@@ -93,6 +125,7 @@ export default function App() {
           {currentTab === 'oraciones' && (
             <PrayersView
               user={user}
+              prayerStyle={prayerStyle}
               onSelectTab={(tab) => setCurrentTab(tab as TabType)}
             />
           )}
@@ -100,7 +133,7 @@ export default function App() {
           {currentTab === 'calendario' && (
             <CalendarView
               user={user}
-              onNavigateToLiturgy={() => setCurrentTab('liturgia')}
+              onNavigateToLiturgy={handleNavigateToLiturgyWithDate}
             />
           )}
 
@@ -116,6 +149,8 @@ export default function App() {
               onUpdatePrayerStyle={handleUpdatePrayerStyle}
               audioEnabled={audioEnabled}
               onUpdateAudioEnabled={handleUpdateAudioEnabled}
+              darkMode={darkMode}
+              onUpdateDarkMode={handleUpdateDarkMode}
             />
           )}
         </div>

@@ -14,6 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import { getLiturgicalDay } from '../data/liturgy.ts';
+import { getTodayDateStr } from '../lib/dateUtils.ts';
 import {
   getUserRoutines,
   saveUserRoutine,
@@ -28,16 +29,18 @@ import type { User } from 'firebase/auth';
 
 interface CalendarViewProps {
   user: User | null;
-  onNavigateToLiturgy?: () => void;
+  onNavigateToLiturgy?: (date?: string) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLiturgy }) => {
   const [activeTab, setActiveTab] = useState<'calendario' | 'rutina' | 'notas'>('rutina');
 
-  // Calendar State
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [currentMonth, setCurrentMonth] = useState(8); // 8 = September (0-indexed)
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState('2026-09-11');
+  // Calendar State initialized dynamically to today's date
+  const todayStr = getTodayDateStr();
+  const todayDateObj = new Date();
+  const [currentYear, setCurrentYear] = useState(() => todayDateObj.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(() => todayDateObj.getMonth());
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(() => todayStr);
 
   // Routines State
   const [routines, setRoutines] = useState<SpiritualRoutine[]>([]);
@@ -85,8 +88,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
   };
 
   const handleToggleRoutine = async (routine: SpiritualRoutine) => {
-    const today = new Date().toISOString().split('T')[0];
-    const isCompleted = routine.completedDates?.includes(today);
+    const isCompleted = routine.completedDates?.includes(todayStr);
     const updated = await toggleRoutineCompleted(user?.uid || 'guest', routine.id, !isCompleted);
 
     setRoutines((prev) =>
@@ -121,8 +123,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
       const perm = await Notification.requestPermission();
       if (perm === 'granted') {
         setNotificationsGranted(true);
-        new Notification('Lumen Espiritual', {
-          body: 'Recordatorios de oración activados para tus rutinas diarias.',
+        new Notification('Pan Vivo', {
+          body: 'Recordatorios de oración activados para tus rutinas litúrgicas.',
           icon: '/favicon.ico',
         });
         showToast('Recordatorios y notificaciones activados con éxito');
@@ -169,7 +171,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
 
   const selectedDayData = getLiturgicalDay(selectedCalendarDate);
 
-  const todayStr = '2026-09-11';
   const completedTodayCount = routines.filter((r) => r.completedDates?.includes(todayStr)).length;
 
   return (
@@ -182,12 +183,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
 
       {/* Hero Banner */}
       <div className="relative h-48 w-full overflow-hidden bg-slate-950">
-        <img
-          src="https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1000&q=80"
-          alt="Monasterio y Calendario"
-          className="w-full h-full object-cover object-center opacity-30 brightness-75 scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.28),rgba(255,255,255,0))]"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[440px] h-[200px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="absolute bottom-4 left-4 right-4 text-center">
           <h1 className="text-2xl font-serif font-bold text-white tracking-tight">
@@ -299,7 +297,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                   const dayNum = i + 1;
                   const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
                   const isSelected = selectedCalendarDate === dateStr;
-                  const isToday = dateStr === '2026-09-11';
+                  const isToday = dateStr === todayStr;
 
                   return (
                     <button
@@ -352,7 +350,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
               </div>
 
               <button
-                onClick={onNavigateToLiturgy}
+                id="btn-ver-liturgia-completa"
+                onClick={() => onNavigateToLiturgy && onNavigateToLiturgy(selectedCalendarDate)}
                 className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all mt-2"
               >
                 <BookOpen className="w-4 h-4" />

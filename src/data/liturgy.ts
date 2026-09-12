@@ -177,6 +177,80 @@ export const LITURGY_DATABASE: Record<string, LiturgicalDay> = {
       acclamation: 'Aleluya, aleluya. Dios no quiera que yo me gloríe sino en la cruz de nuestro Señor Jesucristo, por quien el mundo está crucificado para mí, y yo para el mundo. Aleluya.',
       text: 'En aquel tiempo, Jesús y sus discípulos salieron hacia las aldeas de Cesarea de Filipo, y por el camino preguntó a sus discípulos: «¿Quién dice la gente que soy yo?». Ellos le contestaron: «Unos, Juan el Bautista; otros, Elías; y otros, uno de los profetas». Entonces él les preguntó: «Y vosotros, ¿quién decís que soy yo?». Tomando la palabra Pedro, le dijo: «Tú eres el Mesías». Y les conminó a que no dijeran nada a nadie de él. Y empezó a instruirlos: «El Hijo del hombre tiene que padecer mucho, ser reprobado por los ancianos, sumos sacerdotes y escribas, ser ejecutado y resucitar a los tres días». Con toda claridad les decía esto... Entonces llamó a la gente y a sus discípulos y les dijo: «Si alguno quiere venir en pos de mí, que se niegue a sí mismo, tome su cruz y me siga. Porque quien quiera salvar su vida, la perderá; pero el que pierda su vida por mí y por el Evangelio, la salvará».'
     }
+  },
+
+  '2026-09-14': {
+    date: '2026-09-14',
+    formattedDate: 'lunes, septiembre 14',
+    title: 'Fiesta de la Exaltación de la Santa Cruz',
+    season: 'Fiesta / Solemnidad',
+    color: 'red',
+    colorName: 'Exaltación de la Cruz',
+    saint: {
+      name: 'La Exaltación de la Santa Cruz',
+      title: 'Fiesta del Señor',
+      shortBio: 'Celebramos el madero sagrado en el que Cristo ofreció su vida por la redención del mundo. La Cruz es el árbol de la vida y el trofeo supremo de la victoria sobre el pecado.',
+      fullBio: 'Esta fiesta conmemora la consagración de la basílica del Santo Sepulcro en Jerusalén (año 335) construida por el emperador Constantino, y la recuperación de la reliquia de la Santa Cruz en el 628 por el emperador Heraclio tras haber sido arrebatada por los persas. La Iglesia contempla en la Cruz el trono de amor de Cristo.',
+      patronage: 'Toda la Cristiandad, la redención humana',
+      prayer: 'Señor Dios nuestro, que quisiste que tu Unigénito sufriera la cruz para salvar al género humano, concédenos que quienes hemos conocido en la tierra su misterio, alcancemos en el cielo los frutos de su redención. Por Jesucristo nuestro Señor. Amén.'
+    },
+    firstReading: {
+      citation: 'Números 21:4b-9',
+      text: 'En aquellos días, el pueblo de Israel se impacientó por el camino y habló contra Dios y contra Moisés: «¿Por qué nos hiciste subir de Egipto para que muramos en el desierto? No tenemos pan ni agua, y nos da náuseas este pan sin sustancia». Entonces el Señor envió serpientes abrasadoras, que mordían al pueblo, y murieron muchos israelitas. El pueblo acudió a Moisés: «Hemos pecado al hablar contra el Señor y contra ti. Ruega al Señor que aparte de nosotros estas serpientes». Moisés oró por el pueblo, y el Señor le dijo: «Haz una serpiente y colócala en un asta; el que haya sido mordido y la mire, vivirá». Hizo Moisés una serpiente de bronce y la colocó en un asta; y cuando una serpiente mordía a uno, miraba a la serpiente de bronce y quedaba curado.'
+    },
+    psalm: {
+      citation: 'Salmo 78:1-2, 34-35, 36-37, 38',
+      response: 'No olvidéis las acciones del Señor.',
+      verses: [
+        'Escucha, pueblo mío, mi enseñanza, inclina tu oído a las palabras de mi boca. Abriré mi boca a los proverbios, publicaré los enigmas del pasado.',
+        'Cuando los hacía morir, lo buscaban, y madrugaban para volverse a Dios. Se acordaban de que Dios era su Roca, el Dios Altísimo su libertador.',
+        'Pero lo engañaban con su boca, le mentían con su lengua; su corazón no era sincero con él, no eran fieles a su alianza.'
+      ]
+    },
+    secondReading: {
+      citation: 'Filipenses 2:6-11',
+      text: 'Cristo Jesús, siendo de condición divina, no retuvo ávidamente el ser igual a Dios; al contrario, se despojó de sí mismo tomando la condición de esclavo, hecho semejante a los hombres. Y así, actuando como un hombre cualquiera, se rebajó hasta someterse incluso a la muerte, y una muerte de cruz. Por eso Dios lo exaltó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.'
+    },
+    gospel: {
+      citation: 'Juan 3:13-17',
+      acclamation: 'Te adoramos, oh Cristo, y te bendecimos, porque con tu Santa Cruz redimiste al mundo.',
+      text: 'En aquel tiempo, dijo Jesús a Nicodemo: «Nadie ha subido al cielo sino el que bajó del cielo, el Hijo del hombre. Lo mismo que Moisés elevó la serpiente en el desierto, así tiene que ser elevado el Hijo del hombre, para que todo el que cree en él tenga vida eterna. Porque tanto amó Dios al mundo, que entregó a su Unigénito, para que todo el que cree en él no perezca, sino que tenga vida eterna. Porque Dios no envió a su Hijo al mundo para juzgar al mundo, sino para que el mundo se salve por él».'
+    }
+  },
+
+  '2026-09-15': {
+    date: '2026-09-15',
+    formattedDate: 'martes, septiembre 15',
+    title: 'Memoria de Nuestra Señora la Virgen de los Dolores',
+    season: 'Fiesta / Solemnidad',
+    color: 'white',
+    colorName: 'Nuestra Señora de los Dolores',
+    saint: {
+      name: 'Nuestra Señora de los Dolores',
+      title: 'Memoria obligatoria de la Santísima Virgen',
+      shortBio: 'Conmemoramos la profunda compasión de la Virgen María junto a la Cruz de su Divino Hijo, cumpliéndose la profecía del anciano Simeón: "A ti misma una espada te traspasará el alma".',
+      fullBio: 'Al día siguiente de la Exaltación de la Santa Cruz, la Iglesia venera los dolores de María Santísima. Ella estuvo firme (Stabat Mater) al pie del Calvario, uniendo su dolor de Madre al sacrificio redentor de Cristo. Es modelo sublime de fortaleza en el dolor y consuelo inagotable para todos los que sufren.',
+      patronage: 'Afligidos, personas en duelo, madres',
+      prayer: 'Dios todopoderoso, que quisiste que la Madre de tu Hijo estuviera de pie junto a la Cruz, participando de sus sufrimientos, concede a tu Iglesia que, asociada con María a la Pasión de Cristo, merezca participar también de su gloriosa Resurrección. Por Jesucristo nuestro Señor. Amén.'
+    },
+    firstReading: {
+      citation: 'Hebreos 5:7-9',
+      text: 'Cristo, en los días de su vida mortal, a gritos y con lágrimas, presentó oraciones y súplicas al que podía salvarlo de la muerte, siendo escuchado por su piedad filial. Y, aun siendo Hijo, aprendió, sufriendo, a obedecer. Y, llevado a la consumación, se ha convertido para todos los que le obedecen en autor de salvación eterna.'
+    },
+    psalm: {
+      citation: 'Salmo 31:2-3b, 3cd-4, 5-6, 15-16, 20',
+      response: 'Sálvame, Señor, por tu misericordia.',
+      verses: [
+        'A ti, Señor, me acojo, no quede yo nunca defraudado; tú, que eres justo, ponme a salvo. Inclina tu oído hacia mí, ven aprisa a librarme.',
+        'Sé la roca de mi refugio, un baluarte donde me salve, tú que eres mi roca y mi baluarte; por tu nombre dirígeme y guíame.',
+        'Sácame de la red que me han tendido, porque tú eres mi amparo. A tus manos encomiendo mi espíritu: tú, el Dios leal, me librarás.'
+      ]
+    },
+    gospel: {
+      citation: 'Juan 19:25-27',
+      acclamation: 'Dichosa tú, Virgen María, que sin morir mereciste la palma del martirio junto a la cruz del Señor.',
+      text: 'En aquel tiempo, junto a la cruz de Jesús estaban su madre, la hermana de su madre, María, la de Cleofás, y María Magdalena. Jesús, al ver a su madre y junto a ella al discípulo que él amaba, dijo a su madre: «Mujer, ahí tienes a tu hijo». Luego, dijo al discípulo: «Ahí tienes a tu madre». Y desde aquella hora, el discípulo la acogió en su casa.'
+    }
   }
 };
 
