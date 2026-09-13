@@ -13,9 +13,15 @@ import {
   Check,
   Flame,
   ShieldCheck,
-  LogIn
+  LogIn,
+  Smartphone,
+  Download,
+  CheckCircle2,
+  Share,
+  PlusSquare
 } from 'lucide-react';
 import { logoutUser } from '../lib/firebase.ts';
+import { usePWAInstall } from '../lib/usePWAInstall.ts';
 import type { User } from 'firebase/auth';
 
 interface SettingsViewProps {
@@ -48,6 +54,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onUpdateDarkMode,
 }) => {
   const [clearedNotice, setClearedNotice] = useState<string | null>(null);
+  const { isInstalled, isInstallable, isIOS, install } = usePWAInstall();
+  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   const handleClearBibleCache = () => {
     let count = 0;
@@ -311,7 +319,81 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
 
-        {/* --- 5. Apariencia & Acerca de --- */}
+        {/* --- 5. Instalación en Dispositivo (PWA) --- */}
+        <div className={`border rounded-3xl p-5 shadow-md space-y-3 transition-colors duration-300 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
+        }`}>
+          <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${
+            darkMode ? 'text-amber-300' : 'text-amber-700'
+          }`}>
+            <Smartphone className="w-4 h-4 text-amber-500" />
+            <span>Instalación en Dispositivo</span>
+          </div>
+
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>
+                {isInstalled ? 'Aplicación Instalada' : 'Instalar Pan Vivo'}
+              </span>
+              <span className={`text-[11px] block mt-0.5 ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>
+                {isInstalled
+                  ? 'Pan Vivo está activo como aplicación en tu pantalla de inicio.'
+                  : 'Añade el icono a tu pantalla de inicio para rezar sin barras del navegador.'}
+              </span>
+            </div>
+
+            {isInstalled ? (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold shrink-0">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Instalada</span>
+              </div>
+            ) : isInstallable ? (
+              <button
+                onClick={() => install()}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-xs shadow-md transition-all shrink-0"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Instalar</span>
+              </button>
+            ) : isIOS ? (
+              <button
+                onClick={() => setShowIOSInstructions(!showIOSInstructions)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold transition-all shrink-0"
+              >
+                <Share className="w-3.5 h-3.5" />
+                <span>Cómo instalar</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowIOSInstructions(!showIOSInstructions)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold transition-all shrink-0"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Instrucciones</span>
+              </button>
+            )}
+          </div>
+
+          {showIOSInstructions && (
+            <div className={`mt-3 pt-3 border-t text-xs space-y-2 font-sans ${
+              darkMode ? 'border-slate-800 text-slate-300' : 'border-stone-200 text-stone-700'
+            }`}>
+              <p className="font-semibold text-amber-400">Pasos para instalar:</p>
+              <div className="space-y-1.5 text-[11px]">
+                <p className="flex items-center gap-1.5">
+                  <Share className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>1. En Safari o Chrome, pulsa el botón <strong>Compartir</strong> o el menú de tres puntos (⋮).</span>
+                </p>
+                <p className="flex items-center gap-1.5">
+                  <PlusSquare className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>2. Selecciona <strong>«Añadir a pantalla de inicio»</strong> o <strong>«Instalar aplicación»</strong>.</span>
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* --- 6. Apariencia & Acerca de --- */}
         <div className={`border rounded-3xl p-5 shadow-md space-y-3 transition-colors duration-300 ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
         }`}>

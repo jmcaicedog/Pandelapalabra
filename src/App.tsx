@@ -12,6 +12,7 @@ import { PrayersView } from './components/PrayersView.tsx';
 import { CalendarView } from './components/CalendarView.tsx';
 import { SettingsView } from './components/SettingsView.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt.tsx';
 import type { User } from 'firebase/auth';
 
 export default function App() {
@@ -170,6 +171,9 @@ export default function App() {
           onClose={() => setAuthModalOpen(false)}
           onSuccess={() => setAuthModalOpen(false)}
         />
+
+        {/* Non-intrusive PWA Installation Prompt */}
+        <PWAInstallPrompt darkMode={darkMode} />
       </main>
     </div>
   );
