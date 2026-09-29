@@ -77,7 +77,7 @@ export const CATHOLIC_BOOKS: BibleBook[] = [
   { id: 16, nombre: 'Nehemías', abrev: 'Neh', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 13 },
   { id: 17, nombre: 'Tobías', abrev: 'Tob', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 14 },
   { id: 18, nombre: 'Judit', abrev: 'Jdt', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 16 },
-  { id: 19, nombre: 'Ester', abrev: 'Est', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 10 },
+  { id: 19, nombre: 'Ester', abrev: 'Est', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 16 },
   { id: 20, nombre: '1 Macabeos', abrev: '1 Mac', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 16 },
   { id: 21, nombre: '2 Macabeos', abrev: '2 Mac', testamento: 'AT', categoria: 'Históricos', capitulosTotales: 15 },
   // Sapienciales y Poéticos
@@ -109,32 +109,58 @@ export const CATHOLIC_BOOKS: BibleBook[] = [
   { id: 46, nombre: 'Malaquías', abrev: 'Mal', testamento: 'AT', categoria: 'Proféticos', capitulosTotales: 3 },
 ];
 
-const LOCAL_STORAGE_CACHE_PREFIX = 'lumen_bible_cap_';
+const BIBLE_API_BASE = (import.meta.env?.VITE_BIBLE_API_URL || 'https://apibiblia.vercel.app').replace(/\/$/, '') + '/api/v1';
+
+// v2 cache prefix: entries from the old API (keyed by numeric chapter id) are ignored.
+const LOCAL_STORAGE_CACHE_PREFIX = 'lumen_bible_cap_v2_';
+
+// API slugs indexed by canonical order (same as BibleBook.id - 1)
+const BOOK_SLUGS = [
+  'genesis', 'exodo', 'levitico', 'numeros', 'deuteronomio', 'josue', 'jueces', 'rut', '1-samuel', '2-samuel',
+  '1-reyes', '2-reyes', '1-cronicas', '2-cronicas', 'esdras', 'nehemias', 'tobias', 'judit', 'ester', '1-macabeos',
+  '2-macabeos', 'job', 'salmos', 'proverbios', 'eclesiastes', 'cantar-de-los-cantares', 'sabiduria', 'eclesiastico', 'isaias', 'jeremias',
+  'lamentaciones', 'baruc', 'ezequiel', 'daniel', 'oseas', 'joel', 'amos', 'abdias', 'jonas', 'miqueas',
+  'nahum', 'habacuc', 'sofonias', 'ageo', 'zacarias', 'malaquias', 'mateo', 'marcos', 'lucas', 'juan',
+  'hechos-de-los-apostoles', 'romanos', '1-corintios', '2-corintios', 'galatas', 'efesios', 'filipenses', 'colosenses', '1-tesalonicenses', '2-tesalonicenses',
+  '1-timoteo', '2-timoteo', 'tito', 'filemon', 'hebreos', 'santiago', '1-pedro', '2-pedro', '1-juan', '2-juan',
+  '3-juan', 'judas', 'apocalipsis',
+];
+
+const getBookSlug = (bookId: number) => BOOK_SLUGS[bookId - 1];
+const chapterIdFor = (bookId: number, numero: number) => bookId * 1000 + numero;
+
+async function apiGet<T>(path: string): Promise<T> {
+  const res = await fetch(`${BIBLE_API_BASE}${path}`, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`API Biblia respondió ${res.status}`);
+  const json = await res.json();
+  return json.data as T;
+}
 
 export async function fetchChaptersForBook(bookId: number): Promise<BibleChapter[]> {
+  const slug = getBookSlug(bookId);
   try {
-    const res = await fetch(`/api/biblia/libros/${bookId}/capitulos`);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data;
-      }
+    const data = await apiGet<Array<{ chapter: number }>>(`/books/${slug}/chapters`);
+    if (Array.isArray(data) && data.length > 0) {
+      return data.map((c) => ({ id: chapterIdFor(bookId, c.chapter), libro_id: bookId, numero: c.chapter }));
     }
   } catch (err) {
-    console.warn('Fallback generating chapter list for book', bookId);
+    console.warn('Fallback generating chapter list for book', bookId, err);
   }
   const book = CATHOLIC_BOOKS.find(b => b.id === bookId);
   const total = book?.capitulosTotales || 10;
   return Array.from({ length: total }, (_, i) => ({
-    id: bookId * 1000 + (i + 1),
+    id: chapterIdFor(bookId, i + 1),
     libro_id: bookId,
     numero: i + 1,
   }));
 }
 
 export async function fetchVersesForChapter(chapterId: number, bookName?: string, chapterNum?: number): Promise<BibleVerse[]> {
-  // Check local cache first
-  const cacheKey = `${LOCAL_STORAGE_CACHE_PREFIX}${chapterId}`;
+  const bookId = Math.floor(chapterId / 1000);
+  const numero = chapterNum ?? chapterId % 1000;
+  const slug = getBookSlug(bookId);
+
+  const cacheKey = `${LOCAL_STORAGE_CACHE_PREFIX}${slug}_${numero}`;
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     try {
@@ -143,34 +169,44 @@ export async function fetchVersesForChapter(chapterId: number, bookName?: string
   }
 
   try {
-    const res = await fetch(`/api/biblia/capitulos/${chapterId}/versiculos`);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch {}
-        return data;
-      }
+    const data = await apiGet<{ verses: Array<{ number: number; text: string }> }>(`/books/${slug}/chapters/${numero}`);
+    if (data?.verses?.length) {
+      const verses: BibleVerse[] = data.verses.map((v) => ({
+        id: chapterId * 1000 + v.number,
+        capitulo_id: chapterId,
+        numero: v.number,
+        texto: v.text,
+      }));
+      try { localStorage.setItem(cacheKey, JSON.stringify(verses)); } catch {}
+      return verses;
     }
   } catch (err) {
-    console.warn('Error fetching verses from API, using fallback:', err);
+    console.warn('Error fetching verses from API:', err);
   }
 
-  // Graceful canonical fallback verses if API is unreachable
   return [
-    { id: 1, capitulo_id: chapterId, numero: 1, texto: `En el principio existía la Palabra y la Palabra estaba con Dios, y la Palabra era Dios.` },
-    { id: 2, capitulo_id: chapterId, numero: 2, texto: `Ella estaba en el principio con Dios.` },
-    { id: 3, capitulo_id: chapterId, numero: 3, texto: `Todo se hizo por ella y sin ella no se hizo nada de cuanto existe.` },
-    { id: 4, capitulo_id: chapterId, numero: 4, texto: `En ella estaba la vida y la vida era la luz de los hombres, y la luz brilla en las tinieblas.` }
+    {
+      id: 0,
+      capitulo_id: chapterId,
+      numero: 0,
+      texto: `No se pudo cargar ${bookName ?? 'el libro'} ${numero}. Verifica tu conexión e inténtalo de nuevo.`,
+    },
   ];
 }
 
 export async function searchBible(query: string, limit = 25): Promise<any[]> {
-  if (!query.trim()) return [];
+  if (query.trim().length < 2) return [];
   try {
-    const res = await fetch(`/api/biblia/buscar?q=${encodeURIComponent(query)}&limit=${limit}`);
-    if (res.ok) {
-      return await res.json();
-    }
+    const data = await apiGet<Array<{ bookName: string; chapter: number; verse: number; text: string; reference: string }>>(
+      `/search?q=${encodeURIComponent(query.trim())}&limit=${Math.min(limit, 100)}`
+    );
+    return (data || []).map((r) => ({
+      libro: r.bookName,
+      capitulo: r.chapter,
+      numero: r.verse,
+      texto: r.text,
+      referencia: r.reference,
+    }));
   } catch (err) {
     console.warn('Error searching bible:', err);
   }

@@ -293,27 +293,5 @@ Termina siempre con una bendición sacerdotal breve.`;
     return true;
   }
 
-  // 4. Catholic Bible API Proxy (to bypass CORS and cache results from https://apibiblia.vercel.app)
-  if (pathname.startsWith('/api/biblia/')) {
-    const subpath = pathname.replace('/api/biblia', '');
-    const targetUrl = `https://apibiblia.vercel.app/api${subpath}${url.search}`;
-    try {
-      const resp = await fetch(targetUrl, {
-        headers: { 'Accept': 'application/json' },
-      });
-      if (!resp.ok) {
-        sendJson(res, resp.status, { error: `Error desde API Biblia externa (${resp.status})` });
-        return true;
-      }
-      const data = await resp.json();
-      sendJson(res, 200, data);
-      return true;
-    } catch (err: any) {
-      console.error('Proxy error fetching Catholic Bible API:', err);
-      sendJson(res, 502, { error: 'No se pudo conectar con la API de la Biblia' });
-      return true;
-    }
-  }
-
   return false;
 }
