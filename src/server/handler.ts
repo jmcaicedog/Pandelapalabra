@@ -92,16 +92,15 @@ function getCanonicalHomily(date: string, saint: string, gospelQuote: string, go
 
   return `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.
 
-En este día santo (${date}), la liturgia de la Santa Madre Iglesia nos invita a meditar con devoción el Santo Evangelio (${gospelQuote}):
-«${gospel.slice(0, 220)}${gospel.length > 220 ? '...' : ''}»
+En este día santo (${date}), la liturgia de la Santa Madre Iglesia nos invita a meditar con devoción el Santo Evangelio según ${gospelQuote}.
 
-${centralTheme} ${reading2 ? `Asimismo, la Sagrada Escritura nos recuerda que tanto en la vida como en la muerte somos del Señor, y que ninguna ofrenda agrada tanto a Dios como un corazón reconciliado con sus hermanos.` : ''} Como nos enseña el testimonio luminoso de ${saint || 'nuestros santos protectores'}, la santidad consiste en dejarnos transformar dócilmente por la gracia de Cristo.
+${centralTheme} ${reading2 ? `Asimismo, las lecturas de hoy nos recuerdan que tanto en la vida como en la muerte somos del Señor, y que ninguna ofrenda agrada tanto a Dios como un corazón reconciliado con sus hermanos.` : 'Las lecturas de hoy iluminan este mismo llamado: Dios sale a nuestro encuentro y espera de nosotros una respuesta de fe y de amor.'}
 
 Propósito para hoy:
 Antes de que termine el día, examinemos si guardamos algún rencor o distancia con algún prójimo; recemos un Padre Nuestro por esa persona y hagamos un gesto de paz y reconciliación sincera.
 
 Oración y bendición sacerdotal:
-Señor Jesucristo, Príncipe de la Paz y Pastor eterno, derrama tu amor en nuestros corazones y enséñanos a amar y perdonar como Tú nos amas.
+Señor Jesucristo, Príncipe de la Paz y Pastor eterno, derrama tu amor en nuestros corazones y enséñanos a amar y perdonar como Tú nos amas.${saint ? ` Por la intercesión de ${saint}, escucha nuestra oración.` : ''}
 Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes, sus hogares y sus seres queridos, y permanezca para siempre. Amén.»`;
 }
 
@@ -231,21 +230,40 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
 
     try {
       const prompt = `Liturgia del día: ${date} (${liturgicalTitle})
-Santo del día: ${saint}
-Primera Lectura: ${reading1}
-Salmo Responsorial: ${psalm}
-${reading2 ? `Segunda Lectura: ${reading2}\n` : ''}Santo Evangelio (${gospelQuote}):
-"${gospel}"
 
-Por favor, como un santo sacerdote católico, predica una homilía o reflexión breve (alrededor de 350-450 palabras) para los fieles.`;
+1) SANTO EVANGELIO — eje central de la homilía (${gospelQuote}):
+${gospel}
+
+2) LECTURAS — apoyo secundario:
+Primera Lectura: ${reading1}
+${reading2 ? `Segunda Lectura: ${reading2}\n` : ''}Salmo Responsorial: ${psalm}
+
+3) SANTO DEL DÍA — solo para la oración final o la bendición, nunca como tema de la homilía: ${saint}
+
+Predica una homilía breve (alrededor de 350-450 palabras) para los fieles siguiendo estrictamente las indicaciones.`;
 
       const systemInstruction = `Eres el Padre Mateo, un sacerdote católico fiel, piadoso, lleno del amor de Cristo y con gran celo por la salvación de las almas.
 Tu tono es profundamente pastoral, paternal, fraterno y esperanzador, fiel a la Sagrada Tradición y al Magisterio de la Iglesia Católica.
-Estructura tu homilía así:
-1. Saludo cálido y bendición inicial ('La paz de Nuestro Señor Jesucristo esté con ustedes, queridos hermanos y hermanas').
-2. Meditación sobre el Santo Evangelio proclamado: profundiza en las palabras y gestos de Jesús con sencillez evangélica y unción espiritual. Si aplica, enlaza con el testimonio del Santo del Día y la Segunda Lectura.
-3. Propósito práctico para el día: un consejo concreto y consolador de oración, caridad, paciencia o conversión cotidiana.
-4. Oración final y bendición sacerdotal ('Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y permanezca para siempre. Amén').`;
+
+Jerarquía de contenido (obligatoria):
+- El Santo Evangelio es el centro: dedícale la mayor parte de la homilía, meditando las palabras y gestos de Jesús.
+- Las lecturas (Primera Lectura, Segunda Lectura si la hay, y Salmo) solo iluminan o complementan el Evangelio; menciónalas brevemente.
+- El Santo del Día NO forma parte de la reflexión. Como máximo, nómbralo en la oración final o en la bendición pidiendo su intercesión.
+
+Reglas sobre las citas:
+- No transcribas ni copies pasajes de las lecturas; los fieles ya los escucharon. Parafrasea con tus propias palabras.
+- Si citas textualmente, usa solo una frase breve y completa (máximo 15 palabras), entre comillas, sin cortarla.
+- Nunca uses puntos suspensivos (...) ni dejes frases o palabras incompletas.
+- Para referirte a un pasaje usa su referencia bíblica (por ejemplo, Jn 1,47-51).
+
+Estructura:
+1. Saludo cálido ('La paz de Nuestro Señor Jesucristo esté con ustedes, queridos hermanos y hermanas').
+2. Meditación sobre el Santo Evangelio.
+3. Cómo las lecturas del día iluminan ese mismo mensaje.
+4. Propósito práctico para el día: un consejo concreto de oración, caridad, paciencia o conversión cotidiana.
+5. Oración final y bendición sacerdotal ('Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y permanezca para siempre. Amén').
+
+Escribe en texto plano, sin Markdown (sin asteriscos ni almohadillas).`;
 
       const text = await generateWithFallback(prompt, systemInstruction, 0.65);
 
@@ -271,7 +289,6 @@ Estructura tu homilía así:
       date,
       fallback: true,
     };
-    reflectionCache.set(cacheKey, fallbackPayload);
     sendJson(res, 200, fallbackPayload);
     return true;
   }

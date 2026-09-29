@@ -147,10 +147,10 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         body: JSON.stringify({
           date: data.formattedDate,
           liturgicalTitle: data.title,
-          saint: `${data.saint.name}, ${data.saint.title}`,
-          reading1: `${data.firstReading.citation} - ${data.firstReading.text.slice(0, 300)}...`,
-          reading2: data.secondReading ? `${data.secondReading.citation} - ${data.secondReading.text.slice(0, 300)}...` : undefined,
-          psalm: `${data.psalm.citation}: ${data.psalm.response}`,
+          saint: data.saint.name,
+          reading1: `${data.firstReading.citation} - ${data.firstReading.text}`,
+          reading2: data.secondReading ? `${data.secondReading.citation} - ${data.secondReading.text}` : undefined,
+          psalm: `${data.psalm.citation}. R/. ${data.psalm.response}`,
           gospel: data.gospel.text,
           gospelQuote: data.gospel.citation,
         }),
@@ -167,7 +167,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       });
     } catch {
       const fallbackText =
-        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), la Palabra de Dios proclamada en la Sagrada Liturgia (${data.title}) nos interpela en lo más hondo del alma.\n\nEn el Santo Evangelio (${data.gospel.citation}), Jesús nos enseña el corazón del Reino de Dios: "${data.gospel.text.slice(0, 190)}...". ${data.secondReading ? `Como nos recuerda también la Segunda Lectura (${data.secondReading.citation}), somos llamados a vivir y morir enteramente para el Señor, viviendo en comunión de caridad fraterna.` : ''}\n\nLa verdadera fe se manifiesta en el perdón sincero, en desterrar el rencor y en saber que hemos recibido un perdón infinito de parte de Dios. Que el ejemplo de fidelidad de ${data.saint.name} nos anime a abrir el corazón a la gracia.\n\nPropósito para hoy: Renunciar de corazón a cualquier queja o resentimiento que llevemos guardado, rezar por aquella persona que nos cuesta perdonar y ofrecerle la paz.\n\nOremos: Señor Dios compasivo y misericordioso, enséñanos a perdonar como Tú nos has perdonado y haz que nuestro corazón descanse siempre en tu amor.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
+        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), la Palabra de Dios proclamada en la Sagrada Liturgia (${data.title}) nos interpela en lo más hondo del alma.\n\nEn el Santo Evangelio (${data.gospel.citation}), Jesús nos revela el corazón del Reino de Dios y nos invita a acoger su Palabra con fe sencilla y confiada. ${data.secondReading ? `Las lecturas de hoy, y en especial la Segunda Lectura (${data.secondReading.citation}), nos recuerdan que somos llamados a vivir enteramente para el Señor, en comunión de caridad fraterna.` : `La Primera Lectura (${data.firstReading.citation}) ilumina este mismo llamado a la fidelidad.`}\n\nLa verdadera fe se manifiesta en el perdón sincero, en desterrar el rencor y en saber que hemos recibido un perdón infinito de parte de Dios.\n\nPropósito para hoy: Renunciar de corazón a cualquier queja o resentimiento que llevemos guardado, rezar por aquella persona que nos cuesta perdonar y ofrecerle la paz.\n\nOremos: Señor Dios compasivo y misericordioso, enséñanos a perdonar como Tú nos has perdonado y haz que nuestro corazón descanse siempre en tu amor. Por la intercesión de ${data.saint.name}, escucha nuestra oración.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
       setReflection(fallbackText);
       reflectionClientCache.set(data.formattedDate, {
         reflection: fallbackText,
