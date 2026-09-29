@@ -4,6 +4,8 @@ import {
   VolumeX,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
+  Calendar,
   RefreshCw,
   Share2,
   BookOpen,
@@ -13,7 +15,7 @@ import {
   Check,
   BookmarkPlus
 } from 'lucide-react';
-import { getLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
+import { getLiturgicalDay, fetchLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
 import { getTodayDateStr, getTomorrowDateStr } from '../lib/dateUtils.ts';
 import { speechService } from '../lib/speech.ts';
 import { saveNote } from '../lib/firebase.ts';
@@ -32,8 +34,29 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
   const todayDateStr = getTodayDateStr();
   const tomorrowDateStr = getTomorrowDateStr();
 
+  const shiftDate = (dateStr: string, days: number): string => {
+    const parts = dateStr.split('-');
+    const y = parseInt(parts[0], 10) || 2026;
+    const m = parseInt(parts[1], 10) || 9;
+    const d = parseInt(parts[2], 10) || 1;
+    const dt = new Date(y, m - 1, d);
+    dt.setDate(dt.getDate() + days);
+    const nextY = dt.getFullYear();
+    const nextM = String(dt.getMonth() + 1).padStart(2, '0');
+    const nextD = String(dt.getDate()).padStart(2, '0');
+    return `${nextY}-${nextM}-${nextD}`;
+  };
+
   const [selectedDate, setSelectedDate] = useState(() => initialDate || todayDateStr);
   const [dayData, setDayData] = useState<LiturgicalDay>(() => getLiturgicalDay(initialDate || todayDateStr));
+  const [useAlternative, setUseAlternative] = useState(false);
+  const [syncingLiturgy, setSyncingLiturgy] = useState(false);
+
+  // Active celebration (allows switching between Fiesta and Feria if available for the day)
+  const currentCelebration =
+    useAlternative && dayData.alternativeCelebration
+      ? dayData.alternativeCelebration
+      : dayData;
 
   // If initialDate prop changes from navigation, sync it
   useEffect(() => {
@@ -75,11 +98,35 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     };
   }, []);
 
-  // Update day data when date changes
+  // Update day data when date changes with canonical remote synchronization
   useEffect(() => {
-    const data = getLiturgicalDay(selectedDate);
-    setDayData(data);
-    fetchReflection(data);
+    let isMounted = true;
+    setUseAlternative(false);
+
+    // 1. Immediate synchronous resolution (no delay)
+    const initial = getLiturgicalDay(selectedDate);
+    setDayData(initial);
+    fetchReflection(initial);
+
+    // 2. Asynchronous canonical synchronization for any selected date
+    setSyncingLiturgy(true);
+    fetchLiturgicalDay(selectedDate)
+      .then((canonical) => {
+        if (isMounted && canonical) {
+          setDayData(canonical);
+          fetchReflection(canonical);
+        }
+      })
+      .catch((err) => {
+        console.warn('Liturgia remota no disponible, usando leccionario canónico local:', err);
+      })
+      .finally(() => {
+        if (isMounted) setSyncingLiturgy(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [selectedDate]);
 
   const fetchReflection = async (data: LiturgicalDay) => {
@@ -102,6 +149,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           liturgicalTitle: data.title,
           saint: `${data.saint.name}, ${data.saint.title}`,
           reading1: `${data.firstReading.citation} - ${data.firstReading.text.slice(0, 300)}...`,
+          reading2: data.secondReading ? `${data.secondReading.citation} - ${data.secondReading.text.slice(0, 300)}...` : undefined,
           psalm: `${data.psalm.citation}: ${data.psalm.response}`,
           gospel: data.gospel.text,
           gospelQuote: data.gospel.citation,
@@ -119,7 +167,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       });
     } catch {
       const fallbackText =
-        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), el Señor Jesús en el Santo Evangelio (${data.gospel.citation}) nos llama a la autenticidad evangélica: "${data.gospel.text.slice(0, 160)}...".\n\nLa verdadera caridad cristiana no nace de juzgar a los demás, sino de reconocernos necesitados de la infinita misericordia divina. Como nos enseña el testimonio de ${data.saint.name}, estamos llamados a edificar antes que condenar y a confiar plenamente en la gracia redentora de Cristo.\n\nPropósito para hoy: Antes de criticar mentalmente o de palabra a un hermano o familiar, detengámonos un instante, recemos un Avemaría por él o ella, y pidámosle al Señor la gracia de la humildad.\n\nOremos: Señor Jesús, Maestro de los humildes, limpia los ojos de nuestro corazón de toda soberbia y llénanos de tu luz salvadora.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
+        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), la Palabra de Dios proclamada en la Sagrada Liturgia (${data.title}) nos interpela en lo más hondo del alma.\n\nEn el Santo Evangelio (${data.gospel.citation}), Jesús nos enseña el corazón del Reino de Dios: "${data.gospel.text.slice(0, 190)}...". ${data.secondReading ? `Como nos recuerda también la Segunda Lectura (${data.secondReading.citation}), somos llamados a vivir y morir enteramente para el Señor, viviendo en comunión de caridad fraterna.` : ''}\n\nLa verdadera fe se manifiesta en el perdón sincero, en desterrar el rencor y en saber que hemos recibido un perdón infinito de parte de Dios. Que el ejemplo de fidelidad de ${data.saint.name} nos anime a abrir el corazón a la gracia.\n\nPropósito para hoy: Renunciar de corazón a cualquier queja o resentimiento que llevemos guardado, rezar por aquella persona que nos cuesta perdonar y ofrecerle la paz.\n\nOremos: Señor Dios compasivo y misericordioso, enséñanos a perdonar como Tú nos has perdonado y haz que nuestro corazón descanse siempre en tu amor.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
       setReflection(fallbackText);
       reflectionClientCache.set(data.formattedDate, {
         reflection: fallbackText,
@@ -181,8 +229,8 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     const note = {
       id: 'note_' + Date.now(),
       userId: user?.uid || 'guest',
-      title: `Homilía - ${dayData.title}`,
-      content: `${dayData.gospel.citation}\n\n${reflection}`,
+      title: `Homilía - ${currentCelebration.title}`,
+      content: `${currentCelebration.gospel.citation}\n\n${reflection}`,
       date: dayData.date,
       createdAt: new Date().toISOString(),
     };
@@ -192,20 +240,20 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
   };
 
   const handleShare = async () => {
-    const text = `🕊️ Liturgia de hoy - ${dayData.title}\n\n📖 Evangelio (${dayData.gospel.citation}):\n${dayData.gospel.text}\n\n✨ Reflexión del ${priestName}:\n${reflection?.slice(0, 400)}...\n\nReza con Pan Vivo.`;
+    const text = `🕊️ Liturgia - ${currentCelebration.title}\n\n📖 Evangelio (${currentCelebration.gospel.citation}):\n${currentCelebration.gospel.text}\n\n✨ Reflexión del ${priestName}:\n${reflection?.slice(0, 400)}...\n\nReza con Pan Vivo.`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: dayData.title, text });
+        await navigator.share({ title: currentCelebration.title, text });
       } catch {}
     } else {
       navigator.clipboard.writeText(text);
       setCopiedNotification(true);
-      setTimeout(() => setCopiedNotification(false), 3000);
+      setTimeout(() => setCopiedNotification(false), 2500);
     }
   };
 
   return (
-    <div id="liturgy-container" className="min-h-screen pb-28 text-slate-100">
+    <div id="liturgy-container" className="min-h-screen pb-36 text-slate-100">
       {/* Top Hero Banner with Sacred Light & Pan Vivo Brand */}
       <div className="relative h-60 w-full overflow-hidden bg-slate-950">
         {/* Pure CSS Sacred Light & Altar Glow */}
@@ -219,12 +267,22 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             <PanVivoLogo size="sm" showSubtitle={false} />
           </div>
 
-          {/* Quick toggle: Hoy / Mañana */}
-          <div className="flex items-center bg-[#17100a]/80 backdrop-blur-md p-1 rounded-2xl border border-amber-900/30 text-xs shadow-lg shadow-black/30">
+          {/* Quick toggle: Anterior / Hoy / Mañana / Siguiente + Calendario */}
+          <div className="flex items-center gap-1 bg-[#17100a]/80 backdrop-blur-md p-1 rounded-2xl border border-amber-900/30 text-xs shadow-lg shadow-black/30">
+            <button
+              id="btn-date-prev"
+              title="Día anterior"
+              aria-label="Día anterior"
+              onClick={() => setSelectedDate(shiftDate(selectedDate, -1))}
+              className="p-1 rounded-xl text-slate-300 hover:text-white hover:bg-amber-500/20 transition-all active:scale-95"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
             <button
               id="btn-date-today"
               onClick={() => setSelectedDate(todayDateStr)}
-              className={`px-3 py-1 rounded-xl font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-xl font-medium transition-all ${
                 selectedDate === todayDateStr
                   ? 'bg-amber-500 text-slate-950 shadow-sm font-semibold'
                   : 'text-slate-300 hover:text-white'
@@ -235,7 +293,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             <button
               id="btn-date-tomorrow"
               onClick={() => setSelectedDate(tomorrowDateStr)}
-              className={`px-3 py-1 rounded-xl font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-xl font-medium transition-all ${
                 selectedDate === tomorrowDateStr
                   ? 'bg-amber-500 text-slate-950 shadow-sm font-semibold'
                   : 'text-slate-300 hover:text-white'
@@ -243,28 +301,142 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             >
               Mañana
             </button>
-            {selectedDate !== todayDateStr && selectedDate !== tomorrowDateStr && (
-              <span className="px-2.5 py-1 rounded-xl font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px]">
-                {selectedDate}
-              </span>
-            )}
+
+            <button
+              id="btn-date-next"
+              title="Día siguiente"
+              aria-label="Día siguiente"
+              onClick={() => setSelectedDate(shiftDate(selectedDate, 1))}
+              className="p-1 rounded-xl text-slate-300 hover:text-white hover:bg-amber-500/20 transition-all active:scale-95"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            {/* Native calendar date-picker wrapper */}
+            <label
+              title="Seleccionar otra fecha del año"
+              className="relative p-1 rounded-xl text-amber-300 hover:text-amber-200 hover:bg-amber-500/20 cursor-pointer transition-all flex items-center justify-center"
+            >
+              <Calendar className="w-4 h-4" />
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => {
+                  if (e.target.value) setSelectedDate(e.target.value);
+                }}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              />
+            </label>
           </div>
         </div>
 
         {/* Liturgical Title & Date in Hero */}
-        <div className="absolute bottom-4 left-4 right-4 text-center">
+        <div className="absolute bottom-3 left-4 right-4 text-center">
           <p className="text-xs uppercase tracking-wider text-amber-300/90 font-medium mb-1">
             {dayData.formattedDate}
           </p>
           <h1 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight drop-shadow-md">
-            {dayData.title}
+            {currentCelebration.title}
           </h1>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              {dayData.colorName}
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium border ${
+                currentCelebration.color === 'red'
+                  ? 'bg-red-950/80 border-red-500/40 text-red-300'
+                  : currentCelebration.color === 'purple'
+                  ? 'bg-purple-950/80 border-purple-500/40 text-purple-300'
+                  : currentCelebration.color === 'white'
+                  ? 'bg-slate-800/80 border-amber-300/40 text-amber-200'
+                  : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300'
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  currentCelebration.color === 'red'
+                    ? 'bg-red-400'
+                    : currentCelebration.color === 'purple'
+                    ? 'bg-purple-400'
+                    : currentCelebration.color === 'white'
+                    ? 'bg-amber-300'
+                    : 'bg-emerald-400'
+                }`}
+              ></span>
+              {currentCelebration.colorName}
             </span>
+
+            {syncingLiturgy && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 border border-amber-500/30 text-amber-300 animate-pulse">
+                Sincronizando leccionario canónico...
+              </span>
+            )}
           </div>
+
+          {/* Alternative celebration selector (e.g. Fiesta vs Feria) */}
+          {dayData.alternativeCelebration && (
+            <div className="flex items-center justify-center gap-2 mt-2.5">
+              <button
+                type="button"
+                onClick={() => setUseAlternative(false)}
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
+                  !useAlternative
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
+                    : 'bg-slate-900/80 text-slate-300 hover:text-white border border-slate-700/60'
+                }`}
+              >
+                Celebración principal
+              </button>
+              <button
+                type="button"
+                onClick={() => setUseAlternative(true)}
+                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
+                  useAlternative
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
+                    : 'bg-slate-900/80 text-slate-300 hover:text-white border border-slate-700/60'
+                }`}
+              >
+                Feria / Ordinario
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sticky Fast-Navigation Bar for Liturgical Readings */}
+      <div className="sticky top-0 z-20 px-4 py-2 bg-[#0e0a07]/95 backdrop-blur-md border-y border-amber-950/60 shadow-md">
+        <div className="max-w-xl mx-auto flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => document.getElementById('card-primera-lectura')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 hover:border-amber-500/40 active:scale-95 transition-all text-[11px] font-medium"
+          >
+            1ª Lectura
+          </button>
+          <button
+            onClick={() => document.getElementById('card-salmo-responsorial')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 hover:border-amber-500/40 active:scale-95 transition-all text-[11px] font-medium"
+          >
+            {currentCelebration.psalm.citation.split(':')[0].split(',')[0] || 'Salmo'}
+          </button>
+          {currentCelebration.secondReading && (
+            <button
+              onClick={() => document.getElementById('card-segunda-lectura')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500/25 active:scale-95 transition-all text-[11px] font-semibold flex items-center gap-1"
+            >
+              <span>2ª Lectura</span>
+              <span className="text-[9px] bg-amber-500 text-slate-950 px-1 rounded font-bold">Dom/Sol</span>
+            </button>
+          )}
+          <button
+            onClick={() => document.getElementById('card-evangelio')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-900 border border-amber-500/40 text-amber-300 hover:border-amber-300 active:scale-95 transition-all text-[11px] font-semibold"
+          >
+            Evangelio
+          </button>
+          <button
+            onClick={() => document.getElementById('card-reflexion-sacerdotal')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 hover:border-amber-500/40 active:scale-95 transition-all text-[11px] font-medium"
+          >
+            Homilía
+          </button>
         </div>
       </div>
 
@@ -333,7 +505,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             <button
               id="btn-audio-primera-lectura"
               onClick={() =>
-                playAudio('reading1', `Primera Lectura. De la ${dayData.firstReading.citation}. ${dayData.firstReading.text}`)
+                playAudio('reading1', `Primera Lectura. ${currentCelebration.firstReading.citation}. ${currentCelebration.firstReading.text}. Palabra de Dios. Te alabamos, Señor.`)
               }
               className={`p-2 rounded-full transition-all ${
                 currentPlayingSection === 'reading1' && isPlaying
@@ -351,7 +523,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </div>
 
           <p className="text-xs font-semibold text-amber-400 font-serif mb-2">
-            {dayData.firstReading.citation}
+            {currentCelebration.firstReading.citation}
           </p>
 
           <p
@@ -359,17 +531,20 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               expandedSection === 'reading1' ? '' : 'line-clamp-4'
             }`}
           >
-            {dayData.firstReading.text}
+            {currentCelebration.firstReading.text}
           </p>
 
-          <button
-            onClick={() =>
-              setExpandedSection(expandedSection === 'reading1' ? null : 'reading1')
-            }
-            className="mt-2 text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
-          >
-            {expandedSection === 'reading1' ? 'Mostrar menos' : 'Toca para leer completo'}
-          </button>
+          <div className="mt-2 flex items-center justify-between">
+            <button
+              onClick={() =>
+                setExpandedSection(expandedSection === 'reading1' ? null : 'reading1')
+              }
+              className="text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
+            >
+              {expandedSection === 'reading1' ? 'Mostrar menos' : 'Toca para leer completo'}
+            </button>
+            <span className="text-[10px] text-slate-400 font-serif italic">Palabra de Dios</span>
+          </div>
         </div>
 
         {/* 3. Card: Salmo Responsorial */}
@@ -390,7 +565,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               onClick={() =>
                 playAudio(
                   'psalm',
-                  `Salmo Responsorial. ${dayData.psalm.citation}. Respuesta: ${dayData.psalm.response}. ${dayData.psalm.verses.join('. ')}`
+                  `Salmo Responsorial. ${currentCelebration.psalm.citation}. Respuesta: ${currentCelebration.psalm.response}. ${currentCelebration.psalm.verses.join('. ')}`
                 )
               }
               className={`p-2 rounded-full transition-all ${
@@ -409,13 +584,13 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </div>
 
           <p className="text-xs font-semibold text-slate-400 mb-2">
-            {dayData.psalm.citation}
+            {currentCelebration.psalm.citation}
           </p>
 
           {/* Antiphon Callout */}
           <div className="bg-amber-950/30 border-l-2 border-amber-500 px-3 py-2 rounded-r-xl my-2">
             <p className="text-xs text-amber-300 font-serif font-medium italic">
-              R/. {dayData.psalm.response}
+              R/. {currentCelebration.psalm.response}
             </p>
           </div>
 
@@ -424,7 +599,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               expandedSection === 'psalm' ? '' : 'line-clamp-3'
             }`}
           >
-            {dayData.psalm.verses.map((verse, i) => (
+            {currentCelebration.psalm.verses.map((verse, i) => (
               <p key={i}>{verse}</p>
             ))}
           </div>
@@ -438,6 +613,74 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             {expandedSection === 'psalm' ? 'Mostrar menos' : 'Toca para leer estrofas completas'}
           </button>
         </div>
+
+        {/* 3b. Card: Segunda Lectura (Domingos y Solemnidades) */}
+        {currentCelebration.secondReading && (
+          <div
+            id="card-segunda-lectura"
+            className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold flex items-center justify-center">
+                  2
+                </span>
+                <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Segunda Lectura
+                </span>
+                <span className="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded-full font-sans">
+                  Domingos y Solemnidades
+                </span>
+              </div>
+
+              <button
+                id="btn-audio-segunda-lectura"
+                onClick={() =>
+                  playAudio(
+                    'reading2',
+                    `Segunda Lectura. ${currentCelebration.secondReading!.citation}. ${currentCelebration.secondReading!.text}. Palabra de Dios. Te alabamos, Señor.`
+                  )
+                }
+                className={`p-2 rounded-full transition-all ${
+                  currentPlayingSection === 'reading2' && isPlaying
+                    ? 'bg-amber-500 text-slate-950 scale-105'
+                    : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750'
+                }`}
+                title="Escuchar segunda lectura"
+              >
+                {currentPlayingSection === 'reading2' && isPlaying ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+
+            <p className="text-xs font-semibold text-amber-400 font-serif mb-2">
+              {currentCelebration.secondReading.citation}
+            </p>
+
+            <p
+              className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif ${
+                expandedSection === 'reading2' ? '' : 'line-clamp-4'
+              }`}
+            >
+              {currentCelebration.secondReading.text}
+            </p>
+
+            <div className="mt-2 flex items-center justify-between">
+              <button
+                onClick={() =>
+                  setExpandedSection(expandedSection === 'reading2' ? null : 'reading2')
+                }
+                className="text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
+              >
+                {expandedSection === 'reading2' ? 'Mostrar menos' : 'Toca para leer completo'}
+              </button>
+              <span className="text-[10px] text-slate-400 font-serif italic">Palabra de Dios</span>
+            </div>
+          </div>
+        )}
 
         {/* 4. Card: Santo Evangelio (Golden Accent) */}
         <div
@@ -457,7 +700,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               onClick={() =>
                 playAudio(
                   'gospel',
-                  `Proclamación del Santo Evangelio según ${dayData.gospel.citation}. ${dayData.gospel.text}. Palabra del Señor. Gloria a ti, Señor Jesús.`
+                  `Proclamación del Santo Evangelio según ${currentCelebration.gospel.citation}. ${currentCelebration.gospel.text}. Palabra del Señor. Gloria a ti, Señor Jesús.`
                 )
               }
               className={`p-2 rounded-full transition-all ${
@@ -476,15 +719,15 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </div>
 
           <p className="text-sm font-bold text-amber-200 font-serif mb-1">
-            {dayData.gospel.citation}
+            {currentCelebration.gospel.citation}
           </p>
 
           <p className="text-[11px] text-slate-400 italic mb-3">
-            {dayData.gospel.acclamation}
+            {currentCelebration.gospel.acclamation}
           </p>
 
           <div className="text-xs sm:text-sm text-slate-100 leading-relaxed font-serif space-y-2 border-l border-amber-500/20 pl-3">
-            <p>{dayData.gospel.text}</p>
+            <p>{currentCelebration.gospel.text}</p>
           </div>
 
           <div className="mt-3 pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] text-amber-300/80 font-serif">

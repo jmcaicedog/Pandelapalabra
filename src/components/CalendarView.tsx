@@ -13,7 +13,7 @@ import {
   Flame,
   Check
 } from 'lucide-react';
-import { getLiturgicalDay } from '../data/liturgy.ts';
+import { getLiturgicalDay, fetchLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
 import { getTodayDateStr } from '../lib/dateUtils.ts';
 import {
   getUserRoutines,
@@ -169,7 +169,27 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  const selectedDayData = getLiturgicalDay(selectedCalendarDate);
+  const [selectedDayData, setSelectedDayData] = useState<LiturgicalDay>(() => getLiturgicalDay(selectedCalendarDate));
+
+  useEffect(() => {
+    let isMounted = true;
+    const initial = getLiturgicalDay(selectedCalendarDate);
+    setSelectedDayData(initial);
+
+    fetchLiturgicalDay(selectedCalendarDate)
+      .then((canonical) => {
+        if (isMounted && canonical) {
+          setSelectedDayData(canonical);
+        }
+      })
+      .catch((err) => {
+        console.warn('Calendar liturgy fetch fallback:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCalendarDate]);
 
   const completedTodayCount = routines.filter((r) => r.completedDates?.includes(todayStr)).length;
 
@@ -338,15 +358,41 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                 {selectedDayData.title}
               </h4>
 
-              <div className="text-xs text-slate-300 space-y-1.5 border-t border-slate-800/80 pt-2.5">
-                <p>
-                  <strong className="text-amber-300 font-serif">Santo: </strong>
-                  {selectedDayData.saint.name}
-                </p>
-                <p>
-                  <strong className="text-amber-300 font-serif">Evangelio: </strong>
-                  {selectedDayData.gospel.citation}
-                </p>
+              <div className="text-xs text-slate-300 space-y-2 border-t border-slate-800/80 pt-2.5">
+                <div>
+                  <span className="text-amber-300 font-serif font-semibold text-xs">Santo del Día: </span>
+                  <span className="font-bold text-slate-100">{selectedDayData.saint.name}</span>
+                  {selectedDayData.saint.title && (
+                    <p className="text-[11px] text-slate-400 font-serif italic mt-0.5">
+                      {selectedDayData.saint.title}
+                    </p>
+                  )}
+                  {selectedDayData.saint.patronage && (
+                    <span className="inline-block mt-1 text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                      Patrono de {selectedDayData.saint.patronage}
+                    </span>
+                  )}
+                </div>
+                <div className="text-slate-300 pt-1 border-t border-slate-800/40 space-y-1 text-xs">
+                  <p>
+                    <strong className="text-amber-300 font-serif">1ª Lectura: </strong>
+                    <span className="text-slate-200">{selectedDayData.firstReading.citation}</span>
+                  </p>
+                  <p>
+                    <strong className="text-amber-300 font-serif">Salmo: </strong>
+                    <span className="text-slate-200">{selectedDayData.psalm.citation}</span>
+                  </p>
+                  {selectedDayData.secondReading && (
+                    <p>
+                      <strong className="text-amber-300 font-serif">2ª Lectura: </strong>
+                      <span className="text-slate-200">{selectedDayData.secondReading.citation}</span>
+                    </p>
+                  )}
+                  <p>
+                    <strong className="text-amber-300 font-serif">Evangelio: </strong>
+                    <span className="text-slate-100 font-semibold">{selectedDayData.gospel.citation}</span>
+                  </p>
+                </div>
               </div>
 
               <button

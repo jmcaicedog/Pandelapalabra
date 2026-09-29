@@ -1,5 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import type { IncomingMessage, ServerResponse } from 'http';
+import { LITURGY_DATABASE } from '../data/liturgy.js';
+import { buildCanonicalDay } from '../data/canonicalLectionary.js';
 
 let genAIInstance: GoogleGenAI | null = null;
 
@@ -26,6 +28,7 @@ const CANDIDATE_MODELS = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 // Cache for homilies and counsel to conserve quota
 const reflectionCache = new Map<string, { reflection: string; priestName: string; date: string; fallback: boolean }>();
 const counselCache = new Map<string, { counsel: string; priestName: string; fallback: boolean }>();
+const dynamicLiturgyCache = new Map<string, any>();
 
 // Circuit breaker for quota limits (e.g. 429 RESOURCE_EXHAUSTED)
 let quotaCooldownUntil = 0;
@@ -80,19 +83,25 @@ async function generateWithFallback(
   return null;
 }
 
-function getCanonicalHomily(date: string, saint: string, gospelQuote: string, gospel: string): string {
+function getCanonicalHomily(date: string, saint: string, gospelQuote: string, gospel: string, reading2?: string): string {
+  const isMatthew18 = gospelQuote.includes('18') || gospel.toLowerCase().includes('perdon') || gospel.toLowerCase().includes('setenta veces');
+  
+  const centralTheme = isMatthew18
+    ? 'El Señor Jesús nos llama a vivir la medida divina del perdón: perdonar de corazón setenta veces siete, recordando que nosotros mismos hemos sido perdonados de una deuda impagable por el amor misericordioso del Padre celestial.'
+    : 'El Señor Jesús nos llama a la conversión sincera y a configurar nuestra vida con su Evangelio de caridad, verdad y salvación eterna.';
+
   return `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.
 
-En este día santo (${date}), la liturgia de la Iglesia nos invita a meditar con unción el Evangelio (${gospelQuote}):
+En este día santo (${date}), la liturgia de la Santa Madre Iglesia nos invita a meditar con devoción el Santo Evangelio (${gospelQuote}):
 «${gospel.slice(0, 220)}${gospel.length > 220 ? '...' : ''}»
 
-El Señor Jesús nos llama a mirarnos con autenticidad y verdad ante Dios. Con frecuencia nos fijamos en la mota en el ojo ajeno, olvidando que nosotros mismos somos necesitados de la infinita misericordia del Padre. Como nos enseña el testimonio de ${saint || 'nuestros santos protectores'}, la santidad no consiste en juzgar o condenar a los demás, sino en dejarnos transformar dócilmente por la gracia y el amor salvador de Cristo.
+${centralTheme} ${reading2 ? `Asimismo, la Sagrada Escritura nos recuerda que tanto en la vida como en la muerte somos del Señor, y que ninguna ofrenda agrada tanto a Dios como un corazón reconciliado con sus hermanos.` : ''} Como nos enseña el testimonio luminoso de ${saint || 'nuestros santos protectores'}, la santidad consiste en dejarnos transformar dócilmente por la gracia de Cristo.
 
 Propósito para hoy:
-Antes de emitir un juicio apresurado o guardar resentimiento hacia un hermano, detengamos nuestros pensamientos, recemos un Avemaría pidiendo mansedumbre y hagamos un acto sincero de caridad oculta.
+Antes de que termine el día, examinemos si guardamos algún rencor o distancia con algún prójimo; recemos un Padre Nuestro por esa persona y hagamos un gesto de paz y reconciliación sincera.
 
 Oración y bendición sacerdotal:
-Señor Jesús, Luz del mundo y Médico de los corazones, limpia nuestras almas de toda soberbia y concédenos la paz que solo Tú puedes dar.
+Señor Jesucristo, Príncipe de la Paz y Pastor eterno, derrama tu amor en nuestros corazones y enséñanos a amar y perdonar como Tú nos amas.
 Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes, sus hogares y sus seres queridos, y permanezca para siempre. Amén.»`;
 }
 
@@ -167,7 +176,34 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
     return true;
   }
 
-  // 2. Catholic Priest Homily Reflection
+  // 2. Catholic Liturgy of the Day for any date
+  if (pathname === '/api/liturgy') {
+    const dateParam = url.searchParams.get('date') || '';
+    if (!dateParam || !/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      sendJson(res, 400, { error: 'Se requiere una fecha válida en formato YYYY-MM-DD' });
+      return true;
+    }
+
+    // 1. Direct match in curated liturgical database
+    if (LITURGY_DATABASE[dateParam]) {
+      sendJson(res, 200, LITURGY_DATABASE[dateParam]);
+      return true;
+    }
+
+    if (dynamicLiturgyCache.has(dateParam)) {
+      sendJson(res, 200, dynamicLiturgyCache.get(dateParam));
+      return true;
+    }
+
+    // Canonical Roman Catholic Lectionary (Ordo Lectionum Missae)
+    // Deterministic, immediate (<1ms), and 100% faithful to the liturgical calendar
+    const canonical = buildCanonicalDay(dateParam);
+    dynamicLiturgyCache.set(dateParam, canonical);
+    sendJson(res, 200, canonical);
+    return true;
+  }
+
+  // 3. Catholic Priest Homily Reflection
   if (pathname === '/api/reflection' && req.method === 'POST') {
     let body: any = {};
     try {
@@ -181,6 +217,7 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
       liturgicalTitle = 'Tiempo Ordinario',
       saint = 'Santos del día',
       reading1 = '',
+      reading2 = '',
       psalm = '',
       gospel = '',
       gospelQuote = '',
@@ -197,7 +234,7 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
 Santo del día: ${saint}
 Primera Lectura: ${reading1}
 Salmo Responsorial: ${psalm}
-Santo Evangelio (${gospelQuote}):
+${reading2 ? `Segunda Lectura: ${reading2}\n` : ''}Santo Evangelio (${gospelQuote}):
 "${gospel}"
 
 Por favor, como un santo sacerdote católico, predica una homilía o reflexión breve (alrededor de 350-450 palabras) para los fieles.`;
@@ -206,7 +243,7 @@ Por favor, como un santo sacerdote católico, predica una homilía o reflexión 
 Tu tono es profundamente pastoral, paternal, fraterno y esperanzador, fiel a la Sagrada Tradición y al Magisterio de la Iglesia Católica.
 Estructura tu homilía así:
 1. Saludo cálido y bendición inicial ('La paz de Nuestro Señor Jesucristo esté con ustedes, queridos hermanos y hermanas').
-2. Meditación sobre el Santo Evangelio proclamado: profundiza en las palabras y gestos de Jesús con sencillez evangélica y unción espiritual. Si aplica, enlaza con el testimonio del Santo del Día.
+2. Meditación sobre el Santo Evangelio proclamado: profundiza en las palabras y gestos de Jesús con sencillez evangélica y unción espiritual. Si aplica, enlaza con el testimonio del Santo del Día y la Segunda Lectura.
 3. Propósito práctico para el día: un consejo concreto y consolador de oración, caridad, paciencia o conversión cotidiana.
 4. Oración final y bendición sacerdotal ('Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y permanezca para siempre. Amén').`;
 
@@ -227,7 +264,7 @@ Estructura tu homilía así:
       // Fall through to canonical homily
     }
 
-    const fallbackReflection = getCanonicalHomily(date, saint, gospelQuote, gospel);
+    const fallbackReflection = getCanonicalHomily(date, saint, gospelQuote, gospel, reading2);
     const fallbackPayload = {
       reflection: fallbackReflection,
       priestName: 'Padre Mateo',
