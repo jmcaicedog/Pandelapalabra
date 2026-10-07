@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import type { IncomingMessage, ServerResponse } from 'http';
 import { LITURGY_DATABASE } from '../data/liturgy.js';
 import { buildCanonicalDay } from '../data/canonicalLectionary.js';
+import { fetchEvangelizoDay } from '../data/evangelizo.js';
 
 let genAIInstance: GoogleGenAI | null = null;
 
@@ -183,22 +184,26 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
       return true;
     }
 
-    // 1. Direct match in curated liturgical database
-    if (LITURGY_DATABASE[dateParam]) {
-      sendJson(res, 200, LITURGY_DATABASE[dateParam]);
-      return true;
-    }
-
     if (dynamicLiturgyCache.has(dateParam)) {
       sendJson(res, 200, dynamicLiturgyCache.get(dateParam));
       return true;
     }
 
-    // Canonical Roman Catholic Lectionary (Ordo Lectionum Missae)
-    // Deterministic, immediate (<1ms), and 100% faithful to the liturgical calendar
-    const canonical = buildCanonicalDay(dateParam);
-    dynamicLiturgyCache.set(dateParam, canonical);
-    sendJson(res, 200, canonical);
+    // 1. Official lectionary (Evangelizo) for any published date
+    const official = await fetchEvangelizoDay(dateParam);
+    if (official) {
+      const curated = LITURGY_DATABASE[dateParam];
+      const merged = curated
+        ? { ...official, saint: curated.saint, defaultReflection: curated.defaultReflection }
+        : official;
+      dynamicLiturgyCache.set(dateParam, merged);
+      sendJson(res, 200, merged);
+      return true;
+    }
+
+    // 2. Curated local entry, then local calendar (never cached, so the official
+    //    readings are picked up as soon as they're published or the service recovers)
+    sendJson(res, 200, LITURGY_DATABASE[dateParam] || buildCanonicalDay(dateParam));
     return true;
   }
 

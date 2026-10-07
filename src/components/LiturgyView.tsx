@@ -106,7 +106,8 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     // 1. Immediate synchronous resolution (no delay)
     const initial = getLiturgicalDay(selectedDate);
     setDayData(initial);
-    fetchReflection(initial);
+    if (initial.source !== 'local') fetchReflection(initial);
+    else setLoadingReflection(true);
 
     // 2. Asynchronous canonical synchronization for any selected date
     setSyncingLiturgy(true);
@@ -130,6 +131,15 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
   }, [selectedDate]);
 
   const fetchReflection = async (data: LiturgicalDay) => {
+    if (data.readingsPending) {
+      setReflection(
+        'La homilía de este día estará disponible cuando se publiquen las lecturas oficiales (aproximadamente tres meses antes de la fecha).'
+      );
+      setReflectionError(null);
+      setLoadingReflection(false);
+      return;
+    }
+
     const cached = reflectionClientCache.get(data.formattedDate);
     if (cached) {
       setReflection(cached.reflection);
@@ -527,7 +537,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </p>
 
           <p
-            className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif ${
+            className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line ${
               expandedSection === 'reading1' ? '' : 'line-clamp-4'
             }`}
           >
@@ -595,7 +605,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </div>
 
           <div
-            className={`space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif ${
+            className={`space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif whitespace-pre-line ${
               expandedSection === 'psalm' ? '' : 'line-clamp-3'
             }`}
           >
@@ -661,7 +671,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             </p>
 
             <p
-              className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif ${
+              className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line ${
                 expandedSection === 'reading2' ? '' : 'line-clamp-4'
               }`}
             >
@@ -727,7 +737,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </p>
 
           <div className="text-xs sm:text-sm text-slate-100 leading-relaxed font-serif space-y-2 border-l border-amber-500/20 pl-3">
-            <p>{currentCelebration.gospel.text}</p>
+            <p className="whitespace-pre-line">{currentCelebration.gospel.text}</p>
           </div>
 
           <div className="mt-3 pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] text-amber-300/80 font-serif">

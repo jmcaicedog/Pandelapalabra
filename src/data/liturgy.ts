@@ -1,5 +1,5 @@
-import { getSaintForDate } from './saintsCalendar.js';
 import { buildCanonicalDay } from './canonicalLectionary.js';
+import { fetchEvangelizoDay } from './evangelizo.js';
 
 export interface LiturgicalDay {
   date: string; // YYYY-MM-DD
@@ -35,6 +35,10 @@ export interface LiturgicalDay {
     text: string;
   };
   defaultReflection?: string;
+  /** Origin of the readings: official Evangelizo lectionary, curated local entry or local fallback. */
+  source?: 'evangelizo' | 'curated' | 'local';
+  /** True when the official readings for this date are not yet published (beyond the publication window). */
+  readingsPending?: boolean;
   alternativeCelebration?: {
     title: string;
     season: 'Tiempo Ordinario' | 'Cuaresma' | 'Pascua' | 'Adviento' | 'Navidad' | 'Fiesta / Solemnidad';
@@ -895,88 +899,73 @@ const WEEKDAY_READINGS = [
 
 // Memory cache for runtime dynamic liturgy
 const clientLiturgyMemoryCache = new Map<string, LiturgicalDay>();
+const LITURGY_STORAGE_PREFIX = 'panvivo_liturgy_v3_';
 
-export function getLiturgicalDay(dateStr: string): LiturgicalDay {
-  if (LITURGY_DATABASE[dateStr]) {
-    return LITURGY_DATABASE[dateStr];
-  }
-
-  if (clientLiturgyMemoryCache.has(dateStr)) {
-    return clientLiturgyMemoryCache.get(dateStr)!;
-  }
-
-  // Canonical Roman Lectionary engine guaranteeing correct Gospel (e.g. Luke in weeks 22-34) and saints
-  const canonical = buildCanonicalDay(dateStr);
-  clientLiturgyMemoryCache.set(dateStr, canonical);
-  return canonical;
+function mergeWithCurated(dateStr: string, official: LiturgicalDay): LiturgicalDay {
+  const curated = LITURGY_DATABASE[dateStr];
+  if (!curated) return official;
+  return { ...official, saint: curated.saint, defaultReflection: curated.defaultReflection };
 }
 
-/**
- * Asynchronously fetches authentic Catholic liturgy for any date from the server API,
- * with multi-tier caching (memory, localStorage, and static Roman lectionary database).
- */
-export async function fetchLiturgicalDay(dateStr: string): Promise<LiturgicalDay> {
-  // 1. Static curated database
-  if (LITURGY_DATABASE[dateStr]) {
-    return LITURGY_DATABASE[dateStr];
-  }
+function isOfficial(day: LiturgicalDay | null | undefined): day is LiturgicalDay {
+  return !!day && day.source === 'evangelizo' && !!day.firstReading && !!day.gospel;
+}
 
-  // 2. In-memory cache
-  if (clientLiturgyMemoryCache.has(dateStr)) {
-    const cached = clientLiturgyMemoryCache.get(dateStr)!;
-    // Discard cache if ordinary ferial weekday in weeks 22-34 has incorrect gospel (must be Lucas unless it's a Feast/Solemnity)
-    const isWeekday = new Date(dateStr + 'T12:00:00').getDay() !== 0;
-    const isFeast = cached.season === 'Fiesta / Solemnidad';
-    if (!isWeekday || isFeast || cached.gospel.citation.toLowerCase().includes('lucas')) {
-      return cached;
-    }
-  }
+/** Synchronous best-effort day (used for the first paint before the official readings arrive). */
+export function getLiturgicalDay(dateStr: string): LiturgicalDay {
+  const cached = clientLiturgyMemoryCache.get(dateStr);
+  if (cached) return cached;
 
-  // 3. LocalStorage cache
   if (typeof window !== 'undefined') {
     try {
-      const stored = localStorage.getItem(`panvivo_liturgy_${dateStr}`);
+      const stored = localStorage.getItem(LITURGY_STORAGE_PREFIX + dateStr);
       if (stored) {
         const parsed = JSON.parse(stored) as LiturgicalDay;
-        const isWeekday = new Date(dateStr + 'T12:00:00').getDay() !== 0;
-        const isFeast = parsed.season === 'Fiesta / Solemnidad';
-        if (parsed && parsed.firstReading && parsed.gospel && (!isWeekday || isFeast || parsed.gospel.citation.toLowerCase().includes('lucas'))) {
+        if (isOfficial(parsed)) {
           clientLiturgyMemoryCache.set(dateStr, parsed);
           return parsed;
-        } else {
-          localStorage.removeItem(`panvivo_liturgy_${dateStr}`);
         }
       }
     } catch {
-      // Continue to API fetch
+      // Ignore storage errors
     }
   }
 
-  // 4. Remote API resolution
+  return LITURGY_DATABASE[dateStr] || buildCanonicalDay(dateStr);
+}
+
+/**
+ * Fetches the official liturgy of any date: memory/localStorage cache -> server API ->
+ * Evangelizo directly -> curated/local calendar fallback (readings marked as pending when unknown).
+ */
+export async function fetchLiturgicalDay(dateStr: string): Promise<LiturgicalDay> {
+  const cached = getLiturgicalDay(dateStr);
+  if (isOfficial(cached)) return cached;
+
+  const remember = (day: LiturgicalDay) => {
+    clientLiturgyMemoryCache.set(dateStr, day);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(LITURGY_STORAGE_PREFIX + dateStr, JSON.stringify(day));
+      } catch {
+        // Ignore quota errors
+      }
+    }
+    return day;
+  };
+
   try {
     const res = await fetch(`/api/liturgy?date=${encodeURIComponent(dateStr)}`);
     if (res.ok) {
-      const data = await res.json();
-      if (data && data.firstReading && data.gospel) {
-        clientLiturgyMemoryCache.set(dateStr, data);
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem(`panvivo_liturgy_${dateStr}`, JSON.stringify(data));
-          } catch {
-            // Ignore quota errors
-          }
-        }
-        return data;
-      }
+      const data = (await res.json()) as LiturgicalDay;
+      if (isOfficial(data)) return remember(data);
     }
   } catch {
-    // Fall back to canonical lectionary
+    // Try the official source directly
   }
 
-  // 5. Fallback deterministic liturgical day
-  const fallback = buildCanonicalDay(dateStr);
-  clientLiturgyMemoryCache.set(dateStr, fallback);
-  return fallback;
+  const direct = await fetchEvangelizoDay(dateStr);
+  if (direct) return remember(mergeWithCurated(dateStr, direct));
+
+  return LITURGY_DATABASE[dateStr] || buildCanonicalDay(dateStr);
 }
-
-

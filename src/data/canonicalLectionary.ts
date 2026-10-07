@@ -1,5 +1,11 @@
 import { getSaintForDate } from './saintsCalendar.js';
 import type { LiturgicalDay } from './liturgy.js';
+import {
+  buildSeasonalTitle,
+  getColorName,
+  getLiturgicalCalendarInfo,
+  resolveLiturgicalColor,
+} from './liturgicalCalendar.js';
 
 // Computus algorithm for Easter Sunday (Meeus/Jones/Butcher)
 export function getEasterSunday(year: number): { month: number; day: number } {
@@ -20,53 +26,11 @@ export function getEasterSunday(year: number): { month: number; day: number } {
   return { month, day };
 }
 
-// Helper to add days to a Date
-function addDays(d: Date, days: number): Date {
-  const res = new Date(d);
-  res.setDate(res.getDate() + days);
-  return res;
-}
-
-// Calculate week of Ordinary Time for any given date
+// Week of Ordinary Time for any date (0 when the date falls outside Ordinary Time)
 export function getOrdinaryTimeWeek(date: Date): number {
-  const year = date.getFullYear();
-  const easterData = getEasterSunday(year);
-  const easter = new Date(year, easterData.month - 1, easterData.day, 12, 0, 0);
-
-  // Pentecost is 49 days after Easter
-  const pentecost = addDays(easter, 49);
-
-  // First Sunday of Advent is Sunday closest to Nov 30 (Nov 27 - Dec 3)
-  const nov30 = new Date(year, 10, 30, 12, 0, 0);
-  const dayOfWeekNov30 = nov30.getDay();
-  const advent1 = addDays(nov30, dayOfWeekNov30 <= 3 ? -dayOfWeekNov30 : 7 - dayOfWeekNov30);
-
-  // Week 34 ends on the Saturday before Advent 1
-  const week34Sunday = addDays(advent1, -7);
-
-  // Calculate weeks backwards from week 34
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const diffDays = Math.round((date.getTime() - week34Sunday.getTime()) / msPerDay);
-  const weeksFromWeek34 = Math.floor(diffDays / 7);
-  const estimatedWeek = 34 + weeksFromWeek34;
-
-  if (estimatedWeek >= 1 && estimatedWeek <= 34) {
-    return estimatedWeek;
-  }
-
-  // Fallback estimation for ordinary time
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  if (month === 9) {
-    if (day < 7) return 23;
-    if (day < 14) return 24;
-    if (day < 21) return 25;
-    if (day < 28) return 26;
-    return 27;
-  }
-  if (month === 10) return Math.min(31, 27 + Math.floor((day - 1) / 7));
-  if (month === 11) return Math.min(34, 31 + Math.floor((day - 1) / 7));
-  return 24;
+  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const info = getLiturgicalCalendarInfo(dateStr);
+  return info.season === 'Tiempo Ordinario' ? info.week : 0;
 }
 
 // Roman numeral conversion for weeks
@@ -322,12 +286,12 @@ export const ORDINARY_TIME_YEAR_2_FIRST_READINGS: Record<string, {
       text: 'Hermanos: Ambicionad los carismas mejores. Y aún os voy a mostrar un camino más excelente. Si hablara las lenguas de los hombres y de los ángeles, pero no tengo amor, no sería más que un bronce que resuena o un címbalo que retiñe... El amor es paciente, es benigno; el amor no tiene envidia, no presume, no se engríe, no es indecoroso, no busca su interés, no se irrita, no toma en cuenta el mal... El amor no pasa nunca... Ahora permanecen estas tres virtudes: la fe, la esperanza y el amor. Pero la más grande de ellas es el amor.'
     },
     psalm: {
-      citation: 'Salmo 110, 1-2. 3-4. 5-6',
+      citation: 'Salmo 32, 2-3. 4-5. 12 y 22',
       response: 'Dichoso el pueblo que el Señor se escogió como heredad.',
       verses: [
-        'Doy gracias al Señor de todo corazón en la asamblea de los rectos, en la comunidad. Grandes son las obras del Señor, dignas de estudio para los que las aman.',
-        'Esplendor y belleza son sus obras, su justicia permanece para siempre. Ha hecho célebres sus maravillas; el Señor es piadoso y clemente.',
-        'Él da alimento a sus fieles, recordando siempre su alianza. Mostró a su pueblo la fuerza de sus obras, dándoles la heredad de los gentiles.'
+        'Dad gracias al Señor con la cítara, tocad en su honor el arpa de diez cuerdas; cantadle un cántico nuevo, acompañando los vítores con bordones.',
+        'La palabra del Señor es sincera, y todas sus acciones son leales; él ama la justicia y el derecho, y su misericordia llena la tierra.',
+        'Dichosa la nación cuyo Dios es el Señor, el pueblo que él se escogió como heredad. Que tu misericordia, Señor, venga sobre nosotros, como lo esperamos de ti.'
       ]
     }
   },
@@ -559,6 +523,741 @@ export const ORDINARY_TIME_YEAR_2_FIRST_READINGS: Record<string, {
         'Yo soy tu siervo: dame inteligencia para que conozca tus preceptos. La explicación de tus palabras ilumina, instruye a los sencillos.'
       ]
     }
+  },
+
+  // Semana 27 (Año II - Carta a los Gálatas)
+  '27-1': {
+    firstReading: {
+      citation: 'Gálatas 1, 6-12',
+      text: 'Hermanos: Me maravillo de que tan pronto os hayáis apartado del que os llamó por la gracia de Cristo, para pasaros a otro evangelio. No es que haya otro, sino que hay algunos que os perturban y quieren deformar el Evangelio de Cristo. Pero si alguien —nosotros mismos o un ángel del cielo— os anunciara un evangelio distinto del que os hemos anunciado, ¡sea anatema!... Os hago saber, hermanos, que el Evangelio anunciado por mí no es de origen humano; pues yo no lo he recibido ni aprendido de ningún hombre, sino por revelación de Jesucristo.'
+    },
+    psalm: {
+      citation: 'Salmo 110, 1-2. 7-9. 10c',
+      response: 'El Señor recuerda siempre su alianza.',
+      verses: [
+        'Doy gracias al Señor de todo corazón, en compañía de los rectos, en la asamblea. Grandes son las obras del Señor, dignas de estudio para los que las aman.',
+        'Justicia y verdad son las obras de sus manos, todos sus preceptos merecen confianza: son estables para siempre jamás, se han de cumplir con verdad y rectitud.',
+        'Envió la redención a su pueblo, ratificó para siempre su alianza; su nombre es sagrado y temible. La alabanza del Señor dura por siempre.'
+      ]
+    }
+  },
+  '27-2': {
+    firstReading: {
+      citation: 'Gálatas 1, 13-24',
+      text: 'Hermanos: Habéis oído hablar de mi conducta pasada en el judaísmo: con qué saña perseguía a la Iglesia de Dios y la asolaba... Pero cuando Aquel que me separó desde el seno de mi madre y me llamó por su gracia se dignó revelar a su Hijo en mí, para que lo anunciara entre los gentiles, no consulté con hombres de carne y hueso... Más tarde, pasados tres años, subí a Jerusalén para conocer a Cefas y permanecí quince días con él... Las Iglesias de Judea solo habían oído decir: «El que antes nos perseguía, ahora anuncia la fe que antes intentaba destruir»; y glorificaban a Dios por causa mía.'
+    },
+    psalm: {
+      citation: 'Salmo 138, 1-3. 13-14ab. 14c-15',
+      response: 'Guíame, Señor, por el camino eterno.',
+      verses: [
+        'Señor, tú me sondeas y me conoces; me conoces cuando me siento o me levanto, de lejos penetras mis pensamientos; distingues mi camino y mi descanso, todas mis sendas te son familiares.',
+        'Tú has creado mis entrañas, me has tejido en el seno materno. Te doy gracias, porque me has escogido portentosamente, porque son admirables tus obras.',
+        'Conocías hasta el fondo de mi alma, no desconocías mis huesos, cuando, en lo oculto, me iba formando, y entretejiendo en lo profundo de la tierra.'
+      ]
+    }
+  },
+  '27-3': {
+    firstReading: {
+      citation: 'Gálatas 2, 1-2. 7-14',
+      text: 'Hermanos: Al cabo de catorce años, subí de nuevo a Jerusalén con Bernabé, llevando también a Tito. Subí por una revelación y les expuse el Evangelio que predico entre los gentiles... Vieron que se me había encomendado el Evangelio de la incircuncisión, así como a Pedro el de la circuncisión... Santiago, Cefas y Juan, considerados como columnas, nos dieron la mano en señal de comunión a Bernabé y a mí... Pero cuando Cefas llegó a Antioquía, tuve que enfrentarme con él cara a cara, porque era reprensible... Cuando vi que no andaban rectamente según la verdad del Evangelio, le dije a Cefas delante de todos: «Si tú, siendo judío, vives como un gentil y no como un judío, ¿cómo obligas a los gentiles a judaizar?».'
+    },
+    psalm: {
+      citation: 'Salmo 116, 1. 2',
+      response: 'Id al mundo entero y proclamad el Evangelio.',
+      verses: [
+        'Alabad al Señor todas las naciones, aclamadlo todos los pueblos.',
+        'Firme es su misericordia con nosotros, su fidelidad dura por siempre.'
+      ]
+    }
+  },
+  '27-4': {
+    firstReading: {
+      citation: 'Gálatas 3, 1-5',
+      text: '¡Insensatos gálatas! ¿Quién os ha embrujado a vosotros, ante cuyos ojos fue presentado Jesucristo crucificado? Solo quiero saber esto de vosotros: ¿recibisteis el Espíritu por las obras de la ley o por haber escuchado con fe? ¿Tan insensatos sois? ¿Comenzasteis por el Espíritu para terminar ahora con la carne?... El que os concede el Espíritu y obra milagros entre vosotros, ¿lo hace por las obras de la ley o por haber escuchado con fe?'
+    },
+    psalm: {
+      citation: 'Lucas 1, 69-70. 71-72. 73-75',
+      response: 'Bendito sea el Señor, Dios de Israel, porque ha visitado a su pueblo.',
+      verses: [
+        'Nos ha suscitado una fuerza de salvación en la casa de David, su siervo, según lo había predicho desde antiguo por boca de sus santos profetas.',
+        'Es la salvación que nos libra de nuestros enemigos y de la mano de todos los que nos odian; realizando la misericordia que tuvo con nuestros padres, recordando su santa alianza.',
+        'Y el juramento que juró a nuestro padre Abrahán. Para concedernos que, libres de temor, arrancados de la mano de los enemigos, le sirvamos con santidad y justicia, en su presencia, todos nuestros días.'
+      ]
+    }
+  },
+  '27-5': {
+    firstReading: {
+      citation: 'Gálatas 3, 7-14',
+      text: 'Hermanos: Reconoced que hijos de Abrahán son los que viven de la fe. La Escritura, previendo que Dios justificaría a los gentiles por la fe, anunció de antemano a Abrahán: «En ti serán bendecidas todas las naciones». Así pues, los que viven de la fe son bendecidos con Abrahán, el creyente... Cristo nos rescató de la maldición de la ley, haciéndose por nosotros maldición... para que la bendición de Abrahán alcanzara a los gentiles en Cristo Jesús, y para que recibiéramos por la fe la promesa del Espíritu.'
+    },
+    psalm: {
+      citation: 'Salmo 110, 1-2. 3-4. 5-6',
+      response: 'El Señor recuerda siempre su alianza.',
+      verses: [
+        'Doy gracias al Señor de todo corazón, en compañía de los rectos, en la asamblea. Grandes son las obras del Señor, dignas de estudio para los que las aman.',
+        'Esplendor y belleza son su obra, su generosidad dura por siempre; ha hecho maravillas memorables, el Señor es piadoso y clemente.',
+        'Él da alimento a sus fieles, recordando siempre su alianza; mostró a su pueblo la fuerza de su poder, dándoles la heredad de los gentiles.'
+      ]
+    }
+  },
+  '27-6': {
+    firstReading: {
+      citation: 'Gálatas 3, 22-29',
+      text: 'Hermanos: La Escritura encerró todo bajo el pecado, para que la promesa se diera a los creyentes por la fe en Jesucristo. Antes de que llegara la fe, estábamos custodiados bajo la ley... De modo que la ley fue nuestro pedagogo hasta Cristo, para que fuéramos justificados por la fe... Pues todos sois hijos de Dios por la fe en Cristo Jesús. Los que habéis sido bautizados en Cristo, os habéis revestido de Cristo. No hay judío y griego, esclavo y libre, hombre y mujer, porque todos vosotros sois uno en Cristo Jesús. Y si sois de Cristo, sois descendencia de Abrahán y herederos según la promesa.'
+    },
+    psalm: {
+      citation: 'Salmo 104, 2-3. 4-5. 6-7',
+      response: 'El Señor se acuerda de su alianza eternamente.',
+      verses: [
+        'Cantadle al son de instrumentos, hablad de sus maravillas; gloriaos de su nombre santo, que se alegren los que buscan al Señor.',
+        'Recurrid al Señor y a su poder, buscad continuamente su rostro. Recordad las maravillas que hizo, sus prodigios, las sentencias de su boca.',
+        '¡Estirpe de Abrahán, su siervo; hijos de Jacob, su elegido! El Señor es nuestro Dios, él gobierna toda la tierra.'
+      ]
+    }
+  },
+
+  // Semana 28 (Año II - Gálatas y Efesios)
+  '28-1': {
+    firstReading: {
+      citation: 'Gálatas 4, 22-24. 26-27. 31 — 5, 1',
+      text: 'Hermanos: Está escrito que Abrahán tuvo dos hijos, uno de la esclava y otro de la libre. El de la esclava nació según la carne; el de la libre, en virtud de la promesa. Esto tiene un sentido alegórico: estas mujeres representan dos alianzas... La Jerusalén de arriba es libre, y esa es nuestra madre... Así pues, hermanos, no somos hijos de la esclava, sino de la libre. Para la libertad nos ha liberado Cristo. Manteneos, pues, firmes, y no os sometáis de nuevo al yugo de la esclavitud.'
+    },
+    psalm: {
+      citation: 'Salmo 112, 1-2. 3-4. 5a y 6-7',
+      response: 'Bendito sea el nombre del Señor, por siempre.',
+      verses: [
+        'Alabad, siervos del Señor, alabad el nombre del Señor. Bendito sea el nombre del Señor, ahora y por siempre.',
+        'De la salida del sol hasta su ocaso, alabado sea el nombre del Señor. El Señor se eleva sobre todos los pueblos, su gloria sobre los cielos.',
+        '¿Quién como el Señor, Dios nuestro, que se abaja para mirar al cielo y a la tierra? Levanta del polvo al desvalido, alza de la basura al pobre.'
+      ]
+    }
+  },
+  '28-2': {
+    firstReading: {
+      citation: 'Gálatas 5, 1-6',
+      text: 'Hermanos: Para la libertad nos ha liberado Cristo. Manteneos, pues, firmes, y no dejéis que vuelvan a someteros a yugos de esclavitud. Mirad: yo, Pablo, os digo que, si os circuncidáis, Cristo no os servirá de nada... Nosotros, en cambio, aguardamos por el Espíritu, desde la fe, la esperanza de la justicia. Porque en Cristo Jesús lo mismo da estar circuncidado o no estarlo; lo único que cuenta es la fe que actúa por el amor.'
+    },
+    psalm: {
+      citation: 'Salmo 118, 41. 43. 44. 45. 47. 48',
+      response: 'Señor, que me alcance tu favor.',
+      verses: [
+        'Señor, que me alcance tu favor, tu salvación según tu promesa. No quites de mi boca las palabras sinceras, porque yo espero en tus mandamientos.',
+        'Cumpliré sin cesar tu voluntad, por siempre jamás. Andaré por un camino ancho, buscando tus decretos.',
+        'Serán mi delicia tus mandatos, que tanto amo. Levantaré mis manos hacia ti recitando tus mandatos.'
+      ]
+    }
+  },
+  '28-3': {
+    firstReading: {
+      citation: 'Gálatas 5, 18-25',
+      text: 'Hermanos: Si os guía el Espíritu, no estáis bajo la ley. Las obras de la carne están patentes: fornicación, impureza, libertinaje, idolatría, hechicería, enemistades, discordia, envidia, cólera, ambiciones, divisiones, disensiones, rivalidades, borracheras, orgías y cosas por el estilo... En cambio, el fruto del Espíritu es: amor, alegría, paz, paciencia, afabilidad, bondad, lealtad, modestia, dominio de sí. Contra estas cosas no hay ley. Y los que son de Cristo Jesús han crucificado la carne con sus pasiones y concupiscencias. Si vivimos por el Espíritu, marchemos tras el Espíritu.'
+    },
+    psalm: {
+      citation: 'Salmo 1, 1-2. 3. 4 y 6',
+      response: 'El que te sigue, Señor, tendrá la luz de la vida.',
+      verses: [
+        'Dichoso el hombre que no sigue el consejo de los impíos, ni entra por la senda de los pecadores, ni se sienta en la reunión de los cínicos; sino que su gozo es la ley del Señor, y medita su ley día y noche.',
+        'Será como un árbol plantado al borde de la acequia: da fruto en su sazón y no se marchitan sus hojas; y cuanto emprende tiene buen fin.',
+        'No así los impíos, no así; serán paja que arrebata el viento. Porque el Señor protege el camino de los justos, pero el camino de los impíos acaba mal.'
+      ]
+    }
+  },
+  '28-4': {
+    firstReading: {
+      citation: 'Efesios 1, 1-10',
+      text: 'Pablo, apóstol de Cristo Jesús por voluntad de Dios, a los santos que viven en Éfeso y creen en Cristo Jesús: gracia y paz de parte de Dios, nuestro Padre, y del Señor Jesucristo. Bendito sea Dios, Padre de nuestro Señor Jesucristo, que nos ha bendecido en Cristo con toda clase de bendiciones espirituales en los cielos. Él nos eligió en Cristo antes de la fundación del mundo para que fuésemos santos e intachables ante él por el amor. Él nos ha destinado por medio de Jesucristo, según el beneplácito de su voluntad, a ser sus hijos... En él, por su sangre, tenemos la redención, el perdón de los pecados... recapitular en Cristo todas las cosas del cielo y de la tierra.'
+    },
+    psalm: {
+      citation: 'Salmo 97, 1. 2-3ab. 3cd-4. 5-6',
+      response: 'El Señor da a conocer su victoria.',
+      verses: [
+        'Cantad al Señor un cántico nuevo, porque ha hecho maravillas: su diestra le ha dado la victoria, su santo brazo.',
+        'El Señor da a conocer su victoria, revela a las naciones su justicia: se acordó de su misericordia y su fidelidad en favor de la casa de Israel.',
+        'Los confines de la tierra han contemplado la victoria de nuestro Dios. Aclama al Señor, tierra entera; gritad, vitoread, tocad.'
+      ]
+    }
+  },
+  '28-5': {
+    firstReading: {
+      citation: 'Efesios 1, 11-14',
+      text: 'Hermanos: En Cristo hemos heredado también nosotros, los que ya estábamos destinados por decisión del que lo hace todo según su voluntad, para que seamos alabanza de su gloria quienes antes esperábamos en el Mesías. En él también vosotros, después de haber escuchado la palabra de la verdad —el evangelio de vuestra salvación—, creyendo en él habéis sido marcados con el sello del Espíritu Santo prometido. Él es prenda de nuestra herencia, mientras llega la redención del pueblo de su propiedad, para alabanza de su gloria.'
+    },
+    psalm: {
+      citation: 'Salmo 32, 1-2. 4-5. 12-13',
+      response: 'Dichoso el pueblo que el Señor se escogió como heredad.',
+      verses: [
+        'Aclamad, justos, al Señor, que merece la alabanza de los buenos. Dad gracias al Señor con la cítara, tocad en su honor el arpa de diez cuerdas.',
+        'La palabra del Señor es sincera, y todas sus acciones son leales; él ama la justicia y el derecho, y su misericordia llena la tierra.',
+        'Dichosa la nación cuyo Dios es el Señor, el pueblo que él se escogió como heredad. El Señor mira desde el cielo, se fija en todos los hombres.'
+      ]
+    }
+  },
+  '28-6': {
+    firstReading: {
+      citation: 'Efesios 1, 15-23',
+      text: 'Hermanos: Habiendo oído hablar de vuestra fe en el Señor Jesús y de vuestro amor a todos los santos, no ceso de dar gracias por vosotros, recordándoos en mi oración, a fin de que el Dios de nuestro Señor Jesucristo, el Padre de la gloria, os dé espíritu de sabiduría y revelación para conocerlo... Según la eficacia de la fuerza poderosa que desplegó en Cristo, resucitándolo de entre los muertos y sentándolo a su derecha en el cielo... Y todo lo puso bajo sus pies, y lo dio a la Iglesia como cabeza, sobre todo. Ella es su cuerpo, plenitud del que llena todo en todos.'
+    },
+    psalm: {
+      citation: 'Salmo 8, 2-3a. 4-5. 6-7',
+      response: 'Diste a tu Hijo el mando sobre las obras de tus manos.',
+      verses: [
+        '¡Señor, Dios nuestro, qué admirable es tu nombre en toda la tierra! Ensalzaste tu majestad sobre los cielos. De la boca de los niños de pecho has sacado una alabanza.',
+        'Cuando contemplo el cielo, obra de tus dedos, la luna y las estrellas que has creado, ¿qué es el hombre, para que te acuerdes de él; el ser humano, para darle poder?',
+        'Lo hiciste poco inferior a los ángeles, lo coronaste de gloria y dignidad; le diste el mando sobre las obras de tus manos, todo lo sometiste bajo sus pies.'
+      ]
+    }
+  },
+
+  // Semana 29 (Año II - Efesios)
+  '29-1': {
+    firstReading: {
+      citation: 'Efesios 2, 1-10',
+      text: 'Hermanos: Vosotros estabais muertos por vuestras culpas y pecados... Pero Dios, rico en misericordia, por el gran amor con que nos amó, estando nosotros muertos por los pecados, nos ha hecho revivir con Cristo —estáis salvados por pura gracia—; nos ha resucitado con Cristo Jesús y nos ha sentado en el cielo con él... Porque estáis salvados por su gracia, mediante la fe. Y esto no viene de vosotros: es don de Dios. Tampoco viene de las obras, para que nadie pueda presumir. Somos, pues, obra suya. Dios nos ha creado en Cristo Jesús para que nos dediquemos a las buenas obras, que de antemano dispuso él que practicásemos.'
+    },
+    psalm: {
+      citation: 'Salmo 99, 2. 3. 4. 5',
+      response: 'El Señor nos hizo y somos suyos.',
+      verses: [
+        'Aclama al Señor, tierra entera, servid al Señor con alegría, entrad en su presencia con vítores.',
+        'Sabed que el Señor es Dios: que él nos hizo y somos suyos, su pueblo y ovejas de su rebaño. Entrad por sus puertas con acción de gracias, por sus atrios con himnos.',
+        'Dándole gracias y bendiciendo su nombre: «El Señor es bueno, su misericordia es eterna, su fidelidad por todas las edades».'
+      ]
+    }
+  },
+  '29-2': {
+    firstReading: {
+      citation: 'Efesios 2, 12-22',
+      text: 'Hermanos: En aquel tiempo estabais sin Cristo, excluidos de la ciudadanía de Israel y ajenos a las alianzas de la promesa, sin esperanza y sin Dios en el mundo. Ahora, en cambio, en Cristo Jesús, los que antes estabais lejos estáis cerca por la sangre de Cristo. Él es nuestra paz: el que de los dos pueblos ha hecho uno, derribando en su cuerpo de carne el muro que los separaba: la enemistad... Así, pues, ya no sois extranjeros ni forasteros, sino conciudadanos de los santos y miembros de la familia de Dios. Estáis edificados sobre el cimiento de los apóstoles y profetas, y el mismo Cristo Jesús es la piedra angular.'
+    },
+    psalm: {
+      citation: 'Salmo 84, 9ab-10. 11-12. 13-14',
+      response: 'Dios anuncia la paz a su pueblo.',
+      verses: [
+        'Voy a escuchar lo que dice el Señor: «Dios anuncia la paz a su pueblo y a sus amigos». La salvación está cerca de los que lo temen, y la gloria habitará en nuestra tierra.',
+        'La misericordia y la fidelidad se encuentran, la justicia y la paz se besan; la fidelidad brota de la tierra, y la justicia mira desde el cielo.',
+        'El Señor nos dará la lluvia, y nuestra tierra dará su fruto. La justicia marchará ante él, la salvación seguirá sus pasos.'
+      ]
+    }
+  },
+  '29-3': {
+    firstReading: {
+      citation: 'Efesios 3, 2-12',
+      text: 'Hermanos: Habéis oído hablar de la distribución de la gracia de Dios que se me ha dado en favor vuestro. Ya que se me dio a conocer por revelación el misterio... que no había sido manifestado a los hombres en otros tiempos, como ha sido revelado ahora por el Espíritu a sus santos apóstoles y profetas: que también los gentiles son coherederos, miembros del mismo cuerpo y partícipes de la misma promesa en Jesucristo, por el Evangelio... A mí, el más insignificante de los santos, se me ha dado la gracia de anunciar a los gentiles la riqueza insondable de Cristo.'
+    },
+    psalm: {
+      citation: 'Isaías 12, 2-3. 4bcd. 5-6',
+      response: 'Sacaréis aguas con gozo de las fuentes de la salvación.',
+      verses: [
+        'Él es mi Dios y Salvador: confiaré y no temeré, porque mi fuerza y mi poder es el Señor, él fue mi salvación. Y sacaréis aguas con gozo de las fuentes de la salvación.',
+        'Dad gracias al Señor, invocad su nombre, contad a los pueblos sus hazañas, proclamad que su nombre es excelso.',
+        'Tañed para el Señor, que hizo proezas, anunciadlas a toda la tierra; gritad jubilosos, habitantes de Sión, porque es grande en medio de ti el Santo de Israel.'
+      ]
+    }
+  },
+  '29-4': {
+    firstReading: {
+      citation: 'Efesios 3, 14-21',
+      text: 'Hermanos: Doblo las rodillas ante el Padre, de quien toma nombre toda familia en el cielo y en la tierra, pidiéndole que, conforme a la riqueza de su gloria, os conceda ser robustecidos por medio de su Espíritu en vuestro hombre interior; que Cristo habite por la fe en vuestros corazones; que el amor sea vuestra raíz y vuestro cimiento; de modo que así, con todos los santos, logréis abarcar lo ancho, lo largo, lo alto y lo profundo, comprendiendo el amor de Cristo, que trasciende todo conocimiento. Así llegaréis a vuestra plenitud, según la plenitud total de Dios.'
+    },
+    psalm: {
+      citation: 'Salmo 32, 1-2. 4-5. 11-12. 18-19',
+      response: 'La misericordia del Señor llena la tierra.',
+      verses: [
+        'Aclamad, justos, al Señor, que merece la alabanza de los buenos. Dad gracias al Señor con la cítara, tocad en su honor el arpa de diez cuerdas.',
+        'La palabra del Señor es sincera, y todas sus acciones son leales; él ama la justicia y el derecho, y su misericordia llena la tierra.',
+        'Los ojos del Señor están puestos en sus fieles, en los que esperan en su misericordia, para librar sus vidas de la muerte y reanimarlos en tiempo de hambre.'
+      ]
+    }
+  },
+  '29-5': {
+    firstReading: {
+      citation: 'Efesios 4, 1-6',
+      text: 'Hermanos: Yo, el prisionero por el Señor, os ruego que andéis como pide la vocación a la que habéis sido convocados. Sed siempre humildes y amables, sed comprensivos, sobrellevaos mutuamente con amor; esforzaos en mantener la unidad del Espíritu con el vínculo de la paz. Un solo cuerpo y un solo Espíritu, como una sola es la esperanza de la vocación a la que habéis sido convocados. Un Señor, una fe, un bautismo. Un Dios, Padre de todo, que está sobre todo, actúa por medio de todo y está en todo.'
+    },
+    psalm: {
+      citation: 'Salmo 23, 1-2. 3-4ab. 5-6',
+      response: 'Este es el grupo que viene a tu presencia, Señor.',
+      verses: [
+        'Del Señor es la tierra y cuanto la llena, el orbe y todos sus habitantes: él la fundó sobre los mares, él la afianzó sobre los ríos.',
+        '¿Quién puede subir al monte del Señor? ¿Quién puede estar en el recinto sacro? El hombre de manos inocentes y puro corazón, que no confía en los ídolos.',
+        'Ese recibirá la bendición del Señor, le hará justicia el Dios de salvación. Este es el grupo que busca al Señor, que viene a tu presencia, Dios de Jacob.'
+      ]
+    }
+  },
+  '29-6': {
+    firstReading: {
+      citation: 'Efesios 4, 7-16',
+      text: 'Hermanos: A cada uno de nosotros se le ha dado la gracia según la medida del don de Cristo... Y él ha constituido a unos, apóstoles; a otros, profetas; a otros, evangelizadores; a otros, pastores y doctores, para el perfeccionamiento de los santos, en función de su ministerio, y para la edificación del cuerpo de Cristo; hasta que lleguemos todos a la unidad en la fe y en el conocimiento del Hijo de Dios, al Hombre perfecto, a la medida de Cristo en su plenitud... Realizando la verdad en el amor, hagamos crecer todas las cosas hacia él, que es la cabeza: Cristo.'
+    },
+    psalm: {
+      citation: 'Salmo 121, 1-2. 3-4a. 4b-5',
+      response: 'Vamos alegres a la casa del Señor.',
+      verses: [
+        '¡Qué alegría cuando me dijeron: «Vamos a la casa del Señor»! Ya están pisando nuestros pies tus umbrales, Jerusalén.',
+        'Jerusalén está fundada como ciudad bien compacta. Allá suben las tribus, las tribus del Señor.',
+        'Según la costumbre de Israel, a celebrar el nombre del Señor; en ella están los tribunales de justicia, en el palacio de David.'
+      ]
+    }
+  },
+
+  // Semana 30 (Año II - Efesios y Filipenses)
+  '30-1': {
+    firstReading: {
+      citation: 'Efesios 4, 32 — 5, 8',
+      text: 'Hermanos: Sed buenos, comprensivos, perdonándoos unos a otros como Dios os perdonó en Cristo. Sed imitadores de Dios, como hijos queridos, y vivid en el amor como Cristo os amó y se entregó por nosotros como oblación y víctima de suave olor... Antes erais tinieblas, pero ahora sois luz por el Señor. Caminad como hijos de la luz.'
+    },
+    psalm: {
+      citation: 'Salmo 1, 1-2. 3. 4 y 6',
+      response: 'Seamos imitadores de Dios, como hijos queridos.',
+      verses: [
+        'Dichoso el hombre que no sigue el consejo de los impíos, ni entra por la senda de los pecadores, ni se sienta en la reunión de los cínicos; sino que su gozo es la ley del Señor, y medita su ley día y noche.',
+        'Será como un árbol plantado al borde de la acequia: da fruto en su sazón y no se marchitan sus hojas; y cuanto emprende tiene buen fin.',
+        'No así los impíos, no así; serán paja que arrebata el viento. Porque el Señor protege el camino de los justos, pero el camino de los impíos acaba mal.'
+      ]
+    }
+  },
+  '30-2': {
+    firstReading: {
+      citation: 'Efesios 5, 21-33',
+      text: 'Hermanos: Sed sumisos unos a otros con respeto cristiano... Maridos, amad a vuestras mujeres como Cristo amó a su Iglesia y se entregó a sí mismo por ella, para consagrarla, purificándola con el baño del agua y la palabra, y para presentársela gloriosa, sin mancha ni arruga ni nada semejante, sino santa e inmaculada... «Por eso abandonará el hombre a su padre y a su madre, se unirá a su mujer y serán los dos una sola carne». Es este un gran misterio: y yo lo refiero a Cristo y a la Iglesia.'
+    },
+    psalm: {
+      citation: 'Salmo 127, 1-2. 3. 4-5',
+      response: 'Dichosos los que temen al Señor.',
+      verses: [
+        'Dichoso el que teme al Señor y sigue sus caminos. Comerás del fruto de tu trabajo, serás dichoso, te irá bien.',
+        'Tu mujer, como parra fecunda, en medio de tu casa; tus hijos, como renuevos de olivo, alrededor de tu mesa.',
+        'Esta es la bendición del hombre que teme al Señor. Que el Señor te bendiga desde Sión, que veas la prosperidad de Jerusalén todos los días de tu vida.'
+      ]
+    }
+  },
+  '30-3': {
+    firstReading: {
+      citation: 'Efesios 6, 1-9',
+      text: 'Hijos, obedeced a vuestros padres en el Señor, porque eso es justo. «Honra a tu padre y a tu madre» es el primer mandamiento al que se añade una promesa: «Te irá bien y vivirás largo tiempo en la tierra». Padres, no exasperéis a vuestros hijos; criadlos educándolos y corrigiéndolos según el Señor. Esclavos, obedeced a vuestros amos de la tierra... como esclavos de Cristo que cumplen de corazón la voluntad de Dios... Y vosotros, amos, haced lo mismo con ellos, sabiendo que en el cielo está su Señor y el vuestro, y que en él no hay favoritismos.'
+    },
+    psalm: {
+      citation: 'Salmo 144, 10-11. 12-13ab. 13cd-14',
+      response: 'El Señor es fiel a sus palabras.',
+      verses: [
+        'Que todas tus criaturas te den gracias, Señor, que te bendigan tus fieles; que proclamen la gloria de tu reinado, que hablen de tus hazañas.',
+        'Explicando tus hazañas a los hombres, la gloria y majestad de tu reinado. Tu reinado es un reinado perpetuo, tu gobierno va de edad en edad.',
+        'El Señor es fiel a sus palabras, bondadoso en todas sus acciones. El Señor sostiene a los que van a caer, endereza a los que ya se doblan.'
+      ]
+    }
+  },
+  '30-4': {
+    firstReading: {
+      citation: 'Efesios 6, 10-20',
+      text: 'Hermanos: Buscad vuestra fuerza en el Señor y en su invencible poder. Poneos las armas de Dios, para poder afrontar las asechanzas del diablo... Estad firmes; ceñid la cintura con la verdad, y revestid la coraza de la justicia; calzad los pies con la prontitud para el evangelio de la paz. Embrazad el escudo de la fe... Tomad el casco de la salvación y la espada del Espíritu, que es la palabra de Dios. Siempre en oración y súplica, orad en toda ocasión en el Espíritu... y también por mí, para que cuando abra mi boca se me conceda el don de la palabra, y anuncie con valentía el misterio del Evangelio.'
+    },
+    psalm: {
+      citation: 'Salmo 143, 1. 2. 9-10',
+      response: 'Bendito el Señor, mi Roca.',
+      verses: [
+        'Bendito el Señor, mi Roca, que adiestra mis manos para el combate, mis dedos para la pelea.',
+        'Mi bienhechor, mi alcázar, baluarte donde me pongo a salvo, mi escudo y mi refugio, que me somete los pueblos.',
+        'Dios mío, te cantaré un cántico nuevo, tocaré para ti el arpa de diez cuerdas: para ti que das la victoria a los reyes, y salvas a David, tu siervo.'
+      ]
+    }
+  },
+  '30-5': {
+    firstReading: {
+      citation: 'Filipenses 1, 1-11',
+      text: 'Pablo y Timoteo, siervos de Cristo Jesús, a todos los santos en Cristo Jesús que residen en Filipos... Doy gracias a mi Dios cada vez que os menciono; siempre que rezo por todos vosotros, lo hago con gran alegría, porque habéis sido colaboradores míos en la obra del Evangelio, desde el primer día hasta hoy. Esta es nuestra confianza: que el que ha inaugurado entre vosotros esta buena obra la llevará adelante hasta el Día de Cristo Jesús... Y esta es mi oración: que vuestro amor siga creciendo más y más en penetración y en sensibilidad para apreciar los valores.'
+    },
+    psalm: {
+      citation: 'Salmo 110, 1-2. 3-4. 5-6',
+      response: 'Grandes son las obras del Señor.',
+      verses: [
+        'Doy gracias al Señor de todo corazón, en compañía de los rectos, en la asamblea. Grandes son las obras del Señor, dignas de estudio para los que las aman.',
+        'Esplendor y belleza son su obra, su generosidad dura por siempre; ha hecho maravillas memorables, el Señor es piadoso y clemente.',
+        'Él da alimento a sus fieles, recordando siempre su alianza; mostró a su pueblo la fuerza de su poder, dándoles la heredad de los gentiles.'
+      ]
+    }
+  },
+  '30-6': {
+    firstReading: {
+      citation: 'Filipenses 1, 18b-26',
+      text: 'Hermanos: Con tal de que se anuncie a Cristo, por cualquier medio, sea con segundas intenciones o con sinceridad, yo me alegro y me seguiré alegrando... Cristo será glorificado en mi cuerpo, sea por mi vida o por mi muerte. Para mí la vida es Cristo, y una ganancia el morir. Pero si el vivir esta vida mortal me supone trabajo fructífero, no sé qué escoger. Me encuentro en esta alternativa: por un lado, deseo partir para estar con Cristo, que es con mucho lo mejor; pero, por otro, quedarme en esta vida veo que es más necesario para vosotros.'
+    },
+    psalm: {
+      citation: 'Salmo 41, 2. 3; 42, 3. 4',
+      response: 'Mi alma tiene sed del Dios vivo.',
+      verses: [
+        'Como busca la cierva corrientes de agua, así mi alma te busca a ti, Dios mío.',
+        'Tiene sed de Dios, del Dios vivo: ¿cuándo entraré a ver el rostro de Dios?',
+        'Envía tu luz y tu verdad: que ellas me guíen y me conduzcan hasta tu monte santo, hasta tu morada. Que yo me acerque al altar de Dios, al Dios de mi alegría.'
+      ]
+    }
+  },
+
+  // Semana 31 (Año II - Filipenses)
+  '31-1': {
+    firstReading: {
+      citation: 'Filipenses 2, 1-4',
+      text: 'Hermanos: Si queréis darme el consuelo de Cristo y aliviarme con vuestro amor, si nos une el mismo Espíritu y tenéis entrañas compasivas, dadme esta gran alegría: manteneos unánimes y concordes con un mismo amor y un mismo sentir. No obréis por rivalidad ni por ostentación, dejaos guiar por la humildad y considerad siempre superiores a los demás. No os encerréis en vuestros intereses, sino buscad todos el interés de los demás.'
+    },
+    psalm: {
+      citation: 'Salmo 130, 1. 2. 3',
+      response: 'Guarda mi alma en la paz junto a ti, Señor.',
+      verses: [
+        'Señor, mi corazón no es ambicioso, ni mis ojos altaneros; no pretendo grandezas que superan mi capacidad.',
+        'Sino que acallo y modero mis deseos, como un niño en brazos de su madre.',
+        'Espere Israel en el Señor ahora y por siempre.'
+      ]
+    }
+  },
+  '31-2': {
+    firstReading: {
+      citation: 'Filipenses 2, 5-11',
+      text: 'Hermanos: Tened entre vosotros los sentimientos propios de Cristo Jesús. El cual, siendo de condición divina, no retuvo ávidamente el ser igual a Dios; al contrario, se despojó de sí mismo tomando la condición de esclavo, hecho semejante a los hombres. Y así, reconocido como hombre por su presencia, se humilló a sí mismo, hecho obediente hasta la muerte, y una muerte de cruz. Por eso Dios lo exaltó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.'
+    },
+    psalm: {
+      citation: 'Salmo 21, 26b-27. 28-30a. 31-32',
+      response: 'El Señor es mi alabanza en la gran asamblea.',
+      verses: [
+        'Cumpliré mis votos delante de sus fieles. Los desvalidos comerán hasta saciarse, alabarán al Señor los que lo buscan: ¡viva su corazón por siempre!',
+        'Lo recordarán y volverán al Señor hasta de los confines del orbe; en su presencia se postrarán las familias de los pueblos. Porque del Señor es el reino, él gobierna a los pueblos.',
+        'Mi descendencia lo servirá, hablarán del Señor a la generación futura, contarán su justicia al pueblo que ha de nacer: todo lo que hizo el Señor.'
+      ]
+    }
+  },
+  '31-3': {
+    firstReading: {
+      citation: 'Filipenses 2, 12-18',
+      text: 'Queridos hermanos: Ya que siempre habéis obedecido, no solo cuando yo estaba presente, sino mucho más ahora en mi ausencia, trabajad por vuestra salvación con temor y temblor, porque es Dios quien activa en vosotros el querer y la actividad para realizar su designio de amor. Cualquier cosa que hagáis sea sin protestas ni discusiones, así seréis irreprochables y límpidos, hijos de Dios sin tacha, en medio de una generación perversa y depravada, entre la cual brilláis como lumbreras del mundo, manteniendo firme la palabra de la vida.'
+    },
+    psalm: {
+      citation: 'Salmo 26, 1. 4. 13-14',
+      response: 'El Señor es mi luz y mi salvación.',
+      verses: [
+        'El Señor es mi luz y mi salvación, ¿a quién temeré? El Señor es la defensa de mi vida, ¿quién me hará temblar?',
+        'Una cosa pido al Señor, eso buscaré: habitar en la casa del Señor por los días de mi vida; gozar de la dulzura del Señor, contemplando su templo.',
+        'Espero gozar de la dicha del Señor en el país de la vida. Espera en el Señor, sé valiente, ten ánimo, espera en el Señor.'
+      ]
+    }
+  },
+  '31-4': {
+    firstReading: {
+      citation: 'Filipenses 3, 3-8a',
+      text: 'Hermanos: Los verdaderos circuncisos somos nosotros, que damos culto con el Espíritu de Dios, y que ponemos nuestra gloria en Cristo Jesús, sin confiar en la carne... Sin embargo, todo eso que para mí era ganancia, lo consideré pérdida a causa de Cristo. Más aún: todo lo considero pérdida comparado con la excelencia del conocimiento de Cristo Jesús, mi Señor.'
+    },
+    psalm: {
+      citation: 'Salmo 104, 2-3. 4-5. 6-7',
+      response: 'Que se alegren los que buscan al Señor.',
+      verses: [
+        'Cantadle al son de instrumentos, hablad de sus maravillas; gloriaos de su nombre santo, que se alegren los que buscan al Señor.',
+        'Recurrid al Señor y a su poder, buscad continuamente su rostro. Recordad las maravillas que hizo, sus prodigios, las sentencias de su boca.',
+        '¡Estirpe de Abrahán, su siervo; hijos de Jacob, su elegido! El Señor es nuestro Dios, él gobierna toda la tierra.'
+      ]
+    }
+  },
+  '31-5': {
+    firstReading: {
+      citation: 'Filipenses 3, 17 — 4, 1',
+      text: 'Hermanos: Sed imitadores míos y fijaos en los que andan según el modelo que tenéis en nosotros. Porque —como os decía muchas veces y ahora os lo repito con lágrimas en los ojos— hay muchos que andan como enemigos de la cruz de Cristo... Nosotros, por el contrario, somos ciudadanos del cielo, de donde aguardamos un Salvador: el Señor Jesucristo. Él transformará nuestro cuerpo humilde, según el modelo de su cuerpo glorioso... Así, pues, hermanos míos queridos y añorados, mi alegría y mi corona, manteneos así, en el Señor, queridos.'
+    },
+    psalm: {
+      citation: 'Salmo 121, 1-2. 3-4a. 4b-5',
+      response: 'Vamos alegres a la casa del Señor.',
+      verses: [
+        '¡Qué alegría cuando me dijeron: «Vamos a la casa del Señor»! Ya están pisando nuestros pies tus umbrales, Jerusalén.',
+        'Jerusalén está fundada como ciudad bien compacta. Allá suben las tribus, las tribus del Señor.',
+        'Según la costumbre de Israel, a celebrar el nombre del Señor; en ella están los tribunales de justicia, en el palacio de David.'
+      ]
+    }
+  },
+  '31-6': {
+    firstReading: {
+      citation: 'Filipenses 4, 10-19',
+      text: 'Hermanos: Me alegré mucho en el Señor porque habéis hecho florecer de nuevo vuestro interés por mí... Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación... En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su riqueza en Cristo Jesús.'
+    },
+    psalm: {
+      citation: 'Salmo 111, 1-2. 5-6. 8a y 9',
+      response: 'Dichoso quien teme al Señor.',
+      verses: [
+        'Dichoso quien teme al Señor y ama de corazón sus mandatos. Su linaje será poderoso en la tierra, la descendencia del justo será bendita.',
+        'Dichoso el que se apiada y presta, y administra rectamente sus asuntos. El justo jamás vacilará, su recuerdo será perpetuo.',
+        'Su corazón está seguro, sin temor. Reparte limosna a los pobres; su caridad es constante, sin falta, y alzará la frente con dignidad.'
+      ]
+    }
+  },
+
+  // Semana 32 (Año II - Tito, Filemón, 2 y 3 Juan)
+  '32-1': {
+    firstReading: {
+      citation: 'Tito 1, 1-9',
+      text: 'Pablo, siervo de Dios y apóstol de Jesucristo, para llevar a los elegidos de Dios a la fe y al conocimiento de la verdad... a Tito, verdadero hijo según la fe común: gracia y paz de parte de Dios Padre y de Cristo Jesús, nuestro Salvador. Te dejé en Creta para que pusieras en orden lo que faltaba y establecieras presbíteros en cada ciudad... Porque el obispo, como administrador de Dios, tiene que ser intachable... hospitalario, amigo del bien, sensato, justo, piadoso, dueño de sí; que se mantenga firme en la palabra fiel, según la enseñanza, para que sea capaz de exhortar con la sana doctrina.'
+    },
+    psalm: {
+      citation: 'Salmo 23, 1-2. 3-4ab. 5-6',
+      response: 'Este es el grupo que viene a tu presencia, Señor.',
+      verses: [
+        'Del Señor es la tierra y cuanto la llena, el orbe y todos sus habitantes: él la fundó sobre los mares, él la afianzó sobre los ríos.',
+        '¿Quién puede subir al monte del Señor? ¿Quién puede estar en el recinto sacro? El hombre de manos inocentes y puro corazón, que no confía en los ídolos.',
+        'Ese recibirá la bendición del Señor, le hará justicia el Dios de salvación. Este es el grupo que busca al Señor, que viene a tu presencia, Dios de Jacob.'
+      ]
+    }
+  },
+  '32-2': {
+    firstReading: {
+      citation: 'Tito 2, 1-8. 11-14',
+      text: 'Querido hermano: Habla de lo que es conforme a la sana doctrina... Preséntate tú mismo como modelo de buena conducta en la enseñanza, en la integridad, en la seriedad, con un hablar sano e intachable... Porque se ha manifestado la gracia de Dios, que trae la salvación para todos los hombres, enseñándonos a que, renunciando a la impiedad y a los deseos mundanos, llevemos ya desde ahora una vida sobria, justa y piadosa, aguardando la dicha que esperamos y la manifestación de la gloria del gran Dios y Salvador nuestro, Jesucristo.'
+    },
+    psalm: {
+      citation: 'Salmo 36, 3-4. 18 y 23. 27 y 29',
+      response: 'El Señor es quien salva a los justos.',
+      verses: [
+        'Confía en el Señor y haz el bien, habita tu tierra y practica la lealtad; sea el Señor tu delicia, y él te dará lo que pide tu corazón.',
+        'El Señor vela por los días de los buenos, y su herencia durará siempre. El Señor asegura los pasos del hombre, se complace en sus caminos.',
+        'Apártate del mal y haz el bien, y siempre tendrás una casa; los justos poseen la tierra, la habitarán por siempre jamás.'
+      ]
+    }
+  },
+  '32-3': {
+    firstReading: {
+      citation: 'Tito 3, 1-7',
+      text: 'Querido hermano: Recuérdales que se sometan a los gobernantes y autoridades, que los obedezcan, que estén dispuestos a toda clase de obras buenas... Pero cuando ha aparecido la bondad de Dios, nuestro Salvador, y su amor al hombre, no por las obras de justicia que hayamos hecho nosotros, sino, según su propia misericordia, nos ha salvado por el baño del nuevo nacimiento y de la renovación del Espíritu Santo, que derramó copiosamente sobre nosotros por medio de Jesucristo, nuestro Salvador, para que, justificados por su gracia, seamos, en esperanza, herederos de la vida eterna.'
+    },
+    psalm: {
+      citation: 'Salmo 22, 1-3a. 3b-4. 5. 6',
+      response: 'El Señor es mi pastor, nada me falta.',
+      verses: [
+        'El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas y repara mis fuerzas.',
+        'Me guía por el sendero justo, por el honor de su nombre. Aunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.',
+        'Preparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa. Tu bondad y tu misericordia me acompañan todos los días de mi vida.'
+      ]
+    }
+  },
+  '32-4': {
+    firstReading: {
+      citation: 'Filemón 7-20',
+      text: 'Querido hermano: Tu amor me ha proporcionado gran alegría y consuelo, porque, gracias a ti, los corazones de los santos han encontrado alivio. Por eso, aunque tengo plena libertad en Cristo para mandarte lo que conviene, prefiero rogártelo apelando a tu caridad, yo, Pablo, anciano y ahora prisionero por Cristo Jesús. Te ruego por mi hijo, a quien engendré en la prisión, por Onésimo... Te lo envío como a mi propio corazón... Quizá se apartó de ti por breve tiempo para que lo recobres ahora para siempre; y no como esclavo, sino como algo mejor que un esclavo, como un hermano querido.'
+    },
+    psalm: {
+      citation: 'Salmo 145, 7. 8-9a. 9bc-10',
+      response: 'Dichoso aquel a quien auxilia el Dios de Jacob.',
+      verses: [
+        'El Señor mantiene su fidelidad perpetuamente, hace justicia a los oprimidos, da pan a los hambrientos. El Señor liberta a los cautivos.',
+        'El Señor abre los ojos al ciego, el Señor endereza a los que ya se doblan, el Señor ama a los justos, el Señor guarda a los peregrinos.',
+        'Sustenta al huérfano y a la viuda y trastorna el camino de los malvados. El Señor reina eternamente, tu Dios, Sión, de edad en edad.'
+      ]
+    }
+  },
+  '32-5': {
+    firstReading: {
+      citation: '2 Juan 4-9',
+      text: 'Señora elegida: Me alegré mucho al enterarme de que tus hijos caminan en la verdad, según el mandamiento que el Padre nos dio. Ahora tengo algo que pedirte, señora... que nos amemos unos a otros. Y en esto consiste el amor: en que caminemos según sus mandamientos... Es que han salido en el mundo muchos embusteros, que no reconocen que Jesucristo vino en la carne... Todo el que se propasa y no permanece en la doctrina de Cristo no posee a Dios; quien permanece en la doctrina posee al Padre y al Hijo.'
+    },
+    psalm: {
+      citation: 'Salmo 118, 1. 2. 10. 11. 17. 18',
+      response: 'Dichoso el que camina en la voluntad del Señor.',
+      verses: [
+        'Dichoso el que, con vida intachable, camina en la voluntad del Señor; dichoso el que, guardando sus preceptos, lo busca de todo corazón.',
+        'Te busco de todo corazón, no consientas que me desvíe de tus mandamientos. En mi corazón escondo tus consignas, así no pecaré contra ti.',
+        'Haz bien a tu siervo: viviré y cumpliré tus palabras; ábreme los ojos, y contemplaré las maravillas de tu voluntad.'
+      ]
+    }
+  },
+  '32-6': {
+    firstReading: {
+      citation: '3 Juan 5-8',
+      text: 'Querido Gayo: Te portas con plena fidelidad en todo lo que haces por los hermanos, y eso que para ti son extraños. Ellos han hablado de tu caridad ante la Iglesia. Harás bien en proveerlos para el viaje como Dios se merece; ellos se pusieron en camino por el Nombre, sin aceptar nada de los paganos. Por eso debemos nosotros sostener a hombres como estos, para ser colaboradores de la verdad.'
+    },
+    psalm: {
+      citation: 'Salmo 111, 1-2. 3-4. 5-6',
+      response: 'Dichoso quien teme al Señor.',
+      verses: [
+        'Dichoso quien teme al Señor y ama de corazón sus mandatos. Su linaje será poderoso en la tierra, la descendencia del justo será bendita.',
+        'En su casa habrá riquezas y abundancia, su caridad es constante, sin falta. En las tinieblas brilla como una luz el que es justo, clemente y compasivo.',
+        'Dichoso el que se apiada y presta, y administra rectamente sus asuntos. El justo jamás vacilará, su recuerdo será perpetuo.'
+      ]
+    }
+  },
+
+  // Semana 33 (Año II - Apocalipsis)
+  '33-1': {
+    firstReading: {
+      citation: 'Apocalipsis 1, 1-4; 2, 1-5a',
+      text: 'Revelación de Jesucristo, que Dios le encargó mostrar a sus siervos acerca de lo que tiene que suceder pronto... Dichoso el que lee y dichosos los que escuchan las palabras de esta profecía y guardan lo que en ella está escrito, porque el tiempo está cerca... Oí al Señor que me decía: «Al ángel de la Iglesia de Éfeso escríbele: Conozco tus obras, tu fatiga, tu perseverancia... Pero tengo contra ti que has abandonado tu amor primero. Acuérdate, pues, de dónde has caído, conviértete y haz las obras primeras».'
+    },
+    psalm: {
+      citation: 'Salmo 1, 1-2. 3. 4 y 6',
+      response: 'Al que salga vencedor le daré a comer del árbol de la vida.',
+      verses: [
+        'Dichoso el hombre que no sigue el consejo de los impíos, ni entra por la senda de los pecadores, ni se sienta en la reunión de los cínicos; sino que su gozo es la ley del Señor, y medita su ley día y noche.',
+        'Será como un árbol plantado al borde de la acequia: da fruto en su sazón y no se marchitan sus hojas; y cuanto emprende tiene buen fin.',
+        'No así los impíos, no así; serán paja que arrebata el viento. Porque el Señor protege el camino de los justos, pero el camino de los impíos acaba mal.'
+      ]
+    }
+  },
+  '33-2': {
+    firstReading: {
+      citation: 'Apocalipsis 3, 1-6. 14-22',
+      text: 'Yo, Juan, oí al Señor que me decía: «Al ángel de la Iglesia de Sardes escríbele: Conozco tus obras; tienes nombre como de quien vive, pero estás muerto. Sé vigilante y reanima lo que te queda... Al ángel de la Iglesia de Laodicea escríbele: Conozco tus obras: no eres ni frío ni caliente. ¡Ojalá fueras frío o caliente! Pero porque eres tibio, estoy a punto de vomitarte de mi boca... Mira que estoy a la puerta y llamo; si alguien oye mi voz y me abre la puerta, entraré en su casa y cenaré con él y él conmigo. Al vencedor le concederé sentarse conmigo en mi trono».'
+    },
+    psalm: {
+      citation: 'Salmo 14, 2-3a. 3bc-4ab. 5',
+      response: 'Al vencedor lo sentaré en mi trono, junto a mí.',
+      verses: [
+        'El que procede honradamente y practica la justicia, el que tiene intenciones leales y no calumnia con su lengua.',
+        'El que no hace mal a su prójimo ni difama al vecino, el que considera despreciable al impío y honra a los que temen al Señor.',
+        'El que no presta dinero a usura ni acepta soborno contra el inocente. El que así obra nunca fallará.'
+      ]
+    }
+  },
+  '33-3': {
+    firstReading: {
+      citation: 'Apocalipsis 4, 1-11',
+      text: 'Yo, Juan, miré y vi una puerta abierta en el cielo... Había un trono en el cielo, y uno sentado en el trono... Alrededor del trono había veinticuatro tronos, y sentados en ellos veinticuatro ancianos con vestiduras blancas y coronas de oro en la cabeza... Y los cuatro vivientes no cesan de exclamar día y noche: «Santo, santo, santo es el Señor Dios, el todopoderoso; el que era y es y viene». Y los veinticuatro ancianos se postran ante el que está sentado en el trono, diciendo: «Eres digno, Señor, Dios nuestro, de recibir la gloria, el honor y el poder, porque tú has creado el universo».'
+    },
+    psalm: {
+      citation: 'Salmo 150, 1-2. 3-4. 5-6',
+      response: 'Santo, santo, santo es el Señor, soberano de todo.',
+      verses: [
+        'Alabad al Señor en su templo, alabadlo en su augusto firmamento. Alabadlo por sus obras magníficas, alabadlo por su inmensa grandeza.',
+        'Alabadlo tocando trompetas, alabadlo con arpas y cítaras, alabadlo con tambores y danzas, alabadlo con trompas y flautas.',
+        'Alabadlo con platillos sonoros, alabadlo con platillos vibrantes. Todo ser que alienta alabe al Señor.'
+      ]
+    }
+  },
+  '33-4': {
+    firstReading: {
+      citation: 'Apocalipsis 5, 1-10',
+      text: 'Yo, Juan, vi en la mano derecha del que está sentado en el trono un libro escrito por dentro y por fuera, y sellado con siete sellos... Uno de los ancianos me dijo: «Deja de llorar; pues ha vencido el león de la tribu de Judá, el retoño de David, y es capaz de abrir el libro y sus siete sellos». Y vi en medio del trono... un Cordero de pie, como degollado... Y cantan un cántico nuevo: «Eres digno de tomar el libro y abrir sus sellos, porque fuiste degollado, y con tu sangre compraste para Dios hombres de toda tribu, lengua, pueblo y nación; y has hecho de ellos para nuestro Dios un reino de sacerdotes, y reinan sobre la tierra».'
+    },
+    psalm: {
+      citation: 'Salmo 149, 1-2. 3-4. 5-6a y 9b',
+      response: 'Has hecho de nosotros para nuestro Dios un reino de sacerdotes.',
+      verses: [
+        'Cantad al Señor un cántico nuevo, resuene su alabanza en la asamblea de los fieles; que se alegre Israel por su Creador, los hijos de Sión por su Rey.',
+        'Alabad su nombre con danzas, cantadle con tambores y cítaras; porque el Señor ama a su pueblo y adorna con la victoria a los humildes.',
+        'Que los fieles festejen su gloria y canten jubilosos en filas, con vítores a Dios en la boca. Es un honor para todos sus fieles.'
+      ]
+    }
+  },
+  '33-5': {
+    firstReading: {
+      citation: 'Apocalipsis 10, 8-11',
+      text: 'Yo, Juan, oí la voz del cielo que me hablaba de nuevo, diciendo: «Ve a tomar el librito abierto de la mano del ángel que está de pie sobre el mar y sobre la tierra». Me acerqué al ángel y le pedí que me diera el librito. Él me dice: «Toma y devóralo; te amargará en el vientre, pero en tu boca será dulce como la miel». Tomé el librito de mano del ángel y lo devoré; en mi boca sabía dulce como la miel, pero, cuando lo comí, mi vientre se llenó de amargor. Y me dicen: «Es preciso que profetices de nuevo sobre muchos pueblos, naciones, lenguas y reyes».'
+    },
+    psalm: {
+      citation: 'Salmo 118, 14. 24. 72. 103. 111. 131',
+      response: '¡Qué dulce al paladar tu promesa, Señor!',
+      verses: [
+        'Mi alegría es el camino de tus preceptos, más que todas las riquezas. Tus preceptos son mi delicia, tus decretos son mis consejeros.',
+        'Más estimo yo los preceptos de tu boca que miles de monedas de oro y plata. ¡Qué dulce al paladar tu promesa: más que miel en la boca!',
+        'Tus preceptos son mi herencia perpetua, la alegría de mi corazón. Abro la boca y respiro, ansiando tus mandamientos.'
+      ]
+    }
+  },
+  '33-6': {
+    firstReading: {
+      citation: 'Apocalipsis 11, 4-12',
+      text: 'Me fue dicho a mí, Juan: «Estos son mis dos testigos, los dos olivos y los dos candelabros que están en pie ante el Señor de la tierra»... Y cuando terminen su testimonio, la bestia que sube del abismo les hará la guerra, los vencerá y los matará... Pero, al cabo de tres días y medio, un aliento de vida que venía de Dios entró en ellos, y se pusieron de pie... Y oyeron una gran voz del cielo que les decía: «Subid aquí». Y subieron al cielo en la nube, a la vista de sus enemigos.'
+    },
+    psalm: {
+      citation: 'Salmo 143, 1. 2. 9-10',
+      response: 'Bendito el Señor, mi Roca.',
+      verses: [
+        'Bendito el Señor, mi Roca, que adiestra mis manos para el combate, mis dedos para la pelea.',
+        'Mi bienhechor, mi alcázar, baluarte donde me pongo a salvo, mi escudo y mi refugio, que me somete los pueblos.',
+        'Dios mío, te cantaré un cántico nuevo, tocaré para ti el arpa de diez cuerdas: para ti que das la victoria a los reyes, y salvas a David, tu siervo.'
+      ]
+    }
+  },
+
+  // Semana 34 (Año II - Apocalipsis)
+  '34-1': {
+    firstReading: {
+      citation: 'Apocalipsis 14, 1-3. 4b-5',
+      text: 'Yo, Juan, miré, y he aquí que el Cordero estaba de pie sobre el monte Sión, y con él ciento cuarenta y cuatro mil, que llevaban escrito en la frente su nombre y el nombre de su Padre... Y cantaban un cántico nuevo delante del trono... Estos siguen al Cordero adondequiera que vaya. Han sido rescatados de entre los hombres como primicias para Dios y para el Cordero. En su boca no se encontró mentira: son intachables.'
+    },
+    psalm: {
+      citation: 'Salmo 23, 1-2. 3-4ab. 5-6',
+      response: 'Este es el grupo que viene a tu presencia, Señor.',
+      verses: [
+        'Del Señor es la tierra y cuanto la llena, el orbe y todos sus habitantes: él la fundó sobre los mares, él la afianzó sobre los ríos.',
+        '¿Quién puede subir al monte del Señor? ¿Quién puede estar en el recinto sacro? El hombre de manos inocentes y puro corazón, que no confía en los ídolos.',
+        'Ese recibirá la bendición del Señor, le hará justicia el Dios de salvación. Este es el grupo que busca al Señor, que viene a tu presencia, Dios de Jacob.'
+      ]
+    }
+  },
+  '34-2': {
+    firstReading: {
+      citation: 'Apocalipsis 14, 14-19',
+      text: 'Yo, Juan, miré, y había una nube blanca, y sentado sobre la nube uno semejante a un Hijo de hombre, con una corona de oro en la cabeza y una hoz afilada en la mano. Y otro ángel salió del santuario gritando con voz potente al que estaba sentado sobre la nube: «Mete tu hoz y siega, que ha llegado la hora de la siega, pues ya está madura la mies de la tierra». Y el que estaba sentado sobre la nube metió su hoz sobre la tierra, y la tierra quedó segada.'
+    },
+    psalm: {
+      citation: 'Salmo 95, 10. 11-12. 13',
+      response: 'Llega el Señor a regir la tierra.',
+      verses: [
+        'Decid a los pueblos: «El Señor es rey: él afianzó el orbe, y no se moverá; él gobierna a los pueblos rectamente».',
+        'Alégrese el cielo, goce la tierra, retumbe el mar y cuanto lo llena; vitoreen los campos y cuanto hay en ellos, aclamen los árboles del bosque.',
+        'Delante del Señor, que ya llega, ya llega a regir la tierra: regirá el orbe con justicia y los pueblos con fidelidad.'
+      ]
+    }
+  },
+  '34-3': {
+    firstReading: {
+      citation: 'Apocalipsis 15, 1-4',
+      text: 'Yo, Juan, vi en el cielo otra señal, grande y maravillosa: siete ángeles que llevaban siete plagas, las últimas, pues con ellas se consuma la ira de Dios. Y vi como un mar de vidrio mezclado con fuego; y los que habían vencido a la bestia... estaban de pie sobre el mar de vidrio, con las cítaras de Dios. Y cantan el cántico de Moisés, siervo de Dios, y el cántico del Cordero, diciendo: «Grandes y admirables son tus obras, Señor, Dios todopoderoso; justos y verdaderos tus caminos, Rey de las naciones... porque todas las naciones vendrán y se postrarán en tu acatamiento».'
+    },
+    psalm: {
+      citation: 'Salmo 97, 1. 2-3ab. 7-8. 9',
+      response: 'Grandes y maravillosas son tus obras, Señor, Dios omnipotente.',
+      verses: [
+        'Cantad al Señor un cántico nuevo, porque ha hecho maravillas: su diestra le ha dado la victoria, su santo brazo.',
+        'El Señor da a conocer su victoria, revela a las naciones su justicia: se acordó de su misericordia y su fidelidad en favor de la casa de Israel.',
+        'Retumbe el mar y cuanto contiene, la tierra y cuantos la habitan; aplaudan los ríos, aclamen los montes al Señor, que llega para regir la tierra con justicia y los pueblos con rectitud.'
+      ]
+    }
+  },
+  '34-4': {
+    firstReading: {
+      citation: 'Apocalipsis 18, 1-2. 21-23; 19, 1-3. 9a',
+      text: 'Yo, Juan, vi bajar del cielo a otro ángel con gran autoridad, y la tierra quedó iluminada por su resplandor. Y gritó con voz potente: «¡Cayó, cayó la gran Babilonia!»... Después de esto oí en el cielo como el vocerío de una gran muchedumbre, que decía: «¡Aleluya! La salvación, la gloria y el poder son de nuestro Dios, porque sus juicios son verdaderos y justos»... Y me dijo: «Escribe: Bienaventurados los invitados al banquete de bodas del Cordero».'
+    },
+    psalm: {
+      citation: 'Salmo 99, 2. 3. 4. 5',
+      response: 'Dichosos los invitados a la cena de las bodas del Cordero.',
+      verses: [
+        'Aclama al Señor, tierra entera, servid al Señor con alegría, entrad en su presencia con vítores.',
+        'Sabed que el Señor es Dios: que él nos hizo y somos suyos, su pueblo y ovejas de su rebaño. Entrad por sus puertas con acción de gracias, por sus atrios con himnos.',
+        'Dándole gracias y bendiciendo su nombre: «El Señor es bueno, su misericordia es eterna, su fidelidad por todas las edades».'
+      ]
+    }
+  },
+  '34-5': {
+    firstReading: {
+      citation: 'Apocalipsis 20, 1-4. 11 — 21, 2',
+      text: 'Yo, Juan, vi un ángel que bajaba del cielo con la llave del abismo y una cadena grande en la mano. Sujetó al dragón, la serpiente antigua... Vi un trono blanco y grande, y al que estaba sentado sobre él... Y los muertos fueron juzgados según sus obras... Y vi un cielo nuevo y una tierra nueva, pues el primer cielo y la primera tierra desaparecieron, y el mar ya no existe. Y vi la ciudad santa, la nueva Jerusalén, que descendía del cielo, de parte de Dios, preparada como una esposa que se ha adornado para su esposo.'
+    },
+    psalm: {
+      citation: 'Salmo 83, 3. 4. 5-6a y 8a',
+      response: 'Esta es la morada de Dios con los hombres.',
+      verses: [
+        'Mi alma se consume y anhela los atrios del Señor, mi corazón y mi carne retozan por el Dios vivo.',
+        'Hasta el gorrión ha encontrado una casa; la golondrina, un nido donde colocar sus polluelos: tus altares, Señor del universo, Rey mío y Dios mío.',
+        'Dichosos los que viven en tu casa, alabándote siempre. Dichosos los que encuentran en ti su fuerza; caminan de altura en altura.'
+      ]
+    }
+  },
+  '34-6': {
+    firstReading: {
+      citation: 'Apocalipsis 22, 1-7',
+      text: 'El ángel del Señor me mostró a mí, Juan, el río de agua de vida, reluciente como el cristal, que brotaba del trono de Dios y del Cordero. En medio de su plaza, a un lado y otro del río, hay un árbol de vida que da doce cosechas... Y ya no habrá maldición alguna. Y el trono de Dios y del Cordero estará en ella, y sus siervos le darán culto, y verán su rostro... Y el Señor Dios alumbrará sobre ellos, y reinarán por los siglos de los siglos... «Mira, vengo pronto. Bienaventurado el que guarda las palabras proféticas de este libro».'
+    },
+    psalm: {
+      citation: 'Salmo 94, 1-2. 3-5. 6-7',
+      response: '¡Ven, Señor Jesús!',
+      verses: [
+        'Venid, aclamemos al Señor, demos vítores a la Roca que nos salva; entremos a su presencia dándole gracias, aclamándolo con cantos.',
+        'Porque el Señor es un Dios grande, soberano de todos los dioses: tiene en su mano las simas de la tierra, son suyas las cumbres de los montes; suyo es el mar, porque él lo hizo, la tierra firme que modelaron sus manos.',
+        'Entrad, postrémonos por tierra, bendiciendo al Señor, creador nuestro. Porque él es nuestro Dios, y nosotros su pueblo, el rebaño que él guía.'
+      ]
+    }
   }
 };
 
@@ -647,86 +1346,95 @@ export const SUNDAYS_CYCLE_A: Record<number, {
   }
 };
 
+const PENDING_NOTICE =
+  'Las lecturas oficiales de este día aún no han sido publicadas. El leccionario se publica con unos tres meses de anticipación; vuelve a consultar más cerca de la fecha.';
+
 /**
- * Returns canonical Catholic liturgical day data according to the Roman Lectionary
- * guaranteeing correct Gospel of Saint Luke during weeks 22 to 34 of Ordinary Time.
+ * Local, offline liturgical day. Computes season, week, cycle and color for any date and only
+ * includes local readings when they are known to be valid for that date (Ordinary Time Year II
+ * weekdays and Cycle A Sundays bundled in this file). Otherwise the readings are marked as pending
+ * so the app never shows readings from the wrong day.
  */
 export function buildCanonicalDay(dateStr: string): LiturgicalDay {
   const parts = dateStr.split('-');
-  const year = parseInt(parts[0], 10) || 2026;
-  const month = parseInt(parts[1], 10) || 9;
+  const year = parseInt(parts[0], 10) || new Date().getFullYear();
+  const month = parseInt(parts[1], 10) || 1;
   const dayNum = parseInt(parts[2], 10) || 1;
+  const normalizedDate = `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
 
   const dateObj = new Date(year, month - 1, dayNum, 12, 0, 0);
-  const dayOfWeekIndex = dateObj.getDay(); // 0 = Domingo, 1 = Lunes, ...
+  const dayOfWeekIndex = dateObj.getDay();
   const dayOfWeek = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
   const monthName = dateObj.toLocaleDateString('es-ES', { month: 'long' });
-  const capitalizedDay = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
 
-  const isSunday = dayOfWeekIndex === 0;
-  const weekOfOT = getOrdinaryTimeWeek(dateObj);
-  const weekRoman = ROMAN_WEEKS[weekOfOT] || `${weekOfOT}ª`;
-
-  const sundayCycle = year % 3 === 2026 % 3 ? 'Ciclo A' : (year % 3 === 2027 % 3 ? 'Ciclo B' : 'Ciclo C');
+  const info = getLiturgicalCalendarInfo(normalizedDate);
   const saintData = getSaintForDate(month, dayNum);
+  const saint = {
+    name: saintData.name,
+    title: saintData.title,
+    shortBio: saintData.shortBio,
+    fullBio: saintData.fullBio,
+    patronage: saintData.patronage,
+    prayer: saintData.prayer,
+  };
 
-  if (isSunday) {
-    const sundayData = SUNDAYS_CYCLE_A[weekOfOT];
+  const baseTitle = buildSeasonalTitle(normalizedDate, info);
+  const { color, isFeast } = resolveLiturgicalColor(info, baseTitle, saintData.color);
+  const colorLabel = color !== info.color && info.season === 'Tiempo Ordinario' ? `Memoria de ${saintData.name}` : info.season;
+  const common = {
+    date: dateStr,
+    formattedDate: `${dayOfWeek}, ${monthName} ${dayNum}`,
+    season: isFeast ? ('Fiesta / Solemnidad' as const) : info.season,
+    color,
+    colorName: getColorName(color, colorLabel),
+    saint,
+  };
+
+  const isOrdinaryTime = info.season === 'Tiempo Ordinario';
+
+  if (isOrdinaryTime && info.isSunday && info.sundayCycle === 'A') {
+    const sundayData = SUNDAYS_CYCLE_A[info.week];
     if (sundayData) {
       return {
-        date: dateStr,
-        formattedDate: `${dayOfWeek}, ${monthName} ${dayNum}`,
-        title: `${weekRoman} Domingo del Tiempo Ordinario (${sundayCycle})`,
-        season: 'Tiempo Ordinario',
-        color: 'green',
-        colorName: 'Tiempo Ordinario',
-        saint: {
-          name: saintData.name,
-          title: saintData.title,
-          shortBio: saintData.shortBio,
-          fullBio: saintData.fullBio,
-          patronage: saintData.patronage,
-          prayer: saintData.prayer,
-        },
+        ...common,
+        title: baseTitle,
         firstReading: sundayData.firstReading,
         psalm: sundayData.psalm,
         secondReading: sundayData.secondReading,
         gospel: sundayData.gospel,
+        source: 'local',
       };
     }
   }
 
-  // Weekday in Ordinary Time (Lunes a Sábado)
-  // In weeks 22 to 34: Gospel MUST BE LUCAS (Luke)
-  const lookupKey = `${weekOfOT}-${dayOfWeekIndex}`;
-  const gospelData = ORDINARY_TIME_LUKE_GOSPELS[lookupKey] || ORDINARY_TIME_LUKE_GOSPELS[`24-${dayOfWeekIndex}`] || ORDINARY_TIME_LUKE_GOSPELS['24-1'];
-  
-  const firstReadingYear2 = ORDINARY_TIME_YEAR_2_FIRST_READINGS[lookupKey] || ORDINARY_TIME_YEAR_2_FIRST_READINGS[`24-${dayOfWeekIndex}`] || ORDINARY_TIME_YEAR_2_FIRST_READINGS['24-1'];
-
-  const color = saintData.color === 'red' ? 'red' : saintData.color === 'white' ? 'white' : 'green';
-  const colorName = color === 'red'
-    ? 'Mártires de Cristo (Rojo)'
-    : color === 'white'
-    ? `Memoria de ${saintData.name} (Blanco)`
-    : 'Tiempo Ordinario (Verde)';
+  if (isOrdinaryTime && !info.isSunday) {
+    const lookupKey = `${info.week}-${dayOfWeekIndex}`;
+    // Weekday gospels (Luke, weeks 22-34) are shared by both years; first readings bundled here are Year II only.
+    const gospelData = ORDINARY_TIME_LUKE_GOSPELS[lookupKey];
+    const firstReadingData = info.weekdayYear === 'II' ? ORDINARY_TIME_YEAR_2_FIRST_READINGS[lookupKey] : undefined;
+    if (gospelData && firstReadingData) {
+      return {
+        ...common,
+        title: `${baseTitle} • ${saintData.name}`,
+        firstReading: firstReadingData.firstReading,
+        psalm: firstReadingData.psalm,
+        gospel: gospelData,
+        source: 'local',
+      };
+    }
+  }
 
   return {
-    date: dateStr,
-    formattedDate: `${dayOfWeek}, ${monthName} ${dayNum}`,
-    title: `${capitalizedDay} de la ${weekRoman} semana del Tiempo Ordinario • ${saintData.name}`,
-    season: 'Tiempo Ordinario',
-    color,
-    colorName,
-    saint: {
-      name: saintData.name,
-      title: saintData.title,
-      shortBio: saintData.shortBio,
-      fullBio: saintData.fullBio,
-      patronage: saintData.patronage,
-      prayer: saintData.prayer,
+    ...common,
+    title: info.isSunday ? baseTitle : `${baseTitle} • ${saintData.name}`,
+    firstReading: { citation: 'Primera lectura por publicar', text: PENDING_NOTICE },
+    psalm: { citation: 'Salmo responsorial por publicar', response: 'Lecturas aún no disponibles', verses: [PENDING_NOTICE] },
+    gospel: {
+      citation: 'Evangelio por publicar',
+      acclamation: info.season === 'Cuaresma' ? 'Honor y gloria a ti, Señor Jesús.' : 'Aleluya, aleluya.',
+      text: PENDING_NOTICE,
     },
-    firstReading: firstReadingYear2.firstReading,
-    psalm: firstReadingYear2.psalm,
-    gospel: gospelData,
+    source: 'local',
+    readingsPending: true,
   };
 }
