@@ -1,4 +1,4 @@
-import { getSaintForDate } from './saintsCalendar.js';
+import { confirmedPrintSaint, pendingSaint } from './colombianSaints.js';
 import type { LiturgicalDay } from './liturgy.js';
 import {
   buildSeasonalTitle,
@@ -1347,13 +1347,11 @@ export const SUNDAYS_CYCLE_A: Record<number, {
 };
 
 const PENDING_NOTICE =
-  'Las lecturas oficiales de este día aún no han sido publicadas. El leccionario se publica con unos tres meses de anticipación; vuelve a consultar más cerca de la fecha.';
+  'No se han podido cargar las lecturas completas de este día. Comprueba tu conexión y vuelve a consultar. Para fechas futuras, las lecturas suelen publicarse con unos tres meses de anticipación.';
 
 /**
- * Local, offline liturgical day. Computes season, week, cycle and color for any date and only
- * includes local readings when they are known to be valid for that date (Ordinary Time Year II
- * weekdays and Cycle A Sundays bundled in this file). Otherwise the readings are marked as pending
- * so the app never shows readings from the wrong day.
+ * Local calendar for any date. Bundled readings include abridgments, so they are not
+ * presented as complete Mass readings. Offline readings come from the official cache.
  */
 export function buildCanonicalDay(dateStr: string): LiturgicalDay {
   const parts = dateStr.split('-');
@@ -1363,12 +1361,12 @@ export function buildCanonicalDay(dateStr: string): LiturgicalDay {
   const normalizedDate = `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
 
   const dateObj = new Date(year, month - 1, dayNum, 12, 0, 0);
-  const dayOfWeekIndex = dateObj.getDay();
   const dayOfWeek = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
   const monthName = dateObj.toLocaleDateString('es-ES', { month: 'long' });
 
   const info = getLiturgicalCalendarInfo(normalizedDate);
-  const saintData = getSaintForDate(month, dayNum);
+  const confirmed = confirmedPrintSaint(normalizedDate);
+  const saintData = confirmed?.saint || pendingSaint();
   const saint = {
     name: saintData.name,
     title: saintData.title,
@@ -1388,49 +1386,16 @@ export function buildCanonicalDay(dateStr: string): LiturgicalDay {
     color,
     colorName: getColorName(color, colorLabel),
     saint,
+    saintVerification: confirmed?.saintVerification,
   };
-
-  const isOrdinaryTime = info.season === 'Tiempo Ordinario';
-
-  if (isOrdinaryTime && info.isSunday && info.sundayCycle === 'A') {
-    const sundayData = SUNDAYS_CYCLE_A[info.week];
-    if (sundayData) {
-      return {
-        ...common,
-        title: baseTitle,
-        firstReading: sundayData.firstReading,
-        psalm: sundayData.psalm,
-        secondReading: sundayData.secondReading,
-        gospel: sundayData.gospel,
-        source: 'local',
-      };
-    }
-  }
-
-  if (isOrdinaryTime && !info.isSunday) {
-    const lookupKey = `${info.week}-${dayOfWeekIndex}`;
-    // Weekday gospels (Luke, weeks 22-34) are shared by both years; first readings bundled here are Year II only.
-    const gospelData = ORDINARY_TIME_LUKE_GOSPELS[lookupKey];
-    const firstReadingData = info.weekdayYear === 'II' ? ORDINARY_TIME_YEAR_2_FIRST_READINGS[lookupKey] : undefined;
-    if (gospelData && firstReadingData) {
-      return {
-        ...common,
-        title: `${baseTitle} • ${saintData.name}`,
-        firstReading: firstReadingData.firstReading,
-        psalm: firstReadingData.psalm,
-        gospel: gospelData,
-        source: 'local',
-      };
-    }
-  }
 
   return {
     ...common,
-    title: info.isSunday ? baseTitle : `${baseTitle} • ${saintData.name}`,
-    firstReading: { citation: 'Primera lectura por publicar', text: PENDING_NOTICE },
-    psalm: { citation: 'Salmo responsorial por publicar', response: 'Lecturas aún no disponibles', verses: [PENDING_NOTICE] },
+    title: !confirmed || info.isSunday ? baseTitle : `${baseTitle} • ${saintData.name}`,
+    firstReading: { citation: 'Primera lectura no disponible', text: PENDING_NOTICE },
+    psalm: { citation: 'Salmo responsorial no disponible', response: 'Lecturas aún no disponibles', verses: [PENDING_NOTICE] },
     gospel: {
-      citation: 'Evangelio por publicar',
+      citation: 'Evangelio no disponible',
       acclamation: info.season === 'Cuaresma' ? 'Honor y gloria a ti, Señor Jesús.' : 'Aleluya, aleluya.',
       text: PENDING_NOTICE,
     },

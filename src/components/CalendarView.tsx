@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SaintSource } from './SaintSource.tsx';
 import {
   Calendar as CalendarIcon,
   CheckCircle2,
@@ -362,6 +363,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                 <div>
                   <span className="text-amber-300 font-serif font-semibold text-xs">Santo del Día: </span>
                   <span className="font-bold text-slate-100">{selectedDayData.saint.name}</span>
+                  <SaintSource verification={selectedDayData.saintVerification} />
                   {selectedDayData.saint.title && (
                     <p className="text-[11px] text-slate-400 font-serif italic mt-0.5">
                       {selectedDayData.saint.title}

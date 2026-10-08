@@ -21,6 +21,7 @@ import { speechService } from '../lib/speech.ts';
 import { saveNote } from '../lib/firebase.ts';
 import type { User } from 'firebase/auth';
 import { PanVivoLogo } from './PanVivoLogo.tsx';
+import { SaintSource } from './SaintSource.tsx';
 
 const reflectionClientCache = new Map<string, { reflection: string; priestName: string }>();
 
@@ -64,7 +65,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       setSelectedDate(initialDate);
     }
   }, [initialDate]);
-  const [expandedSection, setExpandedSection] = useState<'reading1' | 'psalm' | 'gospel' | null>(null);
   const [saintModalOpen, setSaintModalOpen] = useState(false);
 
   // Audio speech states
@@ -131,16 +131,18 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
   }, [selectedDate]);
 
   const fetchReflection = async (data: LiturgicalDay) => {
+    const saintName = data.saintVerification?.status === 'publisher' ? data.saint.name : 'todos los santos';
     if (data.readingsPending) {
       setReflection(
-        'La homilía de este día estará disponible cuando se publiquen las lecturas oficiales (aproximadamente tres meses antes de la fecha).'
+        'La homilía de este día estará disponible cuando se puedan cargar las lecturas completas.'
       );
       setReflectionError(null);
       setLoadingReflection(false);
       return;
     }
 
-    const cached = reflectionClientCache.get(data.formattedDate);
+    const reflectionKey = `${data.date}:${saintName}`;
+    const cached = reflectionClientCache.get(reflectionKey);
     if (cached) {
       setReflection(cached.reflection);
       if (cached.priestName) setPriestName(cached.priestName);
@@ -157,7 +159,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         body: JSON.stringify({
           date: data.formattedDate,
           liturgicalTitle: data.title,
-          saint: data.saint.name,
+          saint: saintName,
           reading1: `${data.firstReading.citation} - ${data.firstReading.text}`,
           reading2: data.secondReading ? `${data.secondReading.citation} - ${data.secondReading.text}` : undefined,
           psalm: `${data.psalm.citation}. R/. ${data.psalm.response}`,
@@ -171,16 +173,19 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       if (!json.reflection) throw new Error(json.error || 'Respuesta de reflexión vacía');
       setReflection(json.reflection);
       if (json.priestName) setPriestName(json.priestName);
-      reflectionClientCache.set(data.formattedDate, {
+      reflectionClientCache.set(reflectionKey, {
         reflection: json.reflection,
         priestName: json.priestName || 'Padre Mateo',
       });
     } catch {
       const fallbackText =
         `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), la Palabra de Dios proclamada en la Sagrada Liturgia (${data.title}) nos interpela en lo más hondo del alma.\n\nEn el Santo Evangelio (${data.gospel.citation}), Jesús nos revela el corazón del Reino de Dios y nos invita a acoger su Palabra con fe sencilla y confiada. ${data.secondReading ? `Las lecturas de hoy, y en especial la Segunda Lectura (${data.secondReading.citation}), nos recuerdan que somos llamados a vivir enteramente para el Señor, en comunión de caridad fraterna.` : `La Primera Lectura (${data.firstReading.citation}) ilumina este mismo llamado a la fidelidad.`}\n\nLa verdadera fe se manifiesta en el perdón sincero, en desterrar el rencor y en saber que hemos recibido un perdón infinito de parte de Dios.\n\nPropósito para hoy: Renunciar de corazón a cualquier queja o resentimiento que llevemos guardado, rezar por aquella persona que nos cuesta perdonar y ofrecerle la paz.\n\nOremos: Señor Dios compasivo y misericordioso, enséñanos a perdonar como Tú nos has perdonado y haz que nuestro corazón descanse siempre en tu amor. Por la intercesión de ${data.saint.name}, escucha nuestra oración.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
-      setReflection(fallbackText);
-      reflectionClientCache.set(data.formattedDate, {
-        reflection: fallbackText,
+      const verifiedFallback = fallbackText.replace(
+        `Por la intercesión de ${data.saint.name}`, `Por la intercesión de ${saintName}`,
+      );
+      setReflection(verifiedFallback);
+      reflectionClientCache.set(reflectionKey, {
+        reflection: verifiedFallback,
         priestName: 'Padre Mateo',
       });
     } finally {
@@ -487,13 +492,14 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             </span>
           </h3>
 
-          <p className="text-xs text-slate-300 mt-2 line-clamp-2 leading-relaxed">
-            {dayData.saint.shortBio}
+          <p className="text-xs text-slate-300 mt-2 leading-relaxed whitespace-pre-line">
+            {dayData.saint.fullBio || dayData.saint.shortBio}
           </p>
+          <SaintSource verification={dayData.saintVerification} />
 
           <div className="mt-3 flex items-center justify-between text-[11px] text-amber-400/90 font-medium">
-            <span>Toca para leer biografía y oración</span>
-            <span className="text-slate-500 text-[10px]">Leer más →</span>
+            <span>Toca para abrir biografía y oración</span>
+            <span className="text-slate-500 text-[10px]">Abrir →</span>
           </div>
         </div>
 
@@ -537,22 +543,12 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </p>
 
           <p
-            className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line ${
-              expandedSection === 'reading1' ? '' : 'line-clamp-4'
-            }`}
+            className="text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line"
           >
             {currentCelebration.firstReading.text}
           </p>
 
           <div className="mt-2 flex items-center justify-between">
-            <button
-              onClick={() =>
-                setExpandedSection(expandedSection === 'reading1' ? null : 'reading1')
-              }
-              className="text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
-            >
-              {expandedSection === 'reading1' ? 'Mostrar menos' : 'Toca para leer completo'}
-            </button>
             <span className="text-[10px] text-slate-400 font-serif italic">Palabra de Dios</span>
           </div>
         </div>
@@ -605,23 +601,13 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </div>
 
           <div
-            className={`space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif whitespace-pre-line ${
-              expandedSection === 'psalm' ? '' : 'line-clamp-3'
-            }`}
+            className="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif whitespace-pre-line"
           >
             {currentCelebration.psalm.verses.map((verse, i) => (
               <p key={i}>{verse}</p>
             ))}
           </div>
 
-          <button
-            onClick={() =>
-              setExpandedSection(expandedSection === 'psalm' ? null : 'psalm')
-            }
-            className="mt-2 text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
-          >
-            {expandedSection === 'psalm' ? 'Mostrar menos' : 'Toca para leer estrofas completas'}
-          </button>
         </div>
 
         {/* 3b. Card: Segunda Lectura (Domingos y Solemnidades) */}
@@ -671,22 +657,12 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             </p>
 
             <p
-              className={`text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line ${
-                expandedSection === 'reading2' ? '' : 'line-clamp-4'
-              }`}
+              className="text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line"
             >
               {currentCelebration.secondReading.text}
             </p>
 
             <div className="mt-2 flex items-center justify-between">
-              <button
-                onClick={() =>
-                  setExpandedSection(expandedSection === 'reading2' ? null : 'reading2')
-                }
-                className="text-[11px] text-amber-400/90 hover:text-amber-300 font-medium"
-              >
-                {expandedSection === 'reading2' ? 'Mostrar menos' : 'Toca para leer completo'}
-              </button>
               <span className="text-[10px] text-slate-400 font-serif italic">Palabra de Dios</span>
             </div>
           </div>
@@ -880,7 +856,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
                 <h4 className="font-semibold text-white uppercase text-xs tracking-wider mb-1">
                   Vida y Testimonio
                 </h4>
-                <p>{dayData.saint.fullBio}</p>
+                <p className="whitespace-pre-line">{dayData.saint.fullBio}</p>
               </div>
 
               <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4">

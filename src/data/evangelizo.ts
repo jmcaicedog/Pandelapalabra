@@ -1,5 +1,5 @@
 import type { LiturgicalDay } from './liturgy.js';
-import { getSaintForDate, SAINTS_BY_DAY, type SaintData } from './saintsCalendar.js';
+import { confirmedPrintSaint, pendingSaint } from './colombianSaints.js';
 import {
   getColorName,
   getLiturgicalCalendarInfo,
@@ -63,39 +63,11 @@ function htmlToText(html: string): string {
     .join('\n');
 }
 
-function firstSentences(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  const cut = text.slice(0, maxLength);
-  const end = cut.lastIndexOf('. ');
-  return end > maxLength / 3 ? cut.slice(0, end + 1) : `${cut.trimEnd()}…`;
-}
-
-/** Local curated saint when the day is explicitly defined; otherwise the official saint from Evangelizo. */
-function resolveSaint(date: Date, data: EvangelizoDay): SaintData {
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const key = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  const local = getSaintForDate(month, day);
-  if (SAINTS_BY_DAY[key]) return local;
-
-  const official = [...(data.saints || [])]
-    .filter((s) => s.name?.trim())
-    .sort((a, b) => (a.order1 ?? 99) - (b.order1 ?? 99) || (a.order2 ?? 99) - (b.order2 ?? 99))[0];
-  if (!official?.name) return local;
-
-  const name = official.name.trim();
-  const bioLines = htmlToText(official.bio || '').split('\n');
-  if (bioLines[0] && bioLines[0].replace(/\s+/g, ' ').trim() === name) bioLines.shift();
-  const bio = bioLines.join('\n').trim();
-  const shortDescription = htmlToText(official.short_description || '');
-
-  return {
-    name,
-    title: shortDescription || 'Santo del día',
-    shortBio: bio ? firstSentences(bio.replace(/\n/g, ' '), 220) : `Hoy la Iglesia celebra a ${name}.`,
-    fullBio: bio || `Hoy la Iglesia celebra a ${name}.`,
-    prayer: `Señor Dios, que nos das la alegría de celebrar a ${name}, concédenos, por su intercesión, imitar su fe y su amor, para crecer cada día en santidad. Por Jesucristo, nuestro Señor. Amén.`,
-  };
+export function cleanSaintText(raw: string): string {
+  return htmlToText(raw)
+    .replace(/^\s*#{1,6}\s+/gm, '')
+    .replace(/\*\*([^*\n]+)\*\*/g, '$1')
+    .trim();
 }
 
 function cleanText(raw: string): string {
@@ -192,11 +164,21 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
   const firstReadings = readings.filter((r) => r.type === 'reading');
   const psalmReading = readings.find((r) => r.type === 'psalm');
   const gospelReading = readings.find((r) => r.type === 'gospel');
-  if (!firstReadings.length || !gospelReading) return null;
+  if (
+    !firstReadings.length ||
+    !gospelReading ||
+    [...firstReadings, gospelReading, ...(psalmReading ? [psalmReading] : [])].some(
+      (reading) => !cleanText(reading.text || '') || !reading.reference_displayed?.trim()
+    )
+  ) {
+    console.warn(`Lecturas de Evangelizo vacías o sin referencia para ${dateStr}.`);
+    return null;
+  }
 
   const date = parseDateStr(dateStr);
   const info = getLiturgicalCalendarInfo(dateStr);
-  const saintData = resolveSaint(date, data);
+  const confirmed = confirmedPrintSaint(dateStr);
+  const saintData = confirmed?.saint || pendingSaint();
   const rawTitle = data.liturgic_title || data.liturgy?.title || '';
   const title = rawTitle ? normalizeTitle(rawTitle) : '';
   const { color, isFeast } = resolveLiturgicalColor(info, title, saintData.color);
@@ -245,6 +227,7 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
       patronage: saintData.patronage,
       prayer: saintData.prayer,
     },
+    saintVerification: confirmed?.saintVerification,
     firstReading: {
       citation: buildCitation(firstReadings[0]),
       text: cleanText(firstReadings[0].text || ''),

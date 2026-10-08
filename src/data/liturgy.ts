@@ -1,5 +1,7 @@
 import { buildCanonicalDay } from './canonicalLectionary.js';
 import { fetchEvangelizoDay } from './evangelizo.js';
+import { confirmedPrintSaint, hasFreshSaintVerification, pendingSaint, type SaintVerification } from './colombianSaints.js';
+import { getColorName, getLiturgicalCalendarInfo, resolveLiturgicalColor } from './liturgicalCalendar.js';
 
 export interface LiturgicalDay {
   date: string; // YYYY-MM-DD
@@ -16,6 +18,7 @@ export interface LiturgicalDay {
     patronage?: string;
     prayer: string;
   };
+  saintVerification?: SaintVerification;
   firstReading: {
     citation: string;
     text: string;
@@ -37,7 +40,7 @@ export interface LiturgicalDay {
   defaultReflection?: string;
   /** Origin of the readings: official Evangelizo lectionary, curated local entry or local fallback. */
   source?: 'evangelizo' | 'curated' | 'local';
-  /** True when the official readings for this date are not yet published (beyond the publication window). */
+  /** True when complete official readings could not be loaded or are not yet published. */
   readingsPending?: boolean;
   alternativeCelebration?: {
     title: string;
@@ -899,16 +902,19 @@ const WEEKDAY_READINGS = [
 
 // Memory cache for runtime dynamic liturgy
 const clientLiturgyMemoryCache = new Map<string, LiturgicalDay>();
-const LITURGY_STORAGE_PREFIX = 'panvivo_liturgy_v3_';
+const LITURGY_STORAGE_PREFIX = 'panvivo_liturgy_v5_';
+const LEGACY_LITURGY_STORAGE_PREFIX = 'panvivo_liturgy_v3_';
 
 function mergeWithCurated(dateStr: string, official: LiturgicalDay): LiturgicalDay {
   const curated = LITURGY_DATABASE[dateStr];
   if (!curated) return official;
-  return { ...official, saint: curated.saint, defaultReflection: curated.defaultReflection };
+  return { ...official, defaultReflection: curated.defaultReflection };
 }
 
-function isOfficial(day: LiturgicalDay | null | undefined): day is LiturgicalDay {
-  return !!day && day.source === 'evangelizo' && !!day.firstReading && !!day.gospel;
+function isOfficial(day: LiturgicalDay | null | undefined): boolean {
+  return !!day && day.source === 'evangelizo' && !day.readingsPending
+    && !!day.firstReading?.text?.trim() && !!day.firstReading?.citation?.trim()
+    && !!day.gospel?.text?.trim() && !!day.gospel?.citation?.trim();
 }
 
 /** Synchronous best-effort day (used for the first paint before the official readings arrive). */
@@ -918,10 +924,22 @@ export function getLiturgicalDay(dateStr: string): LiturgicalDay {
 
   if (typeof window !== 'undefined') {
     try {
-      const stored = localStorage.getItem(LITURGY_STORAGE_PREFIX + dateStr);
+      const stored = localStorage.getItem(LITURGY_STORAGE_PREFIX + dateStr)
+        || localStorage.getItem('panvivo_liturgy_v4_' + dateStr)
+        || localStorage.getItem(LEGACY_LITURGY_STORAGE_PREFIX + dateStr);
       if (stored) {
         const parsed = JSON.parse(stored) as LiturgicalDay;
-        if (isOfficial(parsed)) {
+        if (isOfficial(parsed) && parsed.date === dateStr) {
+          if (!parsed.saintVerification || parsed.saintVerification.date !== dateStr) {
+            const confirmed = confirmedPrintSaint(dateStr);
+            parsed.saint = confirmed?.saint || pendingSaint();
+            parsed.saintVerification = confirmed?.saintVerification;
+            const info = getLiturgicalCalendarInfo(dateStr);
+            const { color } = resolveLiturgicalColor(info, parsed.title, confirmed?.saint.color);
+            parsed.color = color;
+            parsed.colorName = getColorName(color, color !== info.color
+              ? `Memoria de ${parsed.saint.name}` : info.season);
+          }
           clientLiturgyMemoryCache.set(dateStr, parsed);
           return parsed;
         }
@@ -931,16 +949,16 @@ export function getLiturgicalDay(dateStr: string): LiturgicalDay {
     }
   }
 
-  return LITURGY_DATABASE[dateStr] || buildCanonicalDay(dateStr);
+  return buildCanonicalDay(dateStr);
 }
 
 /**
  * Fetches the official liturgy of any date: memory/localStorage cache -> server API ->
- * Evangelizo directly -> curated/local calendar fallback (readings marked as pending when unknown).
+ * Evangelizo directly -> local calendar with an explicit notice, never abridged readings.
  */
 export async function fetchLiturgicalDay(dateStr: string): Promise<LiturgicalDay> {
   const cached = getLiturgicalDay(dateStr);
-  if (isOfficial(cached)) return cached;
+  if (isOfficial(cached) && hasFreshSaintVerification(cached.saintVerification, dateStr)) return cached;
 
   const remember = (day: LiturgicalDay) => {
     clientLiturgyMemoryCache.set(dateStr, day);
@@ -958,14 +976,21 @@ export async function fetchLiturgicalDay(dateStr: string): Promise<LiturgicalDay
     const res = await fetch(`/api/liturgy?date=${encodeURIComponent(dateStr)}`);
     if (res.ok) {
       const data = (await res.json()) as LiturgicalDay;
-      if (isOfficial(data)) return remember(data);
+      if (data.date === dateStr && data.saintVerification) {
+        if (isOfficial(data)) return remember(data);
+        if (isOfficial(cached)) return remember({
+          ...cached, saint: data.saint, saintVerification: data.saintVerification,
+        });
+        if (data.readingsPending) return remember(data);
+      }
     }
   } catch {
     // Try the official source directly
   }
 
+  if (isOfficial(cached)) return cached;
   const direct = await fetchEvangelizoDay(dateStr);
   if (direct) return remember(mergeWithCurated(dateStr, direct));
 
-  return LITURGY_DATABASE[dateStr] || buildCanonicalDay(dateStr);
+  return buildCanonicalDay(dateStr);
 }

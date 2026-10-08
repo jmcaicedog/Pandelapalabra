@@ -1,8 +1,10 @@
 import { GoogleGenAI } from '@google/genai';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { LITURGY_DATABASE } from '../data/liturgy.js';
+import { LITURGY_DATABASE, type LiturgicalDay } from '../data/liturgy.js';
 import { buildCanonicalDay } from '../data/canonicalLectionary.js';
 import { fetchEvangelizoDay } from '../data/evangelizo.js';
+import { fetchColombianSantoral } from './colombianSantoral.js';
+import { hasFreshSaintVerification } from '../data/colombianSaints.js';
 
 let genAIInstance: GoogleGenAI | null = null;
 
@@ -29,7 +31,7 @@ const CANDIDATE_MODELS = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
 // Cache for homilies and counsel to conserve quota
 const reflectionCache = new Map<string, { reflection: string; priestName: string; date: string; fallback: boolean }>();
 const counselCache = new Map<string, { counsel: string; priestName: string; fallback: boolean }>();
-const dynamicLiturgyCache = new Map<string, any>();
+const dynamicLiturgyCache = new Map<string, LiturgicalDay>();
 
 // Circuit breaker for quota limits (e.g. 429 RESOURCE_EXHAUSTED)
 let quotaCooldownUntil = 0;
@@ -184,26 +186,30 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
       return true;
     }
 
-    if (dynamicLiturgyCache.has(dateParam)) {
-      sendJson(res, 200, dynamicLiturgyCache.get(dateParam));
+    const cachedDay = dynamicLiturgyCache.get(dateParam);
+    if (cachedDay && hasFreshSaintVerification(cachedDay.saintVerification, dateParam)) {
+      sendJson(res, 200, cachedDay);
       return true;
     }
 
     // 1. Official lectionary (Evangelizo) for any published date
-    const official = await fetchEvangelizoDay(dateParam);
+    const [official, santoral] = await Promise.all([
+      cachedDay ? Promise.resolve(cachedDay) : fetchEvangelizoDay(dateParam),
+      fetchColombianSantoral(dateParam),
+    ]);
     if (official) {
       const curated = LITURGY_DATABASE[dateParam];
       const merged = curated
-        ? { ...official, saint: curated.saint, defaultReflection: curated.defaultReflection }
+        ? { ...official, defaultReflection: curated.defaultReflection }
         : official;
-      dynamicLiturgyCache.set(dateParam, merged);
-      sendJson(res, 200, merged);
+      const verified = { ...merged, ...santoral };
+      dynamicLiturgyCache.set(dateParam, verified);
+      sendJson(res, 200, verified);
       return true;
     }
 
-    // 2. Curated local entry, then local calendar (never cached, so the official
-    //    readings are picked up as soon as they're published or the service recovers)
-    sendJson(res, 200, LITURGY_DATABASE[dateParam] || buildCanonicalDay(dateParam));
+    // Unavailable readings are not cached; bundled abridgments must not replace full texts.
+    sendJson(res, 200, { ...buildCanonicalDay(dateParam), ...santoral });
     return true;
   }
 

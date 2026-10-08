@@ -956,6 +956,22 @@ export const SAINTS_BY_DAY: Record<string, SaintData> = {
     prayer: 'Derrama, Señor, tu gracia sobre nosotros, para que, habiendo conocido por el anuncio del ángel la encarnación de tu Hijo, por su pasión y cruz lleguemos a la gloria de la resurrección meditando estos santos misterios del Rosario. Amén.',
     color: 'white'
   },
+  // Santoral de Pan de la Palabra (Colombia); prioridad sobre el orden de Evangelizo.
+  '10-08': {
+    name: 'Santa Pelagia',
+    title: 'Penitente de Antioquía',
+    shortBio: 'La tradición de Santa Pelagia recuerda una conversión profunda y una vida dedicada a la oración y la penitencia.',
+    fullBio: 'Santa Pelagia es recordada en la tradición cristiana como una mujer de Antioquía que cambió de vida al acoger la fe en Jesucristo.\n\nSegún el relato de su conversión, la predicación del obispo Nono la llevó a pedir el bautismo, abandonar su vida anterior y compartir sus bienes con los pobres. Después se retiró a una vida de oración y penitencia cerca de Jerusalén.\n\nSu testimonio invita a confiar en la misericordia de Dios y a responder a ella con una conversión sincera. Su conmemoración es el 8 de octubre.',
+    prayer: 'Señor, por la intercesión de Santa Pelagia, ayúdanos a acoger tu misericordia y a renovar nuestra vida con fe, oración y caridad. Amén.'
+  },
+  '10-09': {
+    name: 'San Luis Bertrán',
+    title: 'Presbítero dominico y misionero',
+    shortBio: 'Dominico nacido en Valencia, anunció el Evangelio en tierras de la actual Colombia y defendió a las comunidades indígenas.',
+    fullBio: 'San Luis Bertrán nació en Valencia en 1526 e ingresó en la Orden de Predicadores. Como sacerdote dominico se dedicó a la predicación, la formación religiosa y la vida de oración.\n\nDurante el siglo XVI ejerció su misión en el territorio de la actual Colombia. Su ministerio entre las comunidades indígenas estuvo acompañado por la defensa de su dignidad frente a los abusos de los colonizadores.\n\nRegresó a Valencia, donde murió en 1581. Fue canonizado en 1671. En Colombia se le recuerda especialmente por su labor misionera; Pan de la Palabra lo celebra el 9 de octubre.',
+    prayer: 'Señor, por la intercesión de San Luis Bertrán, danos valentía para anunciar tu Evangelio y servir con respeto y caridad a todos los pueblos. Amén.',
+    color: 'white'
+  },
   '10-15': {
     name: 'Santa Teresa de Jesús (Teresa de Ávila)',
     title: 'Virgen y Doctora de la Iglesia',
@@ -1317,10 +1333,7 @@ const MONTH_BACKUP_SAINTS: Record<number, SaintData[]> = {
   ]
 };
 
-/**
- * Returns the authentic Catholic Saint for any MM-DD date of the year.
- * Never returns generic "Santos y Beatos del Día".
- */
+/** Local biography lookup only; not an authority for the Colombian daily selection. */
 export function getSaintForDate(month: number, day: number): SaintData {
   const mm = String(month).padStart(2, '0');
   const dd = String(day).padStart(2, '0');
@@ -1330,14 +1343,11 @@ export function getSaintForDate(month: number, day: number): SaintData {
     return SAINTS_BY_DAY[key];
   }
 
-  // If specific day isn't explicitly in the calendar map, select from month collection deterministically
-  const monthList = MONTH_BACKUP_SAINTS[month] || MONTH_BACKUP_SAINTS[9];
-  const selectedIndex = (day - 1) % monthList.length;
-  const baseSaint = monthList[selectedIndex];
-
-  // Return realistic day-adapted saint profile
   return {
-    ...baseSaint,
-    title: baseSaint.title || 'Confesor de la Fe y Testigo de Cristo'
+    name: 'Santoral colombiano pendiente de confirmar',
+    title: 'Sin selección verificada para esta fecha',
+    shortBio: 'No hay una entrada local para esta fecha.',
+    fullBio: 'No hay una entrada local para esta fecha. Consulta las fuentes colombianas.',
+    prayer: 'Señor, ayúdanos a seguir el ejemplo de tus santos. Amén.',
   };
 }
