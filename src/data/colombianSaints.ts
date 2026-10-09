@@ -1,5 +1,5 @@
 import { SAINTS_BY_DAY, type SaintData } from './saintsCalendar.js';
-import editorial from './colombianEditorialSaints.json';
+import editorial from './colombianEditorialSaints.json' with { type: 'json' };
 import { parseDateStr } from '../lib/dateUtils.js';
 
 export const EDITORIAL_SANTORAL_VERSION = editorial.version;

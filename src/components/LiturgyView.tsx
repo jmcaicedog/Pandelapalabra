@@ -376,13 +376,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         </div>
       </div>
 
-      {!dayData.readingsPending && (
-        <p className="px-4 py-3 text-[11px] text-slate-400">
-          Lecturas: Evangelizo. La disponibilidad de textos no garantiza coincidencia con los propios
-          o traslados del calendario colombiano; contrasta esas celebraciones con el Ordo de tu diócesis.
-        </p>
-      )}
-
       {/* Sticky Fast-Navigation Bar for Liturgical Readings */}
       <div className="sticky top-0 z-20 px-4 py-2 bg-[#0e0a07]/95 backdrop-blur-md border-y border-amber-950/60 shadow-md">
         <div className="max-w-xl mx-auto flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">

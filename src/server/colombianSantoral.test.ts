@@ -5,7 +5,7 @@ import { createElement } from 'react';
 import { fetchColombianSantoral } from './colombianSantoral.ts';
 import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint, hasFreshSaintVerification } from '../data/colombianSaints.ts';
 import { SaintSource } from '../components/SaintSource.tsx';
-import editorial from '../data/colombianEditorialSaints.json';
+import editorial from '../data/colombianEditorialSaints.json' with { type: 'json' };
 
 test('el santoral recurrente cubre todos los días, incluidos bisiestos y años futuros', () => {
   assert.equal(Object.keys(editorial.entries).length, 366);
