@@ -4,12 +4,13 @@ import { loginWithEmail, registerWithEmail, loginWithGoogle, loginAnonymously } 
 import { PanVivoEmblem } from './PanVivoLogo.tsx';
 
 interface AuthModalProps {
+  darkMode?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ darkMode = true, isOpen, onClose, onSuccess }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -87,7 +88,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
     >
       <div
         id="auth-modal-container"
-        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative text-slate-100"
+        className={`w-full max-w-md border rounded-3xl p-6 shadow-2xl relative ${
+          darkMode
+            ? 'bg-slate-900 border-slate-800 text-slate-100'
+            : 'bg-[#fffaf3] border-stone-300 text-stone-900'
+        }`}
       >
         <button
           id="btn-close-auth-modal"

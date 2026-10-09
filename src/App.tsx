@@ -96,8 +96,12 @@ export default function App() {
   return (
     <div
       id="pan-vivo-app-root"
-      style={{ '--reading-font-size': `${fontSize}px` } as React.CSSProperties}
-      className={`min-h-screen flex justify-center selection:bg-amber-500/30 selection:text-amber-200 transition-colors duration-300 ${
+      data-theme={darkMode ? 'dark' : 'light'}
+      style={{
+        '--reading-font-size': `${fontSize}px`,
+        colorScheme: darkMode ? 'dark' : 'light',
+      } as React.CSSProperties}
+      className={`min-h-screen flex justify-center selection:bg-amber-500/30 transition-colors duration-300 ${
         darkMode ? 'bg-[#0c0805] text-slate-100' : 'bg-[#f4efe8] text-stone-900'
       }`}
     >
@@ -163,6 +167,7 @@ export default function App() {
 
         {/* Global Bottom Navigation */}
         <BottomNav
+          darkMode={darkMode}
           currentTab={currentTab}
           onSelectTab={(tab) => {
             setCurrentTab(tab);
@@ -172,6 +177,7 @@ export default function App() {
 
         {/* Auth Modal for Firebase Login / Registration */}
         <AuthModal
+          darkMode={darkMode}
           isOpen={authModalOpen}
           onClose={() => setAuthModalOpen(false)}
           onSuccess={() => setAuthModalOpen(false)}

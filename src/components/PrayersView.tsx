@@ -154,7 +154,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
     <div id="prayers-container" className="min-h-screen pb-28 text-slate-100">
       {statsError && <p role="alert" className="fixed top-5 left-4 right-4 z-[100] rounded-xl bg-slate-900 border border-amber-500 p-4 text-sm text-amber-200">{statsError}</p>}
       {/* Top Hero Banner with Sacred Art */}
-      <div className="relative h-52 w-full overflow-hidden bg-slate-950">
+      <div className="theme-dark-surface relative h-52 w-full overflow-hidden bg-slate-950">
         <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.28),rgba(255,255,255,0))]"></div>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[440px] h-[200px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>

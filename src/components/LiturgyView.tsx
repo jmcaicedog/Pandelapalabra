@@ -259,7 +259,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     <div id="liturgy-container" className="min-h-screen pb-36 text-slate-100">
       {actionError && <p role="alert" className="fixed top-5 left-4 right-4 z-[100] rounded-xl bg-slate-900 border border-amber-500 p-4 text-sm text-amber-200">{actionError}</p>}
       {/* Top Hero Banner with Sacred Light & Pan Vivo Brand */}
-      <div className="relative h-60 w-full overflow-hidden bg-slate-950">
+      <div className="theme-dark-surface relative h-60 w-full overflow-hidden bg-slate-950">
         {/* Pure CSS Sacred Light & Altar Glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(245,158,11,0.28),rgba(255,255,255,0))]"></div>

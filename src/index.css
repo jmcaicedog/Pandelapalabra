@@ -67,6 +67,166 @@
   line-height: 1.65;
 }
 
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) {
+  color: #29211b;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is(
+  .bg-slate-950,
+  .bg-slate-950\/50,
+  .bg-slate-950\/60,
+  .bg-slate-900,
+  .bg-slate-900\/60,
+  .bg-slate-900\/80,
+  .bg-slate-900\/90
+):not(.theme-dark-surface, .theme-dark-surface *) {
+  background-color: #fffdfa;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is(
+  .bg-slate-850,
+  .bg-slate-800,
+  .bg-slate-800\/40,
+  .bg-slate-800\/60,
+  .bg-slate-800\/80,
+  .bg-slate-800\/90,
+  .bg-slate-750,
+  .bg-slate-700
+):not(.theme-dark-surface, .theme-dark-surface *) {
+  background-color: #f3eee8;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container,
+  #bottom-navigation-bar
+) :is([class^="bg-[#"], [class*=" bg-[#"]):not(.theme-dark-surface, .theme-dark-surface *) {
+  background-color: #fffdfa !important;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is(
+  .border-slate-800,
+  .border-slate-800\/40,
+  .border-slate-800\/80,
+  .border-slate-800\/90,
+  .border-slate-700,
+  .border-slate-700\/80,
+  .border-amber-950\/60,
+  .border-amber-900\/40,
+  .border-amber-900\/30
+):not(.theme-dark-surface, .theme-dark-surface *) {
+  border-color: #ded4c8;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) .divide-slate-800\/80:not(.theme-dark-surface, .theme-dark-surface *) > :not(:last-child) {
+  border-color: #e6ddd3;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is(
+  .text-white,
+  .text-slate-100,
+  .text-slate-200
+):not(.theme-dark-surface, .theme-dark-surface *) {
+  color: #29211b;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) .text-slate-300:not(.theme-dark-surface, .theme-dark-surface *) {
+  color: #594a3d;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is(.text-slate-400, .text-slate-500, .text-slate-600):not(.theme-dark-surface, .theme-dark-surface *) {
+  color: #766451;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is(
+  .text-amber-200,
+  .text-amber-200\/40,
+  .text-amber-200\/60,
+  .text-amber-200\/90,
+  .text-amber-300,
+  .text-amber-300\/80,
+  .text-amber-300\/90,
+  .text-amber-400
+):not(.theme-dark-surface, .theme-dark-surface *) {
+  color: #a34308;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container,
+  #auth-modal-container
+) :is([class^="text-[#"], [class*=" text-[#"]):not(.theme-dark-surface, .theme-dark-surface *) {
+  color: #3f352c !important;
+}
+
+#pan-vivo-app-root[data-theme='light'] :is(
+  #liturgy-container,
+  #bible-container,
+  #prayers-container,
+  #calendar-view-container
+) .via-slate-900:not(.theme-dark-surface, .theme-dark-surface *) {
+  --tw-gradient-via: #fffdfa;
+}
+
 /* Custom subtle scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
