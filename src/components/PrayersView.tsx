@@ -550,13 +550,12 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
             ) : (
               <div className="space-y-4 pb-24">
                 {/* Mystery Header Card */}
-                <div className="bg-[#140e09] border border-amber-950/60 rounded-3xl p-5 shadow-xl text-center relative overflow-hidden">
+                <div className="theme-readable-surface bg-[#140e09] border border-amber-950/60 rounded-3xl p-5 shadow-xl text-center relative overflow-hidden">
                   {currentMystery.image && (
                     <div className="mb-4 rounded-2xl overflow-hidden max-h-44 w-full relative border border-amber-900/40 shadow-inner">
                       <img
-                        src={currentMystery.image}
+                        src={`/rosary-${activeMysteryGroup.id}.svg`}
                         alt={currentMystery.name}
-                        referrerPolicy="no-referrer"
                         className="w-full h-44 object-cover object-center"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#140e09] via-transparent to-black/20" />

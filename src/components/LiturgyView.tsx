@@ -472,7 +472,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         {/* 2. Card: Primera Lectura */}
         <div
           id="card-primera-lectura"
-          className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
+          className="theme-readable-surface bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -523,7 +523,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         {/* 3. Card: Salmo Responsorial */}
         <div
           id="card-salmo-responsorial"
-          className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
+          className="theme-readable-surface bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -582,7 +582,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         {currentCelebration.secondReading && (
           <div
             id="card-segunda-lectura"
-            className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
+            className="theme-readable-surface bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md transition-colors"
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -639,7 +639,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         {/* 4. Card: Santo Evangelio (Golden Accent) */}
         <div
           id="card-evangelio"
-          className="relative bg-gradient-to-b from-amber-950/30 to-slate-900 border border-amber-500/30 rounded-2xl p-4 shadow-lg"
+          className="theme-readable-surface relative bg-gradient-to-b from-amber-950/30 to-slate-900 border border-amber-500/30 rounded-2xl p-4 shadow-lg"
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">

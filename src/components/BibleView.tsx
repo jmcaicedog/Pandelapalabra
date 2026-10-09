@@ -741,7 +741,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#17110b] border border-amber-950/60 rounded-t-3xl sm:rounded-3xl max-w-md w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-2xl p-5 overflow-hidden"
+            className="theme-readable-surface bg-[#17110b] border border-amber-950/60 rounded-t-3xl sm:rounded-3xl max-w-md w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-2xl p-5 overflow-hidden"
           >
             <div className="flex items-center justify-between border-b border-amber-950/60 pb-3 mb-4 shrink-0">
               <div>
@@ -786,7 +786,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#17110b] border border-amber-950/60 rounded-3xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl p-6 overflow-hidden"
+            className="theme-readable-surface bg-[#17110b] border border-amber-950/60 rounded-3xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl p-6 overflow-hidden"
           >
             <div className="flex items-center justify-between border-b border-amber-950/60 pb-3 mb-3 shrink-0">
               <div className="flex items-center gap-2">

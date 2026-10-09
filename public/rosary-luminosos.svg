@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
+  <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#07556a"/><stop offset=".5" stop-color="#30a9a1"/><stop offset="1" stop-color="#d9f1d0"/></linearGradient></defs>
+  <rect width="1200" height="700" fill="url(#g)"/><circle cx="600" cy="300" r="160" fill="none" stroke="#e9fff0" stroke-width="12"/><path d="M600 115v390M475 255h250" stroke="#e9fff0" stroke-width="26" stroke-linecap="round"/><path d="M350 580c100-75 400-75 500 0" fill="none" stroke="#e9fff0" stroke-width="12"/><text x="600" y="650" fill="#e9fff0" font-family="serif" font-size="42" text-anchor="middle">Misterios Luminosos</text>
+</svg>
