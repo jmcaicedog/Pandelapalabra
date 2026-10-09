@@ -1,8 +1,8 @@
 import type { LiturgicalDay } from './liturgy.js';
-import { pendingSaint } from './colombianSaints.js';
+import { getEditorialSaint } from './colombianSaints.js';
 import { buildSeasonalTitle, getColorName, getLiturgicalCalendarInfo, parseDateStr } from './liturgicalCalendar.js';
 
-/** Calendar-only fallback: no handcrafted readings or date-specific saint guesses. */
+/** Calendar-only readings fallback with the independent editorial santoral. */
 export function buildCanonicalDay(dateStr: string): LiturgicalDay {
   const date = parseDateStr(dateStr);
   const info = getLiturgicalCalendarInfo(dateStr);
@@ -16,7 +16,7 @@ export function buildCanonicalDay(dateStr: string): LiturgicalDay {
     season: info.season,
     color: info.color,
     colorName: getColorName(info.color, info.season),
-    saint: pendingSaint(),
+    ...getEditorialSaint(dateStr),
     firstReading: { citation: 'Primera lectura no disponible', text: notice },
     psalm: { citation: 'Salmo responsorial no disponible', response: 'Lecturas aún no disponibles', verses: [notice] },
     gospel: { citation: 'Evangelio no disponible', acclamation: '', text: notice },

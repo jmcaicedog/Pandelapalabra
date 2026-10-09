@@ -1,63 +1,53 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { fetchColombianSantoral, parsePublisherSaint, selectOrdoDay } from './colombianSantoral.ts';
-import { hasFreshSaintVerification, publisherUrl } from '../data/colombianSaints.ts';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { createElement } from 'react';
+import { fetchColombianSantoral } from './colombianSantoral.ts';
+import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint, hasFreshSaintVerification } from '../data/colombianSaints.ts';
+import { SaintSource } from '../components/SaintSource.tsx';
+import editorial from '../data/colombianEditorialSaints.json';
 
-function page(date: string, name: string) {
-  return `<ul data-url="${publisherUrl(date)}"></ul><div class="journal-pp-info">
-    <ul><li>Feria</li><li>Verde</li><li><strong>${name}</strong></li></ul></div>
-    <p>Texto editorial que no se importa.</p>`;
-}
-
-test('solo extrae el nombre del encabezado de la fecha solicitada', () => {
-  assert.equal(parsePublisherSaint(page('2025-10-08', 'Santa Pelagia'), '2025-10-08'), 'Santa Pelagia');
-  assert.equal(parsePublisherSaint(page('2025-10-08', 'Santa Pelagia'), '2026-10-08'), null);
-  assert.equal(parsePublisherSaint('<p><strong>Un santo en otro bloque</strong></p>', '2026-10-10'), null);
-  assert.equal(parsePublisherSaint(page('2025-10-09', 'San Luis Bertr&aacute;n'), '2025-10-09'), 'San Luis Bertrán');
+test('el santoral recurrente cubre todos los días, incluidos bisiestos y años futuros', () => {
+  assert.equal(Object.keys(editorial.entries).length, 366);
+  for (const year of [2026, 2027, 2028, 2100, 2400]) {
+    const cursor = new Date(Date.UTC(year, 0, 1));
+    let days = 0;
+    while (cursor.getUTCFullYear() === year) {
+      const date = cursor.toISOString().slice(0, 10);
+      const result = getEditorialSaint(date);
+      assert.ok(result.saint.name.trim());
+      assert.equal(result.saintVerification.date, date);
+      assert.equal(result.saintVerification.status, 'editorial');
+      assert.ok(result.saintVerification.sourceReference);
+      assert.ok(result.saintVerification.review);
+      assert.ok(hasFreshSaintVerification(result.saintVerification, date));
+      days++;
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+    assert.equal(days, year === 2028 || year === 2400 ? 366 : 365);
+  }
+  assert.throws(() => getEditorialSaint('2026-02-29'));
 });
 
-test('el Ordo conserva todas las alternativas, sin asumir la selección editorial del misal', () => {
-  const result = selectOrdoDay('2026-10-09', [
-    { fecha: '2026-10-09', preludio: '<p>San Luis Bertrán; Santos Dionisio y compañeros</p>', celebracion: 'Feria o Memoria libre', colores_dia: 'Verde o Blanco o Rojo' },
-    { fecha: '2026-10-09', preludio: '<p>San Juan Leonardi</p>', celebracion: 'Memoria libre', colores_dia: 'Blanco' },
-    { fecha: '2026-10-10', preludio: '<p>Otro santo</p>', celebracion: 'Memoria', colores_dia: 'Blanco' },
-  ]);
-  assert.equal(result.saintVerification.status, 'ordo');
-  assert.match(result.saint.name, /Bertrán.*Dionisio.*Leonardi/);
-  assert.ok(!result.saint.name.includes('Otro santo'));
-});
-
-test('una feria o un año no publicado no se rellena con un santo de reserva', () => {
-  const feria = selectOrdoDay('2026-10-08', [
-    { fecha: '2026-10-08', preludio: null, celebracion: 'Feria', colores_dia: 'Verde' },
-  ]);
-  assert.equal(feria.saintVerification.status, 'ordo');
-  assert.match(feria.saint.name, /pendiente/);
-  assert.equal(selectOrdoDay('2035-10-08', []).saintVerification.status, 'pending');
-});
-
-test('la selección web del misal prevalece sobre las opciones del Ordo', async (t) => {
-  t.mock.method(globalThis, 'fetch', async (input) => {
-    const url = String(input);
-    return url.includes('sanpablo.co')
-      ? new Response(page('2025-10-08', 'Santa Pelagia'))
-      : new Response(JSON.stringify({ success: true, data: [
-        { fecha: '2025-10-08', preludio: '<p>Otro santo</p>', celebracion: 'Memoria libre', colores_dia: 'Blanco' },
-      ] }));
+test('Pelagia y Luis Bertrán se resuelven localmente, sin consultas externas', async (t) => {
+  const network = t.mock.method(globalThis, 'fetch', async () => {
+    throw new Error('La selección editorial no debe consultar la red.');
   });
-  const result = await fetchColombianSantoral('2025-10-08');
-  assert.equal(result.saint.name, 'Santa Pelagia');
-  assert.equal(result.saintVerification.status, 'publisher');
-  assert.equal(result.saintVerification.method, 'web');
-  assert.equal(result.saintVerification.sourceUrl, publisherUrl('2025-10-08'));
-  assert.ok(hasFreshSaintVerification(result.saintVerification, '2025-10-08'));
-  assert.ok(!hasFreshSaintVerification(result.saintVerification, '2025-10-09'));
-  assert.ok(!hasFreshSaintVerification({ ...result.saintVerification, checkedAt: '2020-01-01' }, '2025-10-08'));
+  for (const year of [2026, 2027, 2035]) {
+    const pelagia = await fetchColombianSantoral(`${year}-10-08`);
+    assert.equal(pelagia.saint.name, 'Santa Pelagia de Antioquía');
+    assert.match(pelagia.saint.fullBio, /Nono/);
+    const luis = await fetchColombianSantoral(`${year}-10-09`);
+    assert.equal(luis.saint.name, 'San Luis Bertrán');
+    assert.match(luis.saint.fullBio, /1526/);
+  }
+  assert.equal(network.mock.calls.length, 0);
 });
 
-test('una fecha fuera de la cobertura no se declara verificada cuando el editor devuelve una página vacía', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => new Response('<html>Sin publicación</html>'));
-  const result = await fetchColombianSantoral('2035-10-08');
-  assert.equal(result.saintVerification.status, 'pending');
-  assert.match(result.saint.name, /pendiente/);
+test('la revisión queda interna y cambiar de versión invalida la selección anterior', () => {
+  const result = getEditorialSaint('2026-10-08');
+  assert.equal(result.saintVerification.version, EDITORIAL_SANTORAL_VERSION);
+  assert.equal(renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification })), '');
+  assert.ok(!hasFreshSaintVerification({ ...result.saintVerification, version: 'old' }, '2026-10-08'));
+  assert.ok(!hasFreshSaintVerification(result.saintVerification, '2026-10-09'));
 });

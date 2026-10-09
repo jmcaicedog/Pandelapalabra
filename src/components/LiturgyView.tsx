@@ -24,7 +24,7 @@ import type { User } from 'firebase/auth';
 import { PanVivoLogo } from './PanVivoLogo.tsx';
 import { SaintSource } from './SaintSource.tsx';
 
-const reflectionClientCache = new ExpiringCache<{ reflection: string; priestName: string }>(30, 60 * 60 * 1000);
+const reflectionClientCache = new ExpiringCache<string>(30, 60 * 60 * 1000);
 
 interface LiturgyViewProps {
   user: User | null;
@@ -70,7 +70,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
   // AI Reflection
   const [reflection, setReflection] = useState<string | null>(null);
-  const [priestName, setPriestName] = useState('Asistente católico (IA)');
   const [loadingReflection, setLoadingReflection] = useState(false);
   const [reflectionError, setReflectionError] = useState<string | null>(null);
 
@@ -148,8 +147,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     const reflectionKey = data.date;
     const cached = reflectionClientCache.get(reflectionKey);
     if (cached) {
-      setReflection(cached.reflection);
-      if (cached.priestName) setPriestName(cached.priestName);
+      setReflection(cached);
       setLoadingReflection(false);
       return;
     }
@@ -162,7 +160,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           signal, method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ date: data.date }),
         });
-        if (!res.ok) throw new Error('La reflexión con IA no está disponible.');
+        if (!res.ok) throw new Error('La reflexión no está disponible.');
         return res.json();
       }, 60000, controller.signal);
       if (json.date !== data.date || typeof json.reflection !== 'string' || !json.reflection.trim() || json.fallback) {
@@ -170,16 +168,12 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       }
       if (!isCurrent()) return;
       setReflection(json.reflection);
-      setPriestName('Asistente católico (IA)');
-      reflectionClientCache.set(reflectionKey, {
-        reflection: json.reflection,
-        priestName: 'Asistente católico (IA)',
-      });
+      reflectionClientCache.set(reflectionKey, json.reflection);
     } catch (error) {
       if (!isCurrent()) return;
       console.warn('Reflexión no disponible:', error);
       setReflection(null);
-      setReflectionError('La reflexión con IA no está disponible. Puedes reintentar o consultar Vatican News.');
+      setReflectionError('La reflexión no está disponible. Puedes reintentar o consultar Vatican News.');
     } finally {
       if (isCurrent()) setLoadingReflection(false);
     }
@@ -217,7 +211,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     const note = {
       id: 'note_' + Date.now(),
       userId: user?.uid || 'guest',
-      title: `Reflexión con IA - ${currentCelebration.title}`,
+      title: `Reflexión - ${currentCelebration.title}`,
       content: `${currentCelebration.gospel.citation}\n\n${reflection}`,
       date: dayData.date,
       createdAt: new Date().toISOString(),
@@ -233,7 +227,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
   };
 
   const handleShare = async () => {
-    const text = `🕊️ Liturgia - ${currentCelebration.title}\n\n📖 Evangelio (${currentCelebration.gospel.citation}):\n${currentCelebration.gospel.text}${reflection ? `\n\n✨ Reflexión con IA:\n${reflection}` : ''}\n\nReza con Pan Vivo.`;
+    const text = `🕊️ Liturgia - ${currentCelebration.title}\n\n📖 Evangelio (${currentCelebration.gospel.citation}):\n${currentCelebration.gospel.text}${reflection ? `\n\n✨ Reflexión:\n${reflection}` : ''}\n\nReza con Pan Vivo.`;
     if (navigator.share) {
       try {
         await navigator.share({ title: currentCelebration.title, text });
@@ -713,10 +707,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               </div>
               <div>
                 <span className="text-xs font-bold text-amber-300 font-serif block">
-                  Reflexión con IA
-                </span>
-                <span className="text-[11px] text-slate-400 font-serif">
-                  {priestName} • No sustituye a un sacerdote
+                  Reflexión
                 </span>
               </div>
             </div>
@@ -741,7 +732,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
                     ? 'bg-amber-400 text-slate-950 scale-105'
                     : 'bg-slate-800 text-amber-400 hover:bg-slate-750'
                 }`}
-                title="Escuchar reflexión con IA"
+                title="Escuchar reflexión"
               >
                 {currentPlayingSection === 'reflection' && isPlaying ? (
                   <VolumeX className="w-4 h-4" />

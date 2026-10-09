@@ -27,12 +27,16 @@ de fuentes, migración de cachés, contratos HTTP y generación compartida.
   leccionario propio de Colombia ni de cada diócesis**. Las celebraciones
   particulares requieren contraste editorial con el Ordo. No se garantiza
   cobertura de lecturas o santoral para años que las fuentes aún no publican.
-- **Santo destacado:** encabezado de la publicación de Pan de la Palabra para
-  esa fecha; en su ausencia, celebraciones y alternativas del Ordo Colombiano.
-  El Ordo no determina la selección editorial del misal. Si no hay datos,
-  aparece “pendiente de confirmar”; no se elige el primer santo de otro país.
-  Las biografías locales solo se usan cuando coincide el nombre verificado.
-- Solo se extraen nombres y metadatos del editor y del Ordo. Vatican News se
+- **Santo destacado:** base editorial local aportada en el Excel V1.0.2,
+  independiente de la celebración litúrgica. Sus 366 entradas mes-día cubren
+  también años bisiestos, sin consultas diarias a San Pablo ni al Ordo.
+  Es cobertura nominal provisional, no validación del Martirologio ni garantía
+  de coincidencia con Pan de la Palabra impreso: 174 entradas proceden del
+  calendario y 192 del santoral complementario. En 2026 se usan 191 de estas últimas.
+  La fuente y revisión se conservan internamente; no se muestran en las tarjetas.
+  Solo se reutilizan biografías locales si coincide la identidad; no se generan
+  biografías ni se cambian lecturas, celebraciones o colores por el santo destacado.
+- Solo se importan nombres y metadatos del Excel. Vatican News se
   enlaza, sin reproducir sus textos o imágenes. Su enlace al evangelio de hoy
   no equivale a la fecha histórica o futura seleccionada.
 - Antes de una publicación comercial, confirmar los permisos de uso de las
@@ -41,6 +45,27 @@ de fuentes, migración de cachés, contratos HTTP y generación compartida.
 “Hoy”, rutinas y estadísticas usan `America/Bogota`. Las fechas seleccionadas
 son fechas civiles, no conversiones de medianoche UTC. El calendario admite
 1583–9999; esto no implica cobertura editorial para todo ese intervalo.
+
+### Revisión del santoral editorial
+
+[colombianEditorialSaints.json](./src/data/colombianEditorialSaints.json) contiene
+la selección por mes-día, fuentes y notas pendientes. Se debe contrastar
+periódicamente con Pan de la Palabra impreso. Corregir una entrada recurrente
+no equivale a trasladar una fiesta: la capa litúrgica sigue siendo independiente.
+Por ejemplo, la base recibida conserva “Epifanía del Señor” el 6 de enero como
+entrada nominal; no cambia la fecha colombiana calculada de esa celebración.
+No se importan las precedencias ni el calendario anual provisional del Excel.
+
+Para actualizar desde un libro con las mismas hojas, sin dependencias Python externas:
+
+```sh
+python3 scripts/import_santoral.py /ruta/al/libro.xlsx src/data/colombianEditorialSaints.json
+```
+
+El importador exige 366 claves válidas, únicas y con nombre. Tras la revisión,
+cambiar la versión de la base cuando cambie su contenido, ejecutar las pruebas
+y desplegar. Las cachés de lecturas anteriores conservan sus textos, pero su
+santo se sustituye por la selección editorial vigente, también sin conexión.
 
 ## Reflexión compartida, sin chat
 
@@ -72,7 +97,9 @@ documento. No borrar reflexiones terminadas durante un despliegue.
 No se puede garantizar exactamente una llamada al proveedor ante un fallo
 entre la generación y el guardado; las reservas y límites acotan los reintentos.
 Sin persistencia configurada **no se genera**: se muestra indisponibilidad y un
-enlace a Vatican News. La IA se identifica como asistente, no como sacerdote.
+enlace a Vatican News. La tarjeta se titula “Reflexión”, sin advertencia adicional;
+la API y las instrucciones del modelo mantienen su identidad de asistente, no
+de sacerdote.
 
 ### Configuración de servidor
 

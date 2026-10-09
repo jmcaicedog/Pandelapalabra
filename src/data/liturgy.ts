@@ -1,6 +1,6 @@
 import { buildCanonicalDay } from './canonicalLectionary.js';
 import { fetchEvangelizoDay } from './evangelizo.js';
-import { hasFreshSaintVerification, pendingSaint, type SaintVerification } from './colombianSaints.js';
+import { getEditorialSaint, hasFreshSaintVerification, pendingSaint, type SaintVerification } from './colombianSaints.js';
 import type { LiturgicalColor, LiturgicalSeason } from './liturgicalCalendar.js';
 import { matchesColombianTransfers, getLiturgicalCalendarInfo, resolveLiturgicalColor, getColorName } from './liturgicalCalendar.js';
 import { isValidDateStr, parseDateStr } from '../lib/dateUtils.js';
@@ -65,7 +65,8 @@ export function isLiturgicalDay(value: unknown): value is LiturgicalDay {
     || !strings(value.saintVerification, ['date', 'checkedAt', 'status'])
     || value.saintVerification.date !== value.date
     || !Number.isFinite(Date.parse(String(value.saintVerification.checkedAt)))
-    || !['publisher', 'ordo', 'pending'].includes(String(value.saintVerification.status))
+    || !['publisher', 'ordo', 'pending', 'editorial'].includes(String(value.saintVerification.status))
+    || (value.saintVerification.status === 'editorial' && !strings(value.saintVerification, ['version', 'sourceReference', 'review']))
     || (value.saintVerification.sourceUrl !== undefined && (typeof value.saintVerification.sourceUrl !== 'string'
       || !/^https:\/\/(?:sanpablo\.co|ordocolombia\.cec\.org\.co)\//.test(value.saintVerification.sourceUrl))))) return false;
   return (value.source === 'local' || value.source === 'evangelizo')
@@ -87,6 +88,7 @@ export function hasFreshReadings(day: LiturgicalDay): boolean {
 }
 
 function remember(day: LiturgicalDay): LiturgicalDay {
+  day = { ...day, ...getEditorialSaint(day.date) };
   memory.set(day.date, day, hasOfficialReadings(day) ? 24 * 60 * 60 * 1000 : 60 * 1000);
   // Missing readings must be retried, never persisted as a full offline lectionary.
   if (hasOfficialReadings(day)) {
@@ -112,11 +114,12 @@ function remember(day: LiturgicalDay): LiturgicalDay {
 export function getLiturgicalDay(date: string): LiturgicalDay {
   parseDateStr(date);
   const cached = memory.get(date);
-  if (cached) return cached;
+  if (cached) return { ...cached, ...getEditorialSaint(date) };
   const stored = readStoredJson(STORAGE_PREFIX + date, isLiturgicalDay);
   if (stored && stored.date === date && hasOfficialReadings(stored)) {
-    memory.set(date, stored);
-    return stored;
+    const current = { ...stored, ...getEditorialSaint(date) };
+    memory.set(date, current);
+    return current;
   }
   // Preserve legacy official readings offline, but discard date patches and saint guesses.
   for (const version of [5, 4, 3]) {

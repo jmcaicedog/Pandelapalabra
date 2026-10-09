@@ -1,0 +1,2568 @@
+{
+  "version": "colombia-editorial-v1.0.2",
+  "workbook": "Calendario_Liturgico_Colombia_2026_V1_0_2_Cobertura_Nominal.xlsx",
+  "entries": {
+    "01-01": {
+      "name": "Santa María, Madre de Dios",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-02": {
+      "name": "Santos Basilio Magno y Gregorio de Nacianzo",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-03": {
+      "name": "Santísimo Nombre de Jesús",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-04": {
+      "name": "Santa Isabel Ana Seton",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-05": {
+      "name": "San Juan Nepomuceno Neumann",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-06": {
+      "name": "Epifanía del Señor",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-07": {
+      "name": "San Raimundo de Peñafort",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-08": {
+      "name": "San Apolinar el Apologista",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-09": {
+      "name": "San Julián el Hospitalario",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-10": {
+      "name": "San Guillermo de Bourges",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-11": {
+      "name": "San Higinio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-12": {
+      "name": "San Benito Biscop",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-13": {
+      "name": "San Hilario",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-14": {
+      "name": "San Félix de Nola",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-15": {
+      "name": "San Pablo el Ermitaño",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-16": {
+      "name": "San Marcelo I",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-17": {
+      "name": "San Antonio, abad",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-18": {
+      "name": "Santa Prisca",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-19": {
+      "name": "San Canuto IV",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-20": {
+      "name": "San Fabián; San Sebastián",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-21": {
+      "name": "Santa Inés",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-22": {
+      "name": "San Vicente, diácono y mártir",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-23": {
+      "name": "San Ildefonso de Toledo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-24": {
+      "name": "San Francisco de Sales",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-25": {
+      "name": "Conversión de San Pablo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-26": {
+      "name": "Santos Timoteo y Tito",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-27": {
+      "name": "Santa Ángela Merici",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-28": {
+      "name": "Santo Tomás de Aquino",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "01-29": {
+      "name": "San Gildas",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-30": {
+      "name": "Santa Martina",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "01-31": {
+      "name": "San Juan Bosco",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-01": {
+      "name": "San Sigeberto III",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-02": {
+      "name": "Presentación del Señor",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-03": {
+      "name": "San Blas; San Óscar",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-04": {
+      "name": "San Andrés Corsini",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-05": {
+      "name": "Santa Águeda",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-06": {
+      "name": "Santos Pablo Miki y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-07": {
+      "name": "San Ricardo de Lucca",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-08": {
+      "name": "San Jerónimo Emiliani",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-09": {
+      "name": "Santa Apolonia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-10": {
+      "name": "Santa Escolástica",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-11": {
+      "name": "Nuestra Señora de Lourdes",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-12": {
+      "name": "Santa Eulalia de Barcelona",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-13": {
+      "name": "Santa Catalina de Ricci",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-14": {
+      "name": "Santos Cirilo y Metodio",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-15": {
+      "name": "Santos Faustino y Jovita",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-16": {
+      "name": "San Onésimo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-17": {
+      "name": "Siete santos fundadores de los Servitas",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-18": {
+      "name": "San Simeón de Jerusalén",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-19": {
+      "name": "San Álvaro de Córdoba",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-20": {
+      "name": "San Eucario de Tréveris",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-21": {
+      "name": "San Pedro Damián",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-22": {
+      "name": "Cátedra de San Pedro",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-23": {
+      "name": "San Policarpo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-24": {
+      "name": "San Modesto de Tréveris",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-25": {
+      "name": "San Valentín de África",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-26": {
+      "name": "San Porfirio de Gaza",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-27": {
+      "name": "San Gregorio de Narek",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "02-28": {
+      "name": "San Román de Condat",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "02-29": {
+      "name": "San Osvaldo de Worcester",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-01": {
+      "name": "San David de Gales",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-02": {
+      "name": "San Simplicio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-03": {
+      "name": "Santa Catalina Drexel",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-04": {
+      "name": "San Casimiro",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-05": {
+      "name": "San Adrián de Cesarea",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-06": {
+      "name": "Santa Coleta de Corbie",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-07": {
+      "name": "Santas Perpetua y Felicidad",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-08": {
+      "name": "San Juan de Dios",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-09": {
+      "name": "Santa Francisca Romana",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-10": {
+      "name": "San Macario de Jerusalén",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-11": {
+      "name": "San Eulogio de Córdoba",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-12": {
+      "name": "San Gregorio Magno (fecha discordante: revisión)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-13": {
+      "name": "San Rodrigo de Córdoba",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-14": {
+      "name": "Santa Matilde",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-15": {
+      "name": "Santa Lucrecia de Mérida",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-16": {
+      "name": "San Abraham de Mesopotamia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-17": {
+      "name": "San Patricio",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-18": {
+      "name": "San Cirilo de Jerusalén",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-19": {
+      "name": "San José, esposo de la Virgen María",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-20": {
+      "name": "San Cuthberto",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-21": {
+      "name": "San Nicolás de Flüe",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-22": {
+      "name": "Santa Catalina de Suecia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-23": {
+      "name": "Santo Toribio de Mogrovejo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-24": {
+      "name": "San Óscar Romero",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-25": {
+      "name": "Anunciación del Señor",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "03-26": {
+      "name": "San Braulio de Zaragoza",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-27": {
+      "name": "San Ruperto de Salzburgo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-28": {
+      "name": "San Sixto III",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-29": {
+      "name": "San Jonás de Persia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-30": {
+      "name": "San Juan Clímaco",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "03-31": {
+      "name": "San Benjamín de Persia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-01": {
+      "name": "San Hugo de Grenoble",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-02": {
+      "name": "San Francisco de Paula",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-03": {
+      "name": "San Ricardo de Chichester",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-04": {
+      "name": "San Isidoro de Sevilla",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-05": {
+      "name": "San Vicente Ferrer",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-06": {
+      "name": "San Sixto I",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-07": {
+      "name": "San Juan Bautista de la Salle",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-08": {
+      "name": "San Alberto de Jerusalén",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-09": {
+      "name": "Santa Casilda de Toledo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-10": {
+      "name": "San Miguel de los Santos",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-11": {
+      "name": "San Estanislao",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-12": {
+      "name": "San Zenón de Verona",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-13": {
+      "name": "San Martín I",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-14": {
+      "name": "Santos Tiburcio, Valeriano y Máximo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-15": {
+      "name": "Santa Anastasia Patricia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-16": {
+      "name": "Santa Bernadette",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-17": {
+      "name": "San Aniceto",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-18": {
+      "name": "San Perfecto de Córdoba",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-19": {
+      "name": "Santa Inés de Montepulciano",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-20": {
+      "name": "San Marcelino",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-21": {
+      "name": "San Anselmo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-22": {
+      "name": "San Sotero",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-23": {
+      "name": "San Adalberto; San Jorge",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-24": {
+      "name": "San Fidel de Sigmaringa",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-25": {
+      "name": "San Marcos, evangelista",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-26": {
+      "name": "Nuestra Señora del Buen Consejo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-27": {
+      "name": "San Pedro Canisio (fecha discordante: revisión)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "04-28": {
+      "name": "San Pedro Chanel; San Luis María Grignion de Montfort",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-29": {
+      "name": "Santa Catalina de Siena",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "04-30": {
+      "name": "San Pío V",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-01": {
+      "name": "San José Obrero",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-02": {
+      "name": "San Atanasio",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-03": {
+      "name": "Exaltación de la Santa Cruz",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-04": {
+      "name": "Santos Felipe y Santiago, apóstoles",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-05": {
+      "name": "San Hilario de Arlés",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-06": {
+      "name": "San Juan ante Portam Latinam",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-07": {
+      "name": "San Augusto Czartoryski",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-08": {
+      "name": "Aparición de San Miguel",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-09": {
+      "name": "San Pacomio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-10": {
+      "name": "San Juan de Ávila",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-11": {
+      "name": "San Mamerto",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-12": {
+      "name": "Santos Nereo y Aquileo; San Pancracio",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-13": {
+      "name": "Nuestra Señora de Fátima",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-14": {
+      "name": "San Matías, apóstol",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-15": {
+      "name": "San Isidro Labrador",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-16": {
+      "name": "Santa Margarita de Escocia (fecha discordante)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-17": {
+      "name": "San Pascual Baylón",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-18": {
+      "name": "San Juan I",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-19": {
+      "name": "Santa María Bernarda Bütler",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-20": {
+      "name": "San Bernardino de Siena",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-21": {
+      "name": "Santos Cristóbal Magallanes y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-22": {
+      "name": "Santa Rita de Casia",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-23": {
+      "name": "San Juan Bautista de Rossi",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-24": {
+      "name": "San Simón Stock",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-25": {
+      "name": "San Beda el Venerable",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-26": {
+      "name": "San Felipe Neri",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-27": {
+      "name": "San Agustín de Canterbury",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-28": {
+      "name": "San Germán de París",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-29": {
+      "name": "San Pablo VI",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "05-30": {
+      "name": "Santa Juana de Arco",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "05-31": {
+      "name": "Visitación de la Virgen María",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-01": {
+      "name": "San Justino",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-02": {
+      "name": "Santos Marcelino y Pedro",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-03": {
+      "name": "Santos Carlos Luanga y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-04": {
+      "name": "San Francisco Caracciolo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-05": {
+      "name": "San Bonifacio",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-06": {
+      "name": "San Norberto",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-07": {
+      "name": "San Pablo I de Constantinopla",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-08": {
+      "name": "San Medardo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-09": {
+      "name": "San Efrén",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-10": {
+      "name": "Beato Álvaro del Portillo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-11": {
+      "name": "San Bernabé, apóstol",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-12": {
+      "name": "San Onofre",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-13": {
+      "name": "San Antonio de Padua",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-14": {
+      "name": "San Metodio I de Constantinopla",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-15": {
+      "name": "San Vito",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-16": {
+      "name": "San Juan Francisco de Regis",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-17": {
+      "name": "San Herve",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-18": {
+      "name": "San Romualdo (fuente secundaria: revisar fecha)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-19": {
+      "name": "San Romualdo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-20": {
+      "name": "San Silverio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-21": {
+      "name": "San Luis Gonzaga",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-22": {
+      "name": "San Paulino de Nola; Santos Juan Fisher y Tomás Moro",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-23": {
+      "name": "San José Cafasso",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-24": {
+      "name": "Nacimiento de san Juan Bautista",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-25": {
+      "name": "San Guillermo de Vercelli",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-26": {
+      "name": "San Josemaría Escrivá",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-27": {
+      "name": "San Cirilo de Alejandría",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-28": {
+      "name": "San Ireneo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "06-29": {
+      "name": "Santos Pedro y Pablo, apóstoles",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "06-30": {
+      "name": "Primeros mártires de la Iglesia de Roma",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-01": {
+      "name": "San Junípero Serra",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-02": {
+      "name": "San Bernardino Realino",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-03": {
+      "name": "Santo Tomás, apóstol",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-04": {
+      "name": "Santa Isabel de Portugal",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-05": {
+      "name": "San Antonio María Zaccaria",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-06": {
+      "name": "Santa María Goretti",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-07": {
+      "name": "San Fermín",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-08": {
+      "name": "San Adrián III",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-09": {
+      "name": "Bienaventurada Virgen María del Rosario de Chiquinquirá, patrona de Colombia",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-10": {
+      "name": "Santos Agustín Zhao Rong y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-11": {
+      "name": "San Benito",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-12": {
+      "name": "San Juan Gualberto",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-13": {
+      "name": "San Enrique",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-14": {
+      "name": "San Camilo de Lellis",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-15": {
+      "name": "San Buenaventura",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-16": {
+      "name": "Bienaventurada Virgen María del Carmen (devoción; verificar calendario local)",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-17": {
+      "name": "Carmelitas de Compiègne",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-18": {
+      "name": "San Federico de Utrecht",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-19": {
+      "name": "Santa Macrina la Joven",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-20": {
+      "name": "San Apolinar",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-21": {
+      "name": "San Lorenzo de Brindis",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-22": {
+      "name": "Santa María Magdalena",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-23": {
+      "name": "Santa Brígida de Suecia",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-24": {
+      "name": "San Chárbel Makhluf",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-25": {
+      "name": "Santiago, apóstol",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-26": {
+      "name": "Santos Joaquín y Ana",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-27": {
+      "name": "San Pantaleón",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-28": {
+      "name": "San Víctor I",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "07-29": {
+      "name": "Santos Marta, María y Lázaro",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-30": {
+      "name": "San Pedro Crisólogo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "07-31": {
+      "name": "San Ignacio de Loyola",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-01": {
+      "name": "San Alfonso María de Ligorio",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-02": {
+      "name": "San Eusebio de Vercelli",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-03": {
+      "name": "San Nicodemo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-04": {
+      "name": "San Juan María Vianney",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-05": {
+      "name": "Dedicación de la Basílica de Santa María la Mayor",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-06": {
+      "name": "Transfiguración del Señor",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-07": {
+      "name": "San Cayetano; Santos Sixto II y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-08": {
+      "name": "Santo Domingo de Guzmán",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-09": {
+      "name": "Santa Teresa Benedicta de la Cruz",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-10": {
+      "name": "San Lorenzo, diácono y mártir",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-11": {
+      "name": "Santa Clara",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-12": {
+      "name": "Santa Juana Francisca de Chantal",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-13": {
+      "name": "Santos Ponciano e Hipólito",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-14": {
+      "name": "San Maximiliano María Kolbe",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-15": {
+      "name": "Asunción de la Virgen María",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-16": {
+      "name": "San Esteban de Hungría",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-17": {
+      "name": "San Jacinto",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-18": {
+      "name": "San Alberto de Praga",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-19": {
+      "name": "San Ezequiel Moreno, obispo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "19 de agosto sustentado en Pan de la Palabra impreso (usuario) y publicación posterior CEC; grado pendiente de cotejo"
+    },
+    "08-20": {
+      "name": "San Bernardo",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-21": {
+      "name": "San Pío X",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-22": {
+      "name": "Bienaventurada Virgen María Reina",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-23": {
+      "name": "Santa Rosa de Lima",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-24": {
+      "name": "San Bartolomé, apóstol",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-25": {
+      "name": "San Luis de Francia; San José de Calasanz",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-26": {
+      "name": "Santa Teresa de Jesús Jornet",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-27": {
+      "name": "Santa Mónica",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-28": {
+      "name": "San Agustín",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-29": {
+      "name": "Martirio de san Juan Bautista",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "08-30": {
+      "name": "Santos Félix y Adauto",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "08-31": {
+      "name": "San Ramón Nonato",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-01": {
+      "name": "San Gil",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-02": {
+      "name": "San Esteban de Hungría (fecha discordante: revisión)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-03": {
+      "name": "San Gregorio Magno",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-04": {
+      "name": "Santa Rosa de Viterbo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-05": {
+      "name": "Santa Teresa de Calcuta",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-06": {
+      "name": "Beato Bertrand de Garrigues",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-07": {
+      "name": "Santa Regina",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-08": {
+      "name": "Natividad de la Bienaventurada Virgen María",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-09": {
+      "name": "San Pedro Claver",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-10": {
+      "name": "San Nicolás de Tolentino",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-11": {
+      "name": "San Juan Gabriel Perboyre",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-12": {
+      "name": "Santísimo Nombre de María",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-13": {
+      "name": "San Juan Crisóstomo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-14": {
+      "name": "Exaltación de la Santa Cruz",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-15": {
+      "name": "Nuestra Señora de los Dolores",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-16": {
+      "name": "Santos Cornelio y Cipriano",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-17": {
+      "name": "San Roberto Belarmino; Santa Hildegarda de Bingen",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-18": {
+      "name": "San José de Cupertino",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-19": {
+      "name": "San Jenaro",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-20": {
+      "name": "Santos Andrés Kim y compañeros",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-21": {
+      "name": "San Mateo, apóstol",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-22": {
+      "name": "San Mauricio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-23": {
+      "name": "San Pío de Pietrelcina",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-24": {
+      "name": "Nuestra Señora de la Merced",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-25": {
+      "name": "San Germán de Auxerre",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-26": {
+      "name": "Santos Cosme y Damián",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-27": {
+      "name": "San Vicente de Paúl",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "09-28": {
+      "name": "San Wenceslao; Santos Lorenzo Ruiz y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-29": {
+      "name": "Santos Miguel, Gabriel y Rafael, arcángeles",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "09-30": {
+      "name": "San Jerónimo",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-01": {
+      "name": "Santa Teresa del Niño Jesús",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-02": {
+      "name": "Santos Ángeles Custodios",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-03": {
+      "name": "San Gerardo de Brogne",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-04": {
+      "name": "San Francisco de Asís",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-05": {
+      "name": "Santa Faustina Kowalska",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-06": {
+      "name": "San Bruno",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-07": {
+      "name": "Bienaventurada Virgen María del Rosario",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-08": {
+      "name": "Santa Pelagia de Antioquía",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-09": {
+      "name": "San Luis Bertrán",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-10": {
+      "name": "San Daniel el Estilita",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-11": {
+      "name": "San Juan XXIII",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-12": {
+      "name": "Nuestra Señora del Pilar",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-13": {
+      "name": "San Eduardo el Confesor",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-14": {
+      "name": "San Calixto I",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-15": {
+      "name": "Santa Teresa de Jesús",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-16": {
+      "name": "Santa Eduviges; Santa Margarita María de Alacoque",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-17": {
+      "name": "San Ignacio de Antioquía",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-18": {
+      "name": "San Lucas, evangelista",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-19": {
+      "name": "Santos Juan de Brébeuf, Isaac Jogues y compañeros; San Pablo de la Cruz",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-20": {
+      "name": "San Juan de Capistrano (fecha discordante: revisión)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-21": {
+      "name": "Santa Laura de Santa Catalina de Siena Montoya y Upegui",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-22": {
+      "name": "San Juan Pablo II",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-23": {
+      "name": "San Juan de Capistrano",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-24": {
+      "name": "San Antonio María Claret",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-25": {
+      "name": "Santos Crisanto y Daría",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-26": {
+      "name": "San Evaristo",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-27": {
+      "name": "San Frumencio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-28": {
+      "name": "Santos Simón y Judas, apóstoles",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "10-29": {
+      "name": "San Narciso de Jerusalén",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-30": {
+      "name": "San Alonso Rodríguez",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "10-31": {
+      "name": "San Wolfango",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-01": {
+      "name": "Todos los Santos",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-02": {
+      "name": "Fieles Difuntos",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-03": {
+      "name": "San Martín de Porres",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-04": {
+      "name": "San Carlos Borromeo",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-05": {
+      "name": "Santos Zacarías e Isabel",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-06": {
+      "name": "San Leonardo de Noblac",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-07": {
+      "name": "San Ernesto de Zwiefalten",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-08": {
+      "name": "San Godofredo de Amiens",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-09": {
+      "name": "Dedicación de la Basílica de Letrán",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-10": {
+      "name": "San León Magno",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-11": {
+      "name": "San Martín de Tours",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-12": {
+      "name": "San Josafat",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-13": {
+      "name": "San Leandro de Sevilla",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-14": {
+      "name": "San Lorenzo O'Toole",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-15": {
+      "name": "San Alberto Magno",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-16": {
+      "name": "Santa Margarita de Escocia; Santa Gertrudis",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-17": {
+      "name": "Santa Isabel de Hungría",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-18": {
+      "name": "Dedicación de las basílicas de San Pedro y San Pablo",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-19": {
+      "name": "Santa Matilde de Hackeborn",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-20": {
+      "name": "San Félix de Valois",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-21": {
+      "name": "Presentación de la Virgen María",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-22": {
+      "name": "Santa Cecilia",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-23": {
+      "name": "San Clemente I; San Columbano",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-24": {
+      "name": "Santos Andrés Dung-Lac y compañeros",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-25": {
+      "name": "Santa Catalina de Alejandría",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "11-26": {
+      "name": "San Silvestre Gozzolini",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-27": {
+      "name": "San Virgilio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-28": {
+      "name": "San Jacobo de la Marca",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-29": {
+      "name": "San Saturnino",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "11-30": {
+      "name": "San Andrés, apóstol",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-01": {
+      "name": "San Eloy",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-02": {
+      "name": "Santa Bibiana",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-03": {
+      "name": "San Francisco Javier",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-04": {
+      "name": "San Juan Damasceno",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-05": {
+      "name": "San Sabas",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-06": {
+      "name": "San Nicolás de Bari",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-07": {
+      "name": "San Ambrosio",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-08": {
+      "name": "Inmaculada Concepción de la Virgen María",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-09": {
+      "name": "San Juan Diego Cuauhtlatoatzin",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-10": {
+      "name": "Bienaventurada Virgen María de Loreto",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-11": {
+      "name": "San Dámaso I",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-12": {
+      "name": "Bienaventurada Virgen María de Guadalupe",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-13": {
+      "name": "Santa Lucía",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-14": {
+      "name": "San Juan de la Cruz",
+      "kind": "calendar",
+      "rank": "Memoria obligatoria",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-15": {
+      "name": "San Valeriano",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-16": {
+      "name": "San Eusebio de Vercelli (fecha discordante: revisión)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-17": {
+      "name": "San Lázaro de Betania",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-18": {
+      "name": "Nuestra Señora de la O",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-19": {
+      "name": "San Anastasio I",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-20": {
+      "name": "Santo Domingo de Silos",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-21": {
+      "name": "San Pedro Canisio",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-22": {
+      "name": "San Flaviano de Constantinopla",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-23": {
+      "name": "San Juan Cancio",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-24": {
+      "name": "San Adalberto de Praga (fecha discordante: revisión)",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-25": {
+      "name": "Natividad del Señor",
+      "kind": "calendar",
+      "rank": "Solemnidad",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-26": {
+      "name": "San Esteban, protomártir",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-27": {
+      "name": "San Juan evangelista",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-28": {
+      "name": "Santos Inocentes",
+      "kind": "calendar",
+      "rank": "Fiesta",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-29": {
+      "name": "San Tomás Becket",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    },
+    "12-30": {
+      "name": "San Anisio",
+      "kind": "complementary",
+      "rank": "",
+      "source": "https://iglesiascerca.org/santoral",
+      "review": "Referencia secundaria; por verificar en Martirologio Romano"
+    },
+    "12-31": {
+      "name": "San Silvestre I",
+      "kind": "calendar",
+      "rank": "Memoria libre",
+      "source": "Calendario propio de Colombia; base editorial aportada",
+      "review": "Cotejo editorial pendiente"
+    }
+  }
+}

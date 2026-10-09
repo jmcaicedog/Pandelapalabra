@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { buildCanonicalDay } from './canonicalLectionary.ts';
 import { cleanSaintText, mapEvangelizoDay } from './evangelizo.ts';
 import { fetchLiturgicalDay, getLiturgicalDay } from './liturgy.ts';
-import { selectColombianSaint } from './colombianSaints.ts';
+import { EDITORIAL_SANTORAL_VERSION } from './colombianSaints.ts';
 
 function officialFixture(date: string) {
   return {
@@ -22,14 +22,13 @@ function officialFixture(date: string) {
   };
 }
 
-test('ningún año conserva excepciones de santos para fechas particulares', () => {
+test('el santoral editorial recurrente no depende del año ni del orden de Evangelizo', () => {
   for (const year of [2026, 2027, 2030, 2100]) {
     for (const day of ['08', '09']) {
       const date = `${year}-10-${day}`;
       assert.match(mapEvangelizoDay(date, officialFixture(date))!.saint.name, /pendiente/);
-      assert.match(buildCanonicalDay(date).saint.name, /pendiente/);
+      assert.equal(buildCanonicalDay(date).saint.name, day === '08' ? 'Santa Pelagia de Antioquía' : 'San Luis Bertrán');
     }
-    assert.match(buildCanonicalDay('2027-10-09').saint.name, /pendiente/);
     assert.match(mapEvangelizoDay('2030-10-08', officialFixture('2030-10-08'))!.saint.name, /pendiente/);
   }
 });
@@ -79,7 +78,7 @@ test('un fallo de red muestra indisponibilidad y permite reintentar', async (t) 
   });
   const pending = await fetchLiturgicalDay('2028-10-09');
   assert.equal(pending.readingsPending, true);
-  assert.match(pending.saint.name, /pendiente/);
+  assert.equal(pending.saint.name, 'San Luis Bertrán');
 
   t.mock.restoreAll();
   t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({
@@ -91,7 +90,7 @@ test('un fallo de red muestra indisponibilidad y permite reintentar', async (t) 
   assert.equal(recovered.gospel.text, 'Evangelio completo hasta el último versículo.');
 });
 
-test('el caché oficial anterior conserva lecturas pero descarta santos no verificados', (t) => {
+test('el caché oficial anterior conserva lecturas y sustituye el santo con la base editorial', (t) => {
   const date = '2026-10-09';
   const official = mapEvangelizoDay(date, officialFixture(date));
   assert.ok(official);
@@ -115,7 +114,7 @@ test('el caché oficial anterior conserva lecturas pero descarta santos no verif
   });
   const cached = getLiturgicalDay(date);
   assert.equal(cached.source, 'evangelizo');
-  assert.match(cached.saint.name, /pendiente/);
+  assert.equal(cached.saint.name, 'San Luis Bertrán');
   assert.equal(cached.color, 'green');
   assert.equal(cached.gospel.text, official.gospel.text);
 });
@@ -127,23 +126,62 @@ test('se rechazan respuestas de otra fecha o sin salmo', () => {
   assert.equal(mapEvangelizoDay(fixture.date, fixture), null);
 });
 
-test('las lecturas oficiales guardadas no impiden verificar después el santo colombiano', async (t) => {
+test('la caché vigente reemplaza selecciones y versiones antiguas incluso sin red', (t) => {
+  const date = '2031-10-10';
+  const official = mapEvangelizoDay(date, officialFixture(date));
+  assert.ok(official);
+  official.saint.name = 'Santo de una selección anterior';
+  official.saintVerification = {
+    date, status: 'editorial', checkedAt: new Date().toISOString(),
+    version: 'old', sourceReference: 'Base anterior', review: 'Pendiente',
+  };
+  const descriptors = new Map(['window', 'localStorage'].map(key =>
+    [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => {
+    for (const [key, descriptor] of descriptors) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
+  });
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: {} });
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: { getItem: (key: string) => key === `panvivo_liturgy_v6_${date}` ? JSON.stringify(official) : null },
+  });
+  const day = getLiturgicalDay(date);
+  assert.notEqual(day.saint.name, official.saint.name);
+  assert.equal(day.saintVerification?.version, EDITORIAL_SANTORAL_VERSION);
+  assert.deepEqual(day.gospel, official.gospel);
+});
+
+test('las lecturas oficiales se reutilizan con el santoral editorial sin consultar al editor', async (t) => {
   const date = '2032-10-09';
   t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({
     data: officialFixture(date),
   })));
   const first = await fetchLiturgicalDay(date);
   assert.equal(first.source, 'evangelizo');
-  assert.match(first.saint.name, /pendiente/);
+  assert.equal(first.saint.name, 'San Luis Bertrán');
+  assert.equal(first.saintVerification?.version, EDITORIAL_SANTORAL_VERSION);
   t.mock.restoreAll();
-  const verified = {
-    ...first,
-    ...selectColombianSaint(date, 'San Luis Bertrán', { status: 'publisher', method: 'web' }),
-  };
-  const api = t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(verified)));
+  const api = t.mock.method(globalThis, 'fetch', async () => {
+    throw new Error('La caché vigente no debe consultar fuentes externas.');
+  });
   const updated = await fetchLiturgicalDay(date);
   assert.equal(updated.saint.name, 'San Luis Bertrán');
-  assert.equal(updated.saintVerification?.status, 'publisher');
+  assert.equal(updated.saintVerification?.status, 'editorial');
   assert.equal(updated.gospel.text, first.gospel.text);
-  assert.equal(api.mock.calls.length, 1);
+  assert.equal(api.mock.calls.length, 0);
+});
+
+test('el santo editorial no cambia las lecturas, celebración ni color litúrgico', async (t) => {
+  const date = '2029-10-08';
+  const official = mapEvangelizoDay(date, officialFixture(date));
+  assert.ok(official);
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(official)));
+  const result = await fetchLiturgicalDay(date);
+  assert.equal(result.saint.name, 'Santa Pelagia de Antioquía');
+  for (const key of ['title', 'color', 'colorName', 'season', 'firstReading', 'psalm', 'gospel'] as const) {
+    assert.deepEqual(result[key], official[key]);
+  }
 });

@@ -1,6 +1,7 @@
 import type { SaintVerification } from '../data/colombianSaints.ts';
 
 export function SaintSource({ verification }: { verification?: SaintVerification }) {
+  if (verification?.status === 'editorial') return null;
   const label = verification?.status === 'publisher'
     ? 'Pan de la Palabra · Colombia'
     : verification?.status === 'ordo'
