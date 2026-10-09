@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { handleApiRoute } from '../src/server/handler.js';
+import { handleApiRoute, sendJson } from '../src/server/handler.js';
 
 // vercel.json rewrites /api/<path> to /api?__path=<path>; restore the original URL for the shared handler.
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
@@ -11,9 +11,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     req.url = `/api/${original}${query ? `?${query}` : ''}`;
   }
 
+  try {
   const handled = await handleApiRoute(req, res);
   if (!handled) {
-    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ error: 'Ruta no encontrada' }));
+    sendJson(res, 404, { error: 'Ruta no encontrada' });
+  }
+  } catch (error) {
+    console.error('Error interno de API:', error);
+    if (!res.headersSent) sendJson(res, 500, { error: 'Error interno del servidor.' });
   }
 }

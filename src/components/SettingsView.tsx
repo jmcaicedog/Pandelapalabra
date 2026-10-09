@@ -58,6 +58,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   const handleClearBibleCache = () => {
+    try {
     let count = 0;
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -71,10 +72,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     });
     setClearedNotice(`Se limpiaron ${count} capítulos almacenados en caché local.`);
     setTimeout(() => setClearedNotice(null), 3500);
+    } catch (error) {
+      console.warn('No se pudo limpiar la caché:', error);
+      setClearedNotice('No se pudo limpiar la caché local.');
+    }
   };
 
   const handleLogout = async () => {
-    await logoutUser();
+    try { await logoutUser(); }
+    catch (error) {
+      console.error('No se pudo cerrar sesión:', error);
+      setClearedNotice('No se pudo cerrar sesión. Reintenta.');
+    }
   };
 
   return (
@@ -178,18 +187,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
 
             <select
-              value={calendarRegion}
-              onChange={(e) => onUpdateCalendarRegion(e.target.value)}
+              value="Colombia"
+              disabled
               className={`border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-400 ${
                 darkMode ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-stone-100 border-stone-300 text-stone-800'
               }`}
             >
-              <option value="Universal">Universal (Vaticano)</option>
               <option value="Colombia">Colombia</option>
-              <option value="México">México</option>
-              <option value="España">España</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Chile">Chile</option>
             </select>
           </div>
         </div>

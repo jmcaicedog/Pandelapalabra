@@ -54,15 +54,35 @@ export function getFirstSundayOfAdvent(year: number): Date {
   return addDays(dec3, -dec3.getDay());
 }
 
-/** Baptism of the Lord: Sunday after January 6 (closes the Christmas season). */
-export function getBaptismOfTheLord(year: number): Date {
-  const jan6 = noon(year, 0, 6);
-  return addDays(jan6, 7 - jan6.getDay());
+/** Colombian Epiphany: Sunday between January 2 and 8. */
+export function getEpiphany(year: number): Date {
+  const jan2 = noon(year, 0, 2);
+  return addDays(jan2, (7 - jan2.getDay()) % 7);
 }
 
-export function parseDateStr(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('-').map((p) => parseInt(p, 10));
-  return noon(y, (m || 1) - 1, d || 1);
+/** When Epiphany falls on Jan 7/8, Baptism is celebrated the following Monday. */
+export function getBaptismOfTheLord(year: number): Date {
+  const epiphany = getEpiphany(year);
+  return addDays(epiphany, epiphany.getDate() >= 7 ? 1 : 7);
+}
+
+/** Reject known differences between the source calendar and Colombian transfers. */
+export function matchesColombianTransfers(dateStr: string, title: string): boolean {
+  const date = parseDateStr(dateStr);
+  const year = date.getFullYear();
+  const easter = getEasterDate(year);
+  const feasts = [
+    { date: getEpiphany(year), pattern: /epifan[ií]a/i },
+    { date: getBaptismOfTheLord(year), pattern: /bautismo del se[nñ]or/i },
+    { date: addDays(easter, 42), pattern: /ascensi[oó]n/i },
+    { date: addDays(easter, 63), pattern: /cuerpo y (?:la )?sangre|corpus christi/i },
+  ];
+  for (const feast of feasts) {
+    const expected = date.getTime() === feast.date.getTime();
+    const actual = feast.pattern.test(title);
+    if (expected !== actual) return false;
+  }
+  return true;
 }
 
 export function getLiturgicalCalendarInfo(dateStr: string): LiturgicalCalendarInfo {
@@ -97,10 +117,11 @@ export function getLiturgicalCalendarInfo(dateStr: string): LiturgicalCalendarIn
     week = date < firstSundayOfLent ? 0 : Math.floor(diffDays(date, firstSundayOfLent) / 7) + 1;
   } else if (date >= easter && date <= pentecost) {
     season = 'Pascua';
-    week = Math.floor(diffDays(date, easter) / 7) + 1;
+    week = Math.min(7, Math.floor(diffDays(date, easter) / 7) + 1);
   } else if (date > baptism && date < ashWednesday) {
     season = 'Tiempo Ordinario';
-    week = Math.floor(diffDays(date, baptism) / 7) + 1;
+    const ordinarySunday = addDays(baptism, (7 - baptism.getDay()) % 7 || 7);
+    week = date < ordinarySunday ? 1 : Math.floor(diffDays(date, ordinarySunday) / 7) + 2;
   } else {
     season = 'Tiempo Ordinario';
     const week34Sunday = addDays(advent, -7);
@@ -219,3 +240,5 @@ export function buildSeasonalTitle(dateStr: string, info: LiturgicalCalendarInfo
         : `${capitalized} de la ${roman} semana del Tiempo Ordinario`;
   }
 }
+import { parseDateStr } from '../lib/dateUtils.js';
+export { parseDateStr } from '../lib/dateUtils.js';

@@ -3,6 +3,7 @@ class SpeechService {
   private synth: SpeechSynthesis | null = null;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isSpeakingState = false;
+  private enabled = true;
   private onStateChangeCallbacks: Array<(speaking: boolean) => void> = [];
 
   constructor() {
@@ -23,7 +24,7 @@ class SpeechService {
   }
 
   public speak(text: string, onEnd?: () => void) {
-    if (!this.synth) return;
+    if (!this.synth || !this.enabled) { onEnd?.(); return; }
 
     this.stop();
 
@@ -67,6 +68,11 @@ class SpeechService {
 
     this.currentUtterance = utterance;
     this.synth.speak(utterance);
+  }
+
+  public setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+    if (!enabled) this.stop();
   }
 
   public stop() {

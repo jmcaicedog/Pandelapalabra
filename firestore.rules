@@ -38,8 +38,8 @@ service cloud.firestore {
       }
     }
 
-    match /test/connection {
-      allow read: if true;
+    match /dailyReflections/{date} {
+      allow read, write: if false;
     }
   }
 }

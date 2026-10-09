@@ -1,9 +1,10 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import 'dotenv/config';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
-import {handleApiRoute} from './src/server/handler.ts';
+import {handleApiRoute, sendJson} from './src/server/handler.ts';
 
 export default defineConfig(() => {
   return {
@@ -47,7 +48,7 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-          navigateFallbackDenylist: [/^\/api\//],
+          navigateFallbackDenylist: [/^\/api(?:\/|$)/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -80,7 +81,7 @@ export default defineConfig(() => {
           ],
         },
         devOptions: {
-          enabled: true,
+          enabled: false,
           type: 'module',
         },
       }),
@@ -88,12 +89,17 @@ export default defineConfig(() => {
         name: 'api-server-middleware',
         configureServer(server) {
           server.middlewares.use(async (req, res, next) => {
-            if (req.url && req.url.startsWith('/api/')) {
+            const pathname = req.url?.split('?')[0];
+            if (pathname === '/api' || pathname?.startsWith('/api/')) {
               try {
                 const handled = await handleApiRoute(req, res);
                 if (handled) return;
+                sendJson(res, 404, { error: 'Ruta no encontrada.' });
+                return;
               } catch (e) {
                 console.error('API middleware error:', e);
+                if (!res.headersSent) sendJson(res, 500, { error: 'Error interno del servidor.' });
+                return;
               }
             }
             next();

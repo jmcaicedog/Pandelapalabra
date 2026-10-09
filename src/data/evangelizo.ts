@@ -1,15 +1,17 @@
 import type { LiturgicalDay } from './liturgy.js';
-import { confirmedPrintSaint, pendingSaint } from './colombianSaints.js';
+import { pendingSaint } from './colombianSaints.js';
+import { buildSeasonalTitle } from './liturgicalCalendar.js';
 import {
   getColorName,
   getLiturgicalCalendarInfo,
   parseDateStr,
   resolveLiturgicalColor,
+  matchesColombianTransfers,
 } from './liturgicalCalendar.js';
 
 /**
- * Official daily Mass readings (Spanish, Latin American lectionary) published by Evangelizo.
- * Past dates are always available; future dates are published roughly 3 months ahead.
+ * Daily Mass readings in Spanish published by Evangelizo.
+ * Availability depends on the publisher; future dates are normally published months ahead.
  */
 export const EVANGELIZO_API_BASE = 'https://publication.evangelizo.ws/SP/days';
 
@@ -160,12 +162,24 @@ function stripTrailingPunctuation(s: string): string {
 }
 
 export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): LiturgicalDay | null {
+  parseDateStr(dateStr);
+  if (data.date !== dateStr || !Array.isArray(data.readings) || data.readings.some(reading =>
+    !reading || typeof reading.type !== 'string'
+    || (reading.text !== undefined && typeof reading.text !== 'string')
+    || (reading.reference_displayed !== undefined && typeof reading.reference_displayed !== 'string')
+    || (reading.chorus != null && typeof reading.chorus !== 'string')
+    || (reading.book !== undefined && (!reading.book || typeof reading.book !== 'object'
+      || (reading.book.full_title !== undefined && typeof reading.book.full_title !== 'string'))))) {
+    console.warn(`Respuesta de Evangelizo inválida o de otra fecha (${dateStr}).`);
+    return null;
+  }
   const readings = data.readings || [];
   const firstReadings = readings.filter((r) => r.type === 'reading');
   const psalmReading = readings.find((r) => r.type === 'psalm');
   const gospelReading = readings.find((r) => r.type === 'gospel');
   if (
     !firstReadings.length ||
+    !psalmReading ||
     !gospelReading ||
     [...firstReadings, gospelReading, ...(psalmReading ? [psalmReading] : [])].some(
       (reading) => !cleanText(reading.text || '') || !reading.reference_displayed?.trim()
@@ -177,10 +191,14 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
 
   const date = parseDateStr(dateStr);
   const info = getLiturgicalCalendarInfo(dateStr);
-  const confirmed = confirmedPrintSaint(dateStr);
-  const saintData = confirmed?.saint || pendingSaint();
-  const rawTitle = data.liturgic_title || data.liturgy?.title || '';
+  const saintData = pendingSaint();
+  const rawTitle = typeof data.liturgic_title === 'string' ? data.liturgic_title
+    : typeof data.liturgy?.title === 'string' ? data.liturgy.title : '';
   const title = rawTitle ? normalizeTitle(rawTitle) : '';
+  if (!matchesColombianTransfers(dateStr, title)) {
+    console.warn(`Evangelizo no coincide con los traslados colombianos para ${dateStr}.`);
+    return null;
+  }
   const { color, isFeast } = resolveLiturgicalColor(info, title, saintData.color);
 
   const colorLabel = isFeast
@@ -189,8 +207,6 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
     ? `Memoria de ${saintData.name}`
     : info.season;
 
-  const weekday = date.toLocaleDateString('es-ES', { weekday: 'long' });
-  const monthName = date.toLocaleDateString('es-ES', { month: 'long' });
 
   let psalm: LiturgicalDay['psalm'];
   if (psalmReading) {
@@ -214,8 +230,8 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
 
   return {
     date: dateStr,
-    formattedDate: `${weekday}, ${monthName} ${date.getDate()}`,
-    title: title || `${weekday} • ${saintData.name}`,
+    formattedDate: date.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+    title: title || buildSeasonalTitle(dateStr, info),
     season: isFeast ? 'Fiesta / Solemnidad' : info.season,
     color,
     colorName: getColorName(color, colorLabel),
@@ -227,7 +243,6 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
       patronage: saintData.patronage,
       prayer: saintData.prayer,
     },
-    saintVerification: confirmed?.saintVerification,
     firstReading: {
       citation: buildCitation(firstReadings[0]),
       text: cleanText(firstReadings[0].text || ''),
@@ -242,6 +257,7 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
       text: cleanText(gospelReading.text || ''),
     },
     source: 'evangelizo',
+    readingsCheckedAt: new Date().toISOString(),
   };
 }
 
@@ -250,6 +266,7 @@ export function mapEvangelizoDay(dateStr: string, data: EvangelizoDay): Liturgic
  * (too far in the future) or the service is unreachable.
  */
 export async function fetchEvangelizoDay(dateStr: string, timeoutMs = 8000): Promise<LiturgicalDay | null> {
+  parseDateStr(dateStr);
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
   try {
@@ -257,11 +274,15 @@ export async function fetchEvangelizoDay(dateStr: string, timeoutMs = 8000): Pro
       signal: controller?.signal,
       headers: { Accept: 'application/json' },
     });
-    if (!res.ok) return null;
+    if (!res.ok) throw new Error(`Evangelizo HTTP ${res.status}`);
     const json = await res.json();
-    if (!json || json.error || !json.data) return null;
+    if (!json || json.error || !json.data) {
+      console.warn(`Evangelizo no tiene lecturas disponibles para ${dateStr}.`);
+      return null;
+    }
     return mapEvangelizoDay(dateStr, json.data as EvangelizoDay);
-  } catch {
+  } catch (error) {
+    console.warn(`No se pudo obtener Evangelizo para ${dateStr}:`, error);
     return null;
   } finally {
     if (timer) clearTimeout(timer);

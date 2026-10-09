@@ -1,3 +1,5 @@
+import { getTodayDateStr, parseDateStr } from '../lib/dateUtils.ts';
+
 export interface MysteryItem {
   id: number;
   numberTitle: string; // "Primer Misterio"
@@ -258,7 +260,7 @@ export const ROSARY_GROUPS: RosaryMysteryGroup[] = [
 ];
 
 export function getTodayMysteries(): RosaryMysteryGroup {
-  const day = new Date().getDay(); // 0 = Dom, 1 = Lun, 2 = Mar, 3 = Mie, 4 = Jue, 5 = Vie, 6 = Sab
+  const day = parseDateStr(getTodayDateStr()).getDay();
   if (day === 1 || day === 6) return ROSARY_GROUPS.find(g => g.id === 'gozosos')!;
   if (day === 2 || day === 5) return ROSARY_GROUPS.find(g => g.id === 'dolorosos')!;
   if (day === 4) return ROSARY_GROUPS.find(g => g.id === 'luminosos')!;

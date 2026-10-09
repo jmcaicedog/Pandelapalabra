@@ -41,7 +41,7 @@ test('la selección web del misal prevalece sobre las opciones del Ordo', async 
     const url = String(input);
     return url.includes('sanpablo.co')
       ? new Response(page('2025-10-08', 'Santa Pelagia'))
-      : new Response(JSON.stringify({ data: [
+      : new Response(JSON.stringify({ success: true, data: [
         { fecha: '2025-10-08', preludio: '<p>Otro santo</p>', celebracion: 'Memoria libre', colores_dia: 'Blanco' },
       ] }));
   });

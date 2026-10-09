@@ -1,14 +1,16 @@
 import {
-  confirmedPrintSaint, hasFreshSaintVerification, publisherUrl, selectColombianSaint,
+  hasFreshSaintVerification, publisherUrl, selectColombianSaint,
   type ColombianSaint,
 } from '../data/colombianSaints.js';
 import { cleanSaintText } from '../data/evangelizo.js';
+import { parseDateStr, isValidDateStr } from '../lib/dateUtils.js';
+import { ExpiringCache } from '../lib/cache.js';
 
 const ORDO_URL = 'https://74j2tngwfd.execute-api.us-east-1.amazonaws.com/api-app/ediciones/obtener-contenido-completo';
 const ORDO_PAGE = 'https://ordocolombia.cec.org.co/';
 // The publisher determines the editorial saint; Ordo supplies alternatives, not a
 // single preferred saint. Only factual names/calendar metadata are imported.
-const cache = new Map<string, ColombianSaint>();
+const cache = new ExpiringCache<ColombianSaint>(120, 15 * 60 * 1000);
 let ordoCache: { expires: number; rows: OrdoDay[] } | undefined;
 let ordoRequest: Promise<OrdoDay[]> | undefined;
 
@@ -49,11 +51,12 @@ async function loadOrdo(): Promise<OrdoDay[]> {
     const response = await fetch(ORDO_URL, { signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error(`Ordo HTTP ${response.status}`);
     const json: unknown = await response.json();
-    if (!json || typeof json !== 'object' || !('data' in json) || !Array.isArray(json.data)) {
+    if (!json || typeof json !== 'object' || !('success' in json) || json.success !== true
+      || !('data' in json) || !Array.isArray(json.data)) {
       throw new Error('Respuesta del Ordo sin calendario');
     }
     const rows = json.data.filter((row): row is OrdoDay =>
-      !!row && typeof row === 'object' && typeof row.fecha === 'string'
+      !!row && typeof row === 'object' && isValidDateStr(row.fecha)
       && (typeof row.preludio === 'string' || row.preludio === null)
       && typeof row.celebracion === 'string' && typeof row.colores_dia === 'string');
     if (!rows.length) throw new Error('Calendario del Ordo vacío');
@@ -68,10 +71,10 @@ async function loadOrdo(): Promise<OrdoDay[]> {
 }
 
 export async function fetchColombianSantoral(date: string): Promise<ColombianSaint> {
+  parseDateStr(date);
   const cached = cache.get(date);
   if (cached && hasFreshSaintVerification(cached.saintVerification, date)) return cached;
-  let selected = confirmedPrintSaint(date);
-  if (!selected) {
+  {
     const [name, rows] = await Promise.all([
       (async () => {
         try {
@@ -89,14 +92,18 @@ export async function fetchColombianSantoral(date: string): Promise<ColombianSai
       }),
     ]);
     const ordo = selectOrdoDay(date, rows);
-    selected = name
+    const selected = name
       ? selectColombianSaint(date, name, {
         status: 'publisher', method: 'web', sourceUrl: publisherUrl(date),
         celebration: ordo.saintVerification.celebration,
         colors: ordo.saintVerification.colors,
       })
       : ordo;
+    if (!name && selected.saintVerification.status === 'pending') {
+      console.warn(`Santoral colombiano sin datos verificables para ${date}.`);
+    }
+    cache.set(date, selected, selected.saintVerification.status === 'publisher'
+      ? 24 * 60 * 60 * 1000 : 15 * 60 * 1000);
+    return selected;
   }
-  cache.set(date, selected);
-  return selected;
 }

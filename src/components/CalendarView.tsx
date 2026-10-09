@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SaintSource } from './SaintSource.tsx';
 import {
   Calendar as CalendarIcon,
@@ -15,7 +15,8 @@ import {
   Check
 } from 'lucide-react';
 import { getLiturgicalDay, fetchLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
-import { getTodayDateStr } from '../lib/dateUtils.ts';
+import { getTodayDateStr, parseDateStr, shiftDate, isValidDateStr } from '../lib/dateUtils.ts';
+import { useTodayDate } from '../lib/useTodayDate.ts';
 import {
   getUserRoutines,
   saveUserRoutine,
@@ -37,11 +38,17 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
   const [activeTab, setActiveTab] = useState<'calendario' | 'rutina' | 'notas'>('rutina');
 
   // Calendar State initialized dynamically to today's date
-  const todayStr = getTodayDateStr();
-  const todayDateObj = new Date();
+  const todayStr = useTodayDate();
+  const todayDateObj = parseDateStr(todayStr);
   const [currentYear, setCurrentYear] = useState(() => todayDateObj.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(() => todayDateObj.getMonth());
   const [selectedCalendarDate, setSelectedCalendarDate] = useState(() => todayStr);
+  const previousToday = useRef(todayStr);
+  useEffect(() => {
+    const previous = previousToday.current;
+    previousToday.current = todayStr;
+    setSelectedCalendarDate(date => date === previous ? todayStr : date);
+  }, [todayStr]);
 
   // Routines State
   const [routines, setRoutines] = useState<SpiritualRoutine[]>([]);
@@ -60,15 +67,20 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
   // Notifications
   const [notificationsGranted, setNotificationsGranted] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const loadVersion = useRef(0);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setNotificationsGranted(Notification.permission === 'granted');
     }
     loadData();
+    return () => { loadVersion.current += 1; };
   }, [user]);
 
   const loadData = async () => {
+    const version = ++loadVersion.current;
+    setRoutines([]);
+    setNotes([]);
     setLoadingRoutines(true);
     try {
       const uid = user?.uid || 'guest';
@@ -76,10 +88,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
         getUserRoutines(uid),
         getUserNotes(uid),
       ]);
+      if (version !== loadVersion.current) return;
       setRoutines(userRoutines);
       setNotes(userNotes);
+    } catch (error) {
+      console.error('No se pudieron cargar rutinas y notas:', error);
+      if (version === loadVersion.current) showToast('No se pudieron cargar tus datos. Reintenta más tarde.');
     } finally {
-      setLoadingRoutines(false);
+      if (version === loadVersion.current) setLoadingRoutines(false);
     }
   };
 
@@ -90,20 +106,27 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
 
   const handleToggleRoutine = async (routine: SpiritualRoutine) => {
     const isCompleted = routine.completedDates?.includes(todayStr);
-    const updated = await toggleRoutineCompleted(user?.uid || 'guest', routine.id, !isCompleted);
-
-    setRoutines((prev) =>
-      prev.map((r) => (r.id === routine.id ? updated : r))
-    );
-    showToast(isCompleted ? 'Rutina desmarcada' : '¡Gloria a Dios! Rutina cumplida');
+    const version = loadVersion.current;
+    try {
+      const updated = await toggleRoutineCompleted(user?.uid || 'guest', routine.id, !isCompleted);
+      if (version !== loadVersion.current) return;
+      setRoutines((prev) =>
+        prev.map((r) => (r.id === routine.id ? updated : r))
+      );
+      showToast(isCompleted ? 'Rutina desmarcada' : '¡Gloria a Dios! Rutina cumplida');
+    } catch (error) {
+      console.error('Error al actualizar rutina:', error);
+      if (version === loadVersion.current) showToast('No se pudo confirmar el guardado de la rutina.');
+    }
   };
 
   const handleCreateRoutine = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRoutineTitle.trim()) return;
+    const version = loadVersion.current;
 
     const newR: SpiritualRoutine = {
-      id: 'routine_' + Date.now(),
+      id: 'routine_' + crypto.randomUUID(),
       userId: user?.uid || 'guest',
       title: newRoutineTitle.trim(),
       time: newRoutineTime,
@@ -112,54 +135,75 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
       completedDates: [],
     };
 
-    await saveUserRoutine(user?.uid || 'guest', newR);
-    setRoutines((prev) => [...prev, newR]);
-    setNewRoutineTitle('');
-    setNewRoutineModalOpen(false);
-    showToast('Nueva rutina añadida');
+    try {
+      await saveUserRoutine(user?.uid || 'guest', newR);
+      if (version !== loadVersion.current) return;
+      setRoutines((prev) => [...prev, newR]);
+      setNewRoutineTitle('');
+      setNewRoutineModalOpen(false);
+      showToast('Nueva rutina añadida');
+    } catch (error) {
+      console.error('Error al guardar rutina:', error);
+      if (version === loadVersion.current) showToast('No se pudo confirmar el guardado de la rutina.');
+    }
   };
 
   const handleRequestNotifications = async () => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      const perm = await Notification.requestPermission();
-      if (perm === 'granted') {
-        setNotificationsGranted(true);
-        new Notification('Pan Vivo', {
-          body: 'Recordatorios de oración activados para tus rutinas litúrgicas.',
-          icon: '/favicon.ico',
-        });
-        showToast('Recordatorios y notificaciones activados con éxito');
-      } else {
-        showToast('Permiso de notificación no concedido por el navegador');
-      }
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          setNotificationsGranted(true);
+          showToast('Permiso concedido. Los recordatorios automáticos aún no están disponibles.');
+        } else {
+          showToast('Permiso de notificación no concedido por el navegador');
+        }
+      } else showToast('Este navegador no admite notificaciones.');
+    } catch (error) {
+      console.warn('Permiso de notificaciones no disponible:', error);
+      showToast('No se pudo solicitar el permiso de notificaciones.');
     }
   };
 
   const handleSaveNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!noteTitle.trim() || !noteContent.trim()) return;
+    const version = loadVersion.current;
 
     const newN: SpiritualNote = {
-      id: 'note_' + Date.now(),
+      id: 'note_' + crypto.randomUUID(),
       userId: user?.uid || 'guest',
       title: noteTitle.trim(),
       content: noteContent.trim(),
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayDateStr(),
       createdAt: new Date().toISOString(),
     };
 
-    await saveNote(user?.uid || 'guest', newN);
-    setNotes((prev) => [newN, ...prev]);
-    setNoteTitle('');
-    setNoteContent('');
-    setNewNoteModalOpen(false);
-    showToast('Nota espiritual guardada');
+    try {
+      await saveNote(user?.uid || 'guest', newN);
+      if (version !== loadVersion.current) return;
+      setNotes((prev) => [newN, ...prev]);
+      setNoteTitle('');
+      setNoteContent('');
+      setNewNoteModalOpen(false);
+      showToast('Nota espiritual guardada');
+    } catch (error) {
+      console.error('Error al guardar nota:', error);
+      if (version === loadVersion.current) showToast('No se pudo confirmar el guardado de la nota.');
+    }
   };
 
   const handleDeleteNote = async (id: string) => {
-    await deleteNote(user?.uid || 'guest', id);
-    setNotes((prev) => prev.filter((n) => n.id !== id));
-    showToast('Nota eliminada');
+    const version = loadVersion.current;
+    try {
+      await deleteNote(user?.uid || 'guest', id);
+      if (version !== loadVersion.current) return;
+      setNotes((prev) => prev.filter((n) => n.id !== id));
+      showToast('Nota eliminada');
+    } catch (error) {
+      console.error('Error al eliminar nota:', error);
+      if (version === loadVersion.current) showToast('No se pudo confirmar la eliminación de la nota.');
+    }
   };
 
   // Calendar Calculation
@@ -193,11 +237,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
   }, [selectedCalendarDate]);
 
   const completedTodayCount = routines.filter((r) => r.completedDates?.includes(todayStr)).length;
+  const completedDates = new Set(routines.flatMap(r => r.completedDates).filter(isValidDateStr));
+  let streak = 0;
+  let streakDate = completedDates.has(todayStr) ? todayStr : shiftDate(todayStr, -1);
+  while (completedDates.has(streakDate)) {
+    streak++;
+    if (streakDate === '1583-01-01') break;
+    streakDate = shiftDate(streakDate, -1);
+  }
 
   return (
     <div id="calendar-view-container" className="min-h-screen pb-28 text-slate-100">
       {toastMsg && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-slate-950 font-semibold px-4 py-2 rounded-full text-xs shadow-xl flex items-center gap-2">
+        <div role="status" className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-amber-500 text-slate-950 font-semibold px-4 py-2 rounded-full text-xs shadow-xl flex items-center gap-2">
           <Check className="w-4 h-4" /> {toastMsg}
         </div>
       )}
@@ -265,6 +317,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
               {/* Calendar Month Header */}
               <div className="flex items-center justify-between mb-4">
                 <button
+                  disabled={currentYear === 1583 && currentMonth === 0}
                   onClick={() => {
                     if (currentMonth === 0) {
                       setCurrentMonth(11);
@@ -283,6 +336,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                 </h3>
 
                 <button
+                  disabled={currentYear === 9999 && currentMonth === 11}
                   onClick={() => {
                     if (currentMonth === 11) {
                       setCurrentMonth(0);
@@ -417,7 +471,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
               <div>
                 <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold mb-1">
                   <Flame className="w-4 h-4 text-amber-500" />
-                  <span>Racha Espiritual: 12 Días</span>
+                  <span>Racha de rutinas: {streak} días</span>
                 </div>
                 <h3 className="text-lg font-serif font-bold text-white">
                   Rutinas de Hoy ({completedTodayCount} de {routines.length})
@@ -434,7 +488,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                     ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
                     : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
                 }`}
-                title={notificationsGranted ? 'Notificaciones activas' : 'Activar recordatorios'}
+                title={notificationsGranted ? 'Permiso concedido; sin recordatorios automáticos' : 'Solicitar permiso de notificaciones'}
               >
                 {notificationsGranted ? (
                   <BellRing className="w-5 h-5" />

@@ -2,9 +2,7 @@ import type { SaintVerification } from '../data/colombianSaints.ts';
 
 export function SaintSource({ verification }: { verification?: SaintVerification }) {
   const label = verification?.status === 'publisher'
-    ? verification.method === 'print'
-      ? 'Pan de la Palabra · Colombia (edición impresa confirmada)'
-      : 'Pan de la Palabra · Colombia'
+    ? 'Pan de la Palabra · Colombia'
     : verification?.status === 'ordo'
     ? 'Ordo Colombiano · selección del misal pendiente'
     : 'Santoral colombiano pendiente de confirmar';

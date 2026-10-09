@@ -1,3 +1,6 @@
+import { readStoredJson, writeStorage } from '../lib/storage.ts';
+import { withAbortTimeout } from '../lib/asyncUtils.ts';
+
 export interface BibleBook {
   id: number;
   nombre: string;
@@ -130,24 +133,18 @@ const getBookSlug = (bookId: number) => BOOK_SLUGS[bookId - 1];
 const chapterIdFor = (bookId: number, numero: number) => bookId * 1000 + numero;
 
 async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${BIBLE_API_BASE}${path}`, { headers: { Accept: 'application/json' } });
-  if (!res.ok) throw new Error(`API Biblia respondió ${res.status}`);
-  const json = await res.json();
-  return json.data as T;
+  return withAbortTimeout(async signal => {
+    const res = await fetch(`${BIBLE_API_BASE}${path}`, { signal, headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`API Biblia respondió ${res.status}`);
+    const json = await res.json();
+    return json.data as T;
+  }, 10000);
 }
 
 export async function fetchChaptersForBook(bookId: number): Promise<BibleChapter[]> {
-  const slug = getBookSlug(bookId);
-  try {
-    const data = await apiGet<Array<{ chapter: number }>>(`/books/${slug}/chapters`);
-    if (Array.isArray(data) && data.length > 0) {
-      return data.map((c) => ({ id: chapterIdFor(bookId, c.chapter), libro_id: bookId, numero: c.chapter }));
-    }
-  } catch (err) {
-    console.warn('Fallback generating chapter list for book', bookId, err);
-  }
   const book = CATHOLIC_BOOKS.find(b => b.id === bookId);
-  const total = book?.capitulosTotales || 10;
+  if (!book) throw new Error('Libro bíblico inválido.');
+  const total = book.capitulosTotales;
   return Array.from({ length: total }, (_, i) => ({
     id: chapterIdFor(bookId, i + 1),
     libro_id: bookId,
@@ -159,48 +156,53 @@ export async function fetchVersesForChapter(chapterId: number, bookName?: string
   const bookId = Math.floor(chapterId / 1000);
   const numero = chapterNum ?? chapterId % 1000;
   const slug = getBookSlug(bookId);
+  const book = CATHOLIC_BOOKS.find(b => b.id === bookId);
+  if (!book || !Number.isInteger(numero) || numero < 1 || numero > book.capitulosTotales) {
+    throw new Error('Capítulo bíblico inválido.');
+  }
 
   const cacheKey = `${LOCAL_STORAGE_CACHE_PREFIX}${slug}_${numero}`;
-  const cached = localStorage.getItem(cacheKey);
-  if (cached) {
-    try {
-      return JSON.parse(cached);
-    } catch {}
-  }
+  const cached = readStoredJson(cacheKey, (value): value is BibleVerse[] =>
+    Array.isArray(value) && value.length > 0 && value.every(v => v && v.capitulo_id === chapterId
+      && Number.isInteger(v.numero) && v.numero > 0 && typeof v.texto === 'string' && v.texto.trim()));
+  if (cached) return cached;
 
   try {
     const data = await apiGet<{ verses: Array<{ number: number; text: string }> }>(`/books/${slug}/chapters/${numero}`);
-    if (data?.verses?.length) {
+    if (Array.isArray(data?.verses) && data.verses.length > 0 && data.verses.every(v =>
+      v && Number.isInteger(v.number) && v.number > 0 && typeof v.text === 'string' && v.text.trim())) {
       const verses: BibleVerse[] = data.verses.map((v) => ({
         id: chapterId * 1000 + v.number,
         capitulo_id: chapterId,
         numero: v.number,
         texto: v.text,
       }));
-      try { localStorage.setItem(cacheKey, JSON.stringify(verses)); } catch {}
+      writeStorage(cacheKey, JSON.stringify(verses));
       return verses;
     }
+    throw new Error('La fuente devolvió un capítulo vacío o inválido.');
   } catch (err) {
     console.warn('Error fetching verses from API:', err);
+    throw new Error(`No se pudo cargar ${bookName ?? book.nombre} ${numero}. Verifica tu conexión e inténtalo de nuevo.`);
   }
-
-  return [
-    {
-      id: 0,
-      capitulo_id: chapterId,
-      numero: 0,
-      texto: `No se pudo cargar ${bookName ?? 'el libro'} ${numero}. Verifica tu conexión e inténtalo de nuevo.`,
-    },
-  ];
 }
 
-export async function searchBible(query: string, limit = 25): Promise<any[]> {
+export interface BibleSearchResult {
+  libro: string; capitulo: number; numero: number; texto: string; referencia: string;
+}
+
+export async function searchBible(query: string, limit = 25): Promise<BibleSearchResult[]> {
   if (query.trim().length < 2) return [];
   try {
     const data = await apiGet<Array<{ bookName: string; chapter: number; verse: number; text: string; reference: string }>>(
       `/search?q=${encodeURIComponent(query.trim())}&limit=${Math.min(limit, 100)}`
     );
-    return (data || []).map((r) => ({
+    if (!Array.isArray(data) || data.some(r => !r || typeof r.bookName !== 'string'
+      || !Number.isInteger(r.chapter) || r.chapter < 1 || !Number.isInteger(r.verse) || r.verse < 1
+      || typeof r.text !== 'string' || typeof r.reference !== 'string')) {
+      throw new Error('Resultados bíblicos inválidos.');
+    }
+    return data.map((r) => ({
       libro: r.bookName,
       capitulo: r.chapter,
       numero: r.verse,
@@ -209,6 +211,6 @@ export async function searchBible(query: string, limit = 25): Promise<any[]> {
     }));
   } catch (err) {
     console.warn('Error searching bible:', err);
+    throw new Error('La búsqueda bíblica no está disponible. Reintenta más tarde.');
   }
-  return [];
 }

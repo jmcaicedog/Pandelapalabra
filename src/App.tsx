@@ -14,6 +14,8 @@ import { SettingsView } from './components/SettingsView.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt.tsx';
 import type { User } from 'firebase/auth';
+import { readStorage, writeStorage } from './lib/storage.ts';
+import { speechService } from './lib/speech.ts';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<TabType>('liturgia');
@@ -23,25 +25,25 @@ export default function App() {
 
   // App settings state with localStorage persistence
   const [fontSize, setFontSize] = useState<number>(() => {
-    const saved = localStorage.getItem('lumen_font_size');
-    return saved ? parseInt(saved, 10) : 18;
+    const saved = Number(readStorage('lumen_font_size'));
+    return Number.isFinite(saved) && saved >= 14 && saved <= 28 ? saved : 18;
   });
 
   const [calendarRegion, setCalendarRegion] = useState<string>(() => {
-    return localStorage.getItem('lumen_cal_region') || 'Universal';
+    return 'Colombia';
   });
 
   const [prayerStyle, setPrayerStyle] = useState<'sacred' | 'minimal'>(() => {
-    return (localStorage.getItem('lumen_prayer_style') as any) || 'sacred';
+    return readStorage('lumen_prayer_style') === 'minimal' ? 'minimal' : 'sacred';
   });
 
   const [audioEnabled, setAudioEnabled] = useState<boolean>(() => {
-    const saved = localStorage.getItem('lumen_audio_enabled');
+    const saved = readStorage('lumen_audio_enabled');
     return saved !== null ? saved === 'true' : true;
   });
 
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('lumen_dark_mode');
+    const saved = readStorage('lumen_dark_mode');
     return saved !== null ? saved === 'true' : true;
   });
 
@@ -50,35 +52,37 @@ export default function App() {
     const unsubscribe = subscribeToAuth(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        await initializeUserRecord(currentUser);
+        try { await initializeUserRecord(currentUser); }
+        catch (error) { console.error('No se pudo inicializar el perfil:', error); }
       }
     });
     return () => unsubscribe();
   }, []);
+  useEffect(() => { speechService.setEnabled(audioEnabled); }, [audioEnabled]);
 
   const handleUpdateFontSize = (size: number) => {
     setFontSize(size);
-    localStorage.setItem('lumen_font_size', size.toString());
+    writeStorage('lumen_font_size', size.toString());
   };
 
   const handleUpdateCalendarRegion = (reg: string) => {
-    setCalendarRegion(reg);
-    localStorage.setItem('lumen_cal_region', reg);
+    setCalendarRegion('Colombia');
+    writeStorage('lumen_cal_region', 'Colombia');
   };
 
   const handleUpdatePrayerStyle = (st: 'sacred' | 'minimal') => {
     setPrayerStyle(st);
-    localStorage.setItem('lumen_prayer_style', st);
+    writeStorage('lumen_prayer_style', st);
   };
 
   const handleUpdateAudioEnabled = (enabled: boolean) => {
     setAudioEnabled(enabled);
-    localStorage.setItem('lumen_audio_enabled', enabled.toString());
+    writeStorage('lumen_audio_enabled', enabled.toString());
   };
 
   const handleUpdateDarkMode = (val: boolean) => {
     setDarkMode(val);
-    localStorage.setItem('lumen_dark_mode', val.toString());
+    writeStorage('lumen_dark_mode', val.toString());
   };
 
   const handleNavigateToLiturgyWithDate = (date?: string) => {
@@ -178,4 +182,3 @@ export default function App() {
     </div>
   );
 }
-

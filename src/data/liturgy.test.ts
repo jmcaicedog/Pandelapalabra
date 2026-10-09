@@ -22,12 +22,12 @@ function officialFixture(date: string) {
   };
 }
 
-test('las fechas impresas verificadas prevalecen sin asumir la selección de años futuros', () => {
-  for (const year of [2026]) {
-    for (const [day, name] of [['08', 'Santa Pelagia'], ['09', 'San Luis Bertrán']]) {
+test('ningún año conserva excepciones de santos para fechas particulares', () => {
+  for (const year of [2026, 2027, 2030, 2100]) {
+    for (const day of ['08', '09']) {
       const date = `${year}-10-${day}`;
-      assert.equal(mapEvangelizoDay(date, officialFixture(date))?.saint.name, name);
-      assert.equal(buildCanonicalDay(date).saint.name, name);
+      assert.match(mapEvangelizoDay(date, officialFixture(date))!.saint.name, /pendiente/);
+      assert.match(buildCanonicalDay(date).saint.name, /pendiente/);
     }
     assert.match(buildCanonicalDay('2027-10-09').saint.name, /pendiente/);
     assert.match(mapEvangelizoDay('2030-10-08', officialFixture('2030-10-08'))!.saint.name, /pendiente/);
@@ -91,7 +91,7 @@ test('un fallo de red muestra indisponibilidad y permite reintentar', async (t) 
   assert.equal(recovered.gospel.text, 'Evangelio completo hasta el último versículo.');
 });
 
-test('el caché oficial anterior sigue disponible sin conexión con el santo corregido', (t) => {
+test('el caché oficial anterior conserva lecturas pero descarta santos no verificados', (t) => {
   const date = '2026-10-09';
   const official = mapEvangelizoDay(date, officialFixture(date));
   assert.ok(official);
@@ -115,9 +115,16 @@ test('el caché oficial anterior sigue disponible sin conexión con el santo cor
   });
   const cached = getLiturgicalDay(date);
   assert.equal(cached.source, 'evangelizo');
-  assert.equal(cached.saint.name, 'San Luis Bertrán');
-  assert.equal(cached.color, 'white');
+  assert.match(cached.saint.name, /pendiente/);
+  assert.equal(cached.color, 'green');
   assert.equal(cached.gospel.text, official.gospel.text);
+});
+
+test('se rechazan respuestas de otra fecha o sin salmo', () => {
+  const fixture = officialFixture('2026-10-09');
+  assert.equal(mapEvangelizoDay('2026-10-08', fixture), null);
+  fixture.readings = fixture.readings.filter(r => r.type !== 'psalm');
+  assert.equal(mapEvangelizoDay(fixture.date, fixture), null);
 });
 
 test('las lecturas oficiales guardadas no impiden verificar después el santo colombiano', async (t) => {

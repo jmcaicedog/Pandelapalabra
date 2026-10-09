@@ -1,362 +1,186 @@
 import { GoogleGenAI } from '@google/genai';
-import type { IncomingMessage, ServerResponse } from 'http';
-import { LITURGY_DATABASE, type LiturgicalDay } from '../data/liturgy.js';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { buildCanonicalDay } from '../data/canonicalLectionary.js';
 import { fetchEvangelizoDay } from '../data/evangelizo.js';
+import { hasFreshReadings, type LiturgicalDay } from '../data/liturgy.js';
 import { fetchColombianSantoral } from './colombianSantoral.js';
 import { hasFreshSaintVerification } from '../data/colombianSaints.js';
+import { isValidDateStr } from '../lib/dateUtils.js';
+import { ExpiringCache } from '../lib/cache.js';
+import { getSharedReflection } from './sharedReflections.js';
 
-let genAIInstance: GoogleGenAI | null = null;
-
-function getGenAI(): GoogleGenAI {
-  if (!genAIInstance) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      throw new Error('GEMINI_API_KEY no está configurada.');
-    }
-    genAIInstance = new GoogleGenAI({
-      apiKey: key,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build'
-        }
-      }
-    });
-  }
-  return genAIInstance;
-}
-
-const CANDIDATE_MODELS = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
-
-// Cache for homilies and counsel to conserve quota
-const reflectionCache = new Map<string, { reflection: string; priestName: string; date: string; fallback: boolean }>();
-const counselCache = new Map<string, { counsel: string; priestName: string; fallback: boolean }>();
-const dynamicLiturgyCache = new Map<string, LiturgicalDay>();
-
-// Circuit breaker for quota limits (e.g. 429 RESOURCE_EXHAUSTED)
+const liturgyCache = new ExpiringCache<LiturgicalDay>(120, 24 * 60 * 60 * 1000);
+const liturgyRequests = new Map<string, Promise<LiturgicalDay>>();
 let quotaCooldownUntil = 0;
 
-function isQuotaExhaustedError(err: any): boolean {
-  const str = String(err?.message || err || '');
-  const status = err?.status || err?.code;
-  return (
-    status === 429 ||
-    status === 'RESOURCE_EXHAUSTED' ||
-    str.includes('429') ||
-    str.includes('quota') ||
-    str.includes('RESOURCE_EXHAUSTED')
-  );
-}
-
-async function generateWithFallback(
-  prompt: string,
-  systemInstruction: string,
-  temperature = 0.65
-): Promise<string | null> {
-  if (Date.now() < quotaCooldownUntil) {
-    // Quota cooldown active, avoid calling API to prevent 429 errors
-    return null;
-  }
-
-  const ai = getGenAI();
-
-  for (const model of CANDIDATE_MODELS) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          systemInstruction,
-          temperature,
-        },
-      });
-      if (response.text) {
-        return response.text;
-      }
-    } catch (err: any) {
-      if (isQuotaExhaustedError(err)) {
-        // Active quota limit detected; pause API calls for 60 seconds
-        quotaCooldownUntil = Date.now() + 60 * 1000;
-        return null;
-      }
-      // If other transient error (503/500), continue to next model
-    }
-  }
-
-  return null;
-}
-
-function getCanonicalHomily(date: string, saint: string, gospelQuote: string, gospel: string, reading2?: string): string {
-  const isMatthew18 = gospelQuote.includes('18') || gospel.toLowerCase().includes('perdon') || gospel.toLowerCase().includes('setenta veces');
-  
-  const centralTheme = isMatthew18
-    ? 'El Señor Jesús nos llama a vivir la medida divina del perdón: perdonar de corazón setenta veces siete, recordando que nosotros mismos hemos sido perdonados de una deuda impagable por el amor misericordioso del Padre celestial.'
-    : 'El Señor Jesús nos llama a la conversión sincera y a configurar nuestra vida con su Evangelio de caridad, verdad y salvación eterna.';
-
-  return `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.
-
-En este día santo (${date}), la liturgia de la Santa Madre Iglesia nos invita a meditar con devoción el Santo Evangelio según ${gospelQuote}.
-
-${centralTheme} ${reading2 ? `Asimismo, las lecturas de hoy nos recuerdan que tanto en la vida como en la muerte somos del Señor, y que ninguna ofrenda agrada tanto a Dios como un corazón reconciliado con sus hermanos.` : 'Las lecturas de hoy iluminan este mismo llamado: Dios sale a nuestro encuentro y espera de nosotros una respuesta de fe y de amor.'}
-
-Propósito para hoy:
-Antes de que termine el día, examinemos si guardamos algún rencor o distancia con algún prójimo; recemos un Padre Nuestro por esa persona y hagamos un gesto de paz y reconciliación sincera.
-
-Oración y bendición sacerdotal:
-Señor Jesucristo, Príncipe de la Paz y Pastor eterno, derrama tu amor en nuestros corazones y enséñanos a amar y perdonar como Tú nos amas.${saint ? ` Por la intercesión de ${saint}, escucha nuestra oración.` : ''}
-Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes, sus hogares y sus seres queridos, y permanezca para siempre. Amén.»`;
-}
-
-function getCanonicalCounsel(question: string): string {
-  return `Querido hermano en Cristo:
-
-He llevado tu inquietud a la oración ante el Santísimo Sacramento: "${question.slice(0, 100)}${question.length > 100 ? '...' : ''}".
-
-Recuerda las palabras que tantas veces nos repite el Señor en el Evangelio: «No teman, tengan fe» y «Vengan a mí todos los que están fatigados y agobiados, y yo les daré descanso» (Mt 11,28). 
-
-En tu camino espiritual, te sugiero tres pasos concretos:
-1. Acércate con confianza al sacramento de la Reconciliación (Confesión), manantial inagotable de gracia y purificación.
-2. Persevera en la oración diaria con el Santo Rosario, entregando tus agobios al Inmaculado Corazón de la Virgen María.
-3. Dedica un momento de silencio diario para escuchar la voz de Dios en las Sagradas Escrituras.
-
-Encomiendo tus intenciones en la Santa Misa. Que la paz y la gracia del Señor Jesús inunden tu corazón. Te bendigo en el nombre del Padre, del Hijo y del Espíritu Santo. Amén.`;
-}
-function parseBody(req: any): Promise<any> {
-  if (req.body && typeof req.body === 'object') {
-    return Promise.resolve(req.body);
-  }
-  if (req.complete) {
-    return Promise.resolve(req.body || {});
-  }
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk: any) => {
-      body += chunk;
-      if (body.length > 1e6) {
-        req.destroy();
-        reject(new Error('Payload too large'));
-      }
-    });
-    req.on('end', () => {
-      try {
-        resolve(body ? JSON.parse(body) : {});
-      } catch (err) {
-        reject(err);
-      }
-    });
-    req.on('error', reject);
-  });
-}
-
-function sendJson(res: ServerResponse, status: number, data: any) {
+export function sendJson(res: ServerResponse, status: number, data: unknown): void {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
   });
   res.end(JSON.stringify(data));
 }
 
-export async function handleApiRoute(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
-  const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
-  const pathname = url.pathname;
+class BodyError extends Error {
+  constructor(message: string, readonly status: number) { super(message); }
+}
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+async function parseBody(req: IncomingMessage): Promise<Record<string, unknown>> {
+  if (req.headers['content-type']?.split(';')[0].trim().toLowerCase() !== 'application/json') {
+    throw new BodyError('Se requiere Content-Type application/json.', 415);
+  }
+  const preParsed = 'body' in req ? req.body : undefined;
+  let value: unknown;
+  if (preParsed !== undefined) {
+    if (Buffer.byteLength(JSON.stringify(preParsed)) > 100000) throw new BodyError('Solicitud demasiado grande.', 413);
+    try { value = typeof preParsed === 'string' ? JSON.parse(preParsed) : preParsed; }
+    catch { throw new BodyError('JSON inválido.', 400); }
+  } else {
+    const chunks: Buffer[] = [];
+    let length = 0;
+    for await (const chunk of req) {
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      length += buffer.length;
+      if (length > 100000) throw new BodyError('Solicitud demasiado grande.', 413);
+      chunks.push(buffer);
+    }
+    const body = Buffer.concat(chunks).toString('utf8');
+    try { value = JSON.parse(body); }
+    catch { throw new BodyError('JSON inválido.', 400); }
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new BodyError('Se requiere un objeto JSON.', 400);
+  return Object.fromEntries(Object.entries(value));
+}
+
+function field(body: Record<string, unknown>, name: string, max: number, required = false): string {
+  const value = body[name];
+  if (value === undefined && !required) return '';
+  if (typeof value !== 'string' || value.length > max || (required && !value.trim())) {
+    throw new BodyError(`Campo inválido: ${name}.`, 400);
+  }
+  return value.trim();
+}
+
+async function generate(prompt: string, systemInstruction: string): Promise<string> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key || key === 'MY_GEMINI_API_KEY') {
+    console.warn('Gemini: GEMINI_API_KEY ausente o con valor de ejemplo.');
+    throw new Error('Servicio de IA no configurado.');
+  }
+  if (Date.now() < quotaCooldownUntil) throw new Error('Servicio de IA temporalmente limitado.');
+  try {
+    const ai = new GoogleGenAI({
+      apiKey: key,
+      httpOptions: { timeout: 30000, retryOptions: { attempts: 1 } },
     });
-    res.end();
-    return true;
-  }
-
-  // 1. Health check
-  if (pathname === '/api/health') {
-    sendJson(res, 200, { status: 'ok', timestamp: new Date().toISOString() });
-    return true;
-  }
-
-  // 2. Catholic Liturgy of the Day for any date
-  if (pathname === '/api/liturgy') {
-    const dateParam = url.searchParams.get('date') || '';
-    if (!dateParam || !/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
-      sendJson(res, 400, { error: 'Se requiere una fecha válida en formato YYYY-MM-DD' });
-      return true;
+    const response = await ai.models.generateContent({
+      model: process.env.GEMINI_MODEL || 'gemini-flash-latest',
+      contents: prompt,
+      config: { systemInstruction, temperature: 0.65 },
+    });
+    if (response.candidates?.[0]?.finishReason && response.candidates[0].finishReason !== 'STOP') {
+      console.warn('Gemini: respuesta incompleta.', { finishReason: response.candidates[0].finishReason });
+      throw new Error('La IA no completó la reflexión; no se guarda un texto recortado.');
     }
+    if (!response.text?.trim()) throw new Error('Respuesta de IA vacía.');
+    return response.text.trim();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const quota = /429|quota|RESOURCE_EXHAUSTED/i.test(message);
+    if (quota) quotaCooldownUntil = Date.now() + 60000;
+    // Do not log spiritual questions, reading text or credentials.
+    const category = quota ? 'quota'
+      : /API_KEY_INVALID|API key not valid/i.test(message) ? 'invalid_key'
+      : /403|PERMISSION_DENIED/i.test(message) ? 'permission'
+      : /404|NOT_FOUND/i.test(message) ? 'model_not_found'
+      : /504|DEADLINE_EXCEEDED|timeout|timed out|abort/i.test(message) ? 'timeout'
+      : /fetch|network|ECONN|ENOTFOUND/i.test(message) ? 'network'
+      : /Respuesta de IA vacía/i.test(message) ? 'empty_response'
+      : /no completó la reflexión/i.test(message) ? 'incomplete_response'
+      : 'provider_or_response';
+    const status = error && typeof error === 'object' && 'status' in error && typeof error.status === 'number'
+      ? error.status : undefined;
+    console.warn('El servicio de IA no pudo completar la solicitud.', { category, status });
+    throw error;
+  }
+}
 
-    const cachedDay = dynamicLiturgyCache.get(dateParam);
-    if (cachedDay && hasFreshSaintVerification(cachedDay.saintVerification, dateParam)) {
-      sendJson(res, 200, cachedDay);
-      return true;
-    }
-
-    // 1. Official lectionary (Evangelizo) for any published date
-    const [official, santoral] = await Promise.all([
-      cachedDay ? Promise.resolve(cachedDay) : fetchEvangelizoDay(dateParam),
-      fetchColombianSantoral(dateParam),
+async function loadLiturgy(date: string): Promise<LiturgicalDay> {
+  const cached = liturgyCache.get(date);
+  if (cached && hasFreshReadings(cached) && hasFreshSaintVerification(cached.saintVerification, date)) return cached;
+  const running = liturgyRequests.get(date);
+  if (running) return running;
+  const request = (async () => {
+    const [readings, santoral] = await Promise.all([
+      cached && hasFreshReadings(cached) ? Promise.resolve(cached) : fetchEvangelizoDay(date),
+      fetchColombianSantoral(date),
     ]);
-    if (official) {
-      const curated = LITURGY_DATABASE[dateParam];
-      const merged = curated
-        ? { ...official, defaultReflection: curated.defaultReflection }
-        : official;
-      const verified = { ...merged, ...santoral };
-      dynamicLiturgyCache.set(dateParam, verified);
-      sendJson(res, 200, verified);
-      return true;
-    }
+    const day = { ...(readings || cached || buildCanonicalDay(date)), ...santoral };
+    if (!day.readingsPending) liturgyCache.set(date, day);
+    return day;
+  })().finally(() => liturgyRequests.delete(date));
+  liturgyRequests.set(date, request);
+  return request;
+}
 
-    // Unavailable readings are not cached; bundled abridgments must not replace full texts.
-    sendJson(res, 200, { ...buildCanonicalDay(dateParam), ...santoral });
+const AI_IDENTITY = `Eres un asistente de inteligencia artificial de orientación católica, no un sacerdote.
+No afirmes haber celebrado sacramentos, ofrecido misas o bendiciones sacramentales, ni sustituir a un profesional.
+Ofrece orientación respetuosa, prudente y fiel al Evangelio. No inventes citas ni hechos.
+Escribe texto plano, completo y sin Markdown.`;
+
+export async function handleApiRoute(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
+  const url = new URL(req.url || '/', 'http://localhost');
+  const routes: Record<string, string> = {
+    '/api/health': 'GET', '/api/liturgy': 'GET',
+    '/api/reflection': 'POST',
+  };
+  const method = routes[url.pathname];
+  if (!method) return false;
+  if (req.method !== method) {
+    res.setHeader('Allow', method);
+    sendJson(res, 405, { error: 'Método no permitido.' });
     return true;
   }
-
-  // 3. Catholic Priest Homily Reflection
-  if (pathname === '/api/reflection' && req.method === 'POST') {
-    let body: any = {};
-    try {
-      body = await parseBody(req);
-    } catch {
-      body = {};
-    }
-
-    const {
-      date = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      liturgicalTitle = 'Tiempo Ordinario',
-      saint = 'Santos del día',
-      reading1 = '',
-      reading2 = '',
-      psalm = '',
-      gospel = '',
-      gospelQuote = '',
-    } = body;
-
-    const cacheKey = `reflection_${date}_${gospelQuote}`;
-    if (reflectionCache.has(cacheKey)) {
-      sendJson(res, 200, reflectionCache.get(cacheKey));
+  if (url.pathname === '/api/health') {
+    sendJson(res, 200, { status: 'ok', timestamp: new Date().toISOString(), region: 'Colombia' });
+    return true;
+  }
+  if (url.pathname === '/api/liturgy') {
+    const date = url.searchParams.get('date');
+    if (!isValidDateStr(date)) {
+      sendJson(res, 400, { error: 'Se requiere una fecha real YYYY-MM-DD (1583–9999).' });
       return true;
     }
-
-    try {
-      const prompt = `Liturgia del día: ${date} (${liturgicalTitle})
-
-1) SANTO EVANGELIO — eje central de la homilía (${gospelQuote}):
-${gospel}
-
-2) LECTURAS — apoyo secundario:
-Primera Lectura: ${reading1}
-${reading2 ? `Segunda Lectura: ${reading2}\n` : ''}Salmo Responsorial: ${psalm}
-
-3) SANTO DEL DÍA — solo para la oración final o la bendición, nunca como tema de la homilía: ${saint}
-
-Predica una homilía breve (alrededor de 350-450 palabras) para los fieles siguiendo estrictamente las indicaciones.`;
-
-      const systemInstruction = `Eres el Padre Mateo, un sacerdote católico fiel, piadoso, lleno del amor de Cristo y con gran celo por la salvación de las almas.
-Tu tono es profundamente pastoral, paternal, fraterno y esperanzador, fiel a la Sagrada Tradición y al Magisterio de la Iglesia Católica.
-
-Jerarquía de contenido (obligatoria):
-- El Santo Evangelio es el centro: dedícale la mayor parte de la homilía, meditando las palabras y gestos de Jesús.
-- Las lecturas (Primera Lectura, Segunda Lectura si la hay, y Salmo) solo iluminan o complementan el Evangelio; menciónalas brevemente.
-- El Santo del Día NO forma parte de la reflexión. Como máximo, nómbralo en la oración final o en la bendición pidiendo su intercesión.
-
-Reglas sobre las citas:
-- No transcribas ni copies pasajes de las lecturas; los fieles ya los escucharon. Parafrasea con tus propias palabras.
-- Si citas textualmente, usa solo una frase breve y completa (máximo 15 palabras), entre comillas, sin cortarla.
-- Nunca uses puntos suspensivos (...) ni dejes frases o palabras incompletas.
-- Para referirte a un pasaje usa su referencia bíblica (por ejemplo, Jn 1,47-51).
-
-Estructura:
-1. Saludo cálido ('La paz de Nuestro Señor Jesucristo esté con ustedes, queridos hermanos y hermanas').
-2. Meditación sobre el Santo Evangelio.
-3. Cómo las lecturas del día iluminan ese mismo mensaje.
-4. Propósito práctico para el día: un consejo concreto de oración, caridad, paciencia o conversión cotidiana.
-5. Oración final y bendición sacerdotal ('Que la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y permanezca para siempre. Amén').
-
-Escribe en texto plano, sin Markdown (sin asteriscos ni almohadillas).`;
-
-      const text = await generateWithFallback(prompt, systemInstruction, 0.65);
-
-      if (text) {
-        const payload = {
-          reflection: text,
-          priestName: 'Padre Mateo',
-          date,
-          fallback: false,
-        };
-        reflectionCache.set(cacheKey, payload);
-        sendJson(res, 200, payload);
-        return true;
-      }
-    } catch {
-      // Fall through to canonical homily
+    sendJson(res, 200, await loadLiturgy(date));
+    return true;
+  }
+  try {
+    const body = await parseBody(req);
+    if (url.pathname === '/api/reflection') {
+      const date = field(body, 'date', 10, true);
+      if (!isValidDateStr(date)) throw new BodyError('Fecha inválida.', 400);
+      if (Object.keys(body).some(key => key !== 'date')) throw new BodyError('Solo se admite la fecha; no consultas personalizadas.', 400);
+      const reflection = await getSharedReflection(date, async () => {
+        const day = await loadLiturgy(date);
+        if (!hasFreshReadings(day)) throw new Error('Lecturas verificadas no disponibles.');
+        return generate(
+        `Fecha: ${date}. Celebración según Evangelizo: ${day.title}.\nEvangelio (${day.gospel.citation}): ${day.gospel.text}`,
+        `${AI_IDENTITY}\nRedacta una meditación de 550–700 palabras en 8–10 párrafos centrada únicamente en el Evangelio proporcionado. Dedica al menos seis párrafos a explicar y meditar el Evangelio: su contexto, los gestos y palabras de Jesús, y su aplicación concreta a la vida familiar y comunitaria. Profundiza con dos o tres párrafos adicionales, sin repetir ideas ni inventar detalles ausentes del pasaje. Termina con un propósito cotidiano y una oración breve en párrafos separados. No presentes el texto como una homilía de un sacerdote real.`,
+        );
+      });
+      sendJson(res, 200, { reflection, priestName: 'Asistente católico (IA)', date, fallback: false });
     }
-
-    const fallbackReflection = getCanonicalHomily(date, saint, gospelQuote, gospel, reading2);
-    const fallbackPayload = {
-      reflection: fallbackReflection,
-      priestName: 'Padre Mateo',
-      date,
+  } catch (error) {
+    if (error instanceof BodyError) sendJson(res, error.status, { error: error.message });
+    else {
+      console.warn('Reflexión compartida no disponible; revisar configuración, fuentes y cuota.');
+      sendJson(res, 503, {
+      error: 'La orientación con IA no está disponible. Puedes reintentar o consultar Vatican News.',
       fallback: true,
-    };
-    sendJson(res, 200, fallbackPayload);
-    return true;
+      fallbackUrl: 'https://www.vaticannews.va/es/evangelio-de-hoy.html',
+      });
+    }
   }
-
-  // 3. Spiritual Counsel with Catholic Priest
-  if (pathname === '/api/spiritual-counsel' && req.method === 'POST') {
-    let body: any = {};
-    try {
-      body = await parseBody(req);
-    } catch {
-      body = {};
-    }
-    const { question, context } = body;
-    if (!question) {
-      sendJson(res, 400, { error: 'Pregunta requerida' });
-      return true;
-    }
-
-    const counselCacheKey = `counsel_${question.trim().toLowerCase().slice(0, 100)}`;
-    if (counselCache.has(counselCacheKey)) {
-      sendJson(res, 200, counselCache.get(counselCacheKey));
-      return true;
-    }
-
-    try {
-      const prompt = `Consulta espiritual del fiel: "${question}"\nContexto o lecturas del día: ${context || 'Ninguno'}`;
-      const systemInstruction = `Eres el Padre Mateo, un confesor y director espiritual católico compasivo, sabio y ortodoxo.
-Responde a las inquietudes del alma con caridad, doctrina católica sólida (Catecismo, Evangelio, santos doctores), prudencia pastoral y ternura.
-Invita siempre a la oración, a los Santos Sacramentos (la Confesión y la Eucaristía) y al amor a la Santísima Virgen María.
-Termina siempre con una bendición sacerdotal breve.`;
-
-      const text = await generateWithFallback(prompt, systemInstruction, 0.7);
-
-      if (text) {
-        const payload = {
-          counsel: text,
-          priestName: 'Padre Mateo',
-          fallback: false,
-        };
-        counselCache.set(counselCacheKey, payload);
-        sendJson(res, 200, payload);
-        return true;
-      }
-    } catch {
-      // Fall through to canonical counsel
-    }
-
-    const fallbackCounsel = getCanonicalCounsel(question);
-    const fallbackPayload = {
-      counsel: fallbackCounsel,
-      priestName: 'Padre Mateo',
-      fallback: true,
-    };
-    counselCache.set(counselCacheKey, fallbackPayload);
-    sendJson(res, 200, fallbackPayload);
-    return true;
-  }
-
-  return false;
+  return true;
 }

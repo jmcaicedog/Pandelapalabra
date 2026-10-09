@@ -59,6 +59,14 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
 
   // Audio Speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [statsError, setStatsError] = useState<string | null>(null);
+  const savePrayerStats = (increment: number) => {
+    setStatsError(null);
+    updateUserPrayerStats(user?.uid || 'guest', increment).catch(error => {
+      console.error('No se pudo registrar la oración:', error);
+      setStatsError('La oración terminó, pero no se pudo confirmar el guardado de tus estadísticas.');
+    });
+  };
 
   useEffect(() => {
     const unsub = speechService.subscribe(setIsSpeaking);
@@ -101,7 +109,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
         // Finished all 5 decades!
         setRosaryFinished(true);
         confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-        updateUserPrayerStats(user?.uid || 'guest', 1);
+        savePrayerStats(1);
       }
     }
   };
@@ -136,7 +144,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
     } else if (coronillaStep === 'trisagio') {
       setCoronillaFinished(true);
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-      updateUserPrayerStats(user?.uid || 'guest', 1);
+      savePrayerStats(0);
     }
   };
 
@@ -144,6 +152,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
 
   return (
     <div id="prayers-container" className="min-h-screen pb-28 text-slate-100">
+      {statsError && <p role="alert" className="fixed top-5 left-4 right-4 z-[100] rounded-xl bg-slate-900 border border-amber-500 p-4 text-sm text-amber-200">{statsError}</p>}
       {/* Top Hero Banner with Sacred Art */}
       <div className="relative h-52 w-full overflow-hidden bg-slate-950">
         <div className="absolute inset-0 bg-gradient-to-b from-[#1c130b] via-[#140e08] to-[#0c0805]"></div>

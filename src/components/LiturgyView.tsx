@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Volume2,
   VolumeX,
@@ -9,21 +9,22 @@ import {
   RefreshCw,
   Share2,
   BookOpen,
-  MessageCircle,
   X,
-  Send,
   Check,
   BookmarkPlus
 } from 'lucide-react';
 import { getLiturgicalDay, fetchLiturgicalDay, type LiturgicalDay } from '../data/liturgy.ts';
-import { getTodayDateStr, getTomorrowDateStr } from '../lib/dateUtils.ts';
+import { shiftDate, isValidDateStr } from '../lib/dateUtils.ts';
+import { useTodayDate } from '../lib/useTodayDate.ts';
+import { withAbortTimeout } from '../lib/asyncUtils.ts';
+import { ExpiringCache } from '../lib/cache.ts';
 import { speechService } from '../lib/speech.ts';
 import { saveNote } from '../lib/firebase.ts';
 import type { User } from 'firebase/auth';
 import { PanVivoLogo } from './PanVivoLogo.tsx';
 import { SaintSource } from './SaintSource.tsx';
 
-const reflectionClientCache = new Map<string, { reflection: string; priestName: string }>();
+const reflectionClientCache = new ExpiringCache<{ reflection: string; priestName: string }>(30, 60 * 60 * 1000);
 
 interface LiturgyViewProps {
   user: User | null;
@@ -32,36 +33,32 @@ interface LiturgyViewProps {
 }
 
 export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onNavigateTab }) => {
-  const todayDateStr = getTodayDateStr();
-  const tomorrowDateStr = getTomorrowDateStr();
+  const todayDateStr = useTodayDate();
+  const tomorrowDateStr = shiftDate(todayDateStr, 1);
+  const previousToday = useRef(todayDateStr);
 
-  const shiftDate = (dateStr: string, days: number): string => {
-    const parts = dateStr.split('-');
-    const y = parseInt(parts[0], 10) || 2026;
-    const m = parseInt(parts[1], 10) || 9;
-    const d = parseInt(parts[2], 10) || 1;
-    const dt = new Date(y, m - 1, d);
-    dt.setDate(dt.getDate() + days);
-    const nextY = dt.getFullYear();
-    const nextM = String(dt.getMonth() + 1).padStart(2, '0');
-    const nextD = String(dt.getDate()).padStart(2, '0');
-    return `${nextY}-${nextM}-${nextD}`;
-  };
-
-  const [selectedDate, setSelectedDate] = useState(() => initialDate || todayDateStr);
-  const [dayData, setDayData] = useState<LiturgicalDay>(() => getLiturgicalDay(initialDate || todayDateStr));
-  const [useAlternative, setUseAlternative] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(() => isValidDateStr(initialDate) ? initialDate : todayDateStr);
+  const [dayData, setDayData] = useState<LiturgicalDay>(() => getLiturgicalDay(isValidDateStr(initialDate) ? initialDate : todayDateStr));
   const [syncingLiturgy, setSyncingLiturgy] = useState(false);
+  useEffect(() => {
+    const previous = previousToday.current;
+    previousToday.current = todayDateStr;
+    setSelectedDate(date => date === previous ? todayDateStr : date);
+  }, [todayDateStr]);
 
-  // Active celebration (allows switching between Fiesta and Feria if available for the day)
-  const currentCelebration =
-    useAlternative && dayData.alternativeCelebration
-      ? dayData.alternativeCelebration
-      : dayData;
+  const currentCelebration = dayData;
+  const reflectionRequest = useRef(0);
+  const reflectionAbort = useRef<AbortController | null>(null);
+  const selectedDateRef = useRef(selectedDate);
+  selectedDateRef.current = selectedDate;
+  useEffect(() => () => {
+    reflectionRequest.current += 1;
+    reflectionAbort.current?.abort();
+  }, []);
 
   // If initialDate prop changes from navigation, sync it
   useEffect(() => {
-    if (initialDate && initialDate !== selectedDate) {
+    if (isValidDateStr(initialDate) && initialDate !== selectedDate) {
       setSelectedDate(initialDate);
     }
   }, [initialDate]);
@@ -73,18 +70,13 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
   // AI Reflection
   const [reflection, setReflection] = useState<string | null>(null);
-  const [priestName, setPriestName] = useState('Padre Mateo');
+  const [priestName, setPriestName] = useState('Asistente católico (IA)');
   const [loadingReflection, setLoadingReflection] = useState(false);
   const [reflectionError, setReflectionError] = useState<string | null>(null);
 
-  // Pastoral Counsel dialog
-  const [counselOpen, setCounselOpen] = useState(false);
-  const [counselQuery, setCounselQuery] = useState('');
-  const [counselMessages, setCounselMessages] = useState<Array<{ role: 'user' | 'priest'; text: string }>>([]);
-  const [counselLoading, setCounselLoading] = useState(false);
-
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [savedNotification, setSavedNotification] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Sync speech state
   useEffect(() => {
@@ -101,13 +93,18 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
   // Update day data when date changes with canonical remote synchronization
   useEffect(() => {
     let isMounted = true;
-    setUseAlternative(false);
+    reflectionRequest.current += 1;
+    reflectionAbort.current?.abort();
+    speechService.stop();
+    setReflection(null);
+    setReflectionError(null);
+    setSaintModalOpen(false);
+    setActionError(null);
 
     // 1. Immediate synchronous resolution (no delay)
     const initial = getLiturgicalDay(selectedDate);
     setDayData(initial);
-    if (initial.source !== 'local') fetchReflection(initial);
-    else setLoadingReflection(true);
+    setLoadingReflection(true);
 
     // 2. Asynchronous canonical synchronization for any selected date
     setSyncingLiturgy(true);
@@ -120,6 +117,10 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       })
       .catch((err) => {
         console.warn('Liturgia remota no disponible, usando leccionario canónico local:', err);
+        if (isMounted) {
+          setReflectionError('No se pudo cargar la liturgia. Reintenta la consulta.');
+          setLoadingReflection(false);
+        }
       })
       .finally(() => {
         if (isMounted) setSyncingLiturgy(false);
@@ -127,21 +128,24 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
     return () => {
       isMounted = false;
+      reflectionRequest.current += 1;
     };
   }, [selectedDate]);
 
   const fetchReflection = async (data: LiturgicalDay) => {
-    const saintName = data.saintVerification?.status === 'publisher' ? data.saint.name : 'todos los santos';
+    const requestId = ++reflectionRequest.current;
+    reflectionAbort.current?.abort();
+    const controller = new AbortController();
+    reflectionAbort.current = controller;
+    const isCurrent = () => requestId === reflectionRequest.current && data.date === selectedDateRef.current;
     if (data.readingsPending) {
-      setReflection(
-        'La homilía de este día estará disponible cuando se puedan cargar las lecturas completas.'
-      );
-      setReflectionError(null);
+      setReflection(null);
+      setReflectionError('La reflexión estará disponible cuando se puedan cargar las lecturas completas.');
       setLoadingReflection(false);
       return;
     }
 
-    const reflectionKey = `${data.date}:${saintName}`;
+    const reflectionKey = data.date;
     const cached = reflectionClientCache.get(reflectionKey);
     if (cached) {
       setReflection(cached.reflection);
@@ -153,47 +157,52 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     setLoadingReflection(true);
     setReflectionError(null);
     try {
-      const res = await fetch('/api/reflection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: data.formattedDate,
-          liturgicalTitle: data.title,
-          saint: saintName,
-          reading1: `${data.firstReading.citation} - ${data.firstReading.text}`,
-          reading2: data.secondReading ? `${data.secondReading.citation} - ${data.secondReading.text}` : undefined,
-          psalm: `${data.psalm.citation}. R/. ${data.psalm.response}`,
-          gospel: data.gospel.text,
-          gospelQuote: data.gospel.citation,
-        }),
-      });
-
-      if (!res.ok) throw new Error('Error al conectar con la reflexión');
-      const json = await res.json();
-      if (!json.reflection) throw new Error(json.error || 'Respuesta de reflexión vacía');
+      const json = await withAbortTimeout(async signal => {
+        const res = await fetch('/api/reflection', {
+          signal, method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: data.date }),
+        });
+        if (!res.ok) throw new Error('La reflexión con IA no está disponible.');
+        return res.json();
+      }, 60000, controller.signal);
+      if (json.date !== data.date || typeof json.reflection !== 'string' || !json.reflection.trim() || json.fallback) {
+        throw new Error('Respuesta de reflexión no disponible.');
+      }
+      if (!isCurrent()) return;
       setReflection(json.reflection);
-      if (json.priestName) setPriestName(json.priestName);
+      setPriestName('Asistente católico (IA)');
       reflectionClientCache.set(reflectionKey, {
         reflection: json.reflection,
-        priestName: json.priestName || 'Padre Mateo',
+        priestName: 'Asistente católico (IA)',
       });
-    } catch {
-      const fallbackText =
-        `«La paz de Nuestro Señor Jesucristo esté con todos ustedes, queridos hermanos y hermanas en la fe.\n\nEn este día santo (${data.formattedDate}), la Palabra de Dios proclamada en la Sagrada Liturgia (${data.title}) nos interpela en lo más hondo del alma.\n\nEn el Santo Evangelio (${data.gospel.citation}), Jesús nos revela el corazón del Reino de Dios y nos invita a acoger su Palabra con fe sencilla y confiada. ${data.secondReading ? `Las lecturas de hoy, y en especial la Segunda Lectura (${data.secondReading.citation}), nos recuerdan que somos llamados a vivir enteramente para el Señor, en comunión de caridad fraterna.` : `La Primera Lectura (${data.firstReading.citation}) ilumina este mismo llamado a la fidelidad.`}\n\nLa verdadera fe se manifiesta en el perdón sincero, en desterrar el rencor y en saber que hemos recibido un perdón infinito de parte de Dios.\n\nPropósito para hoy: Renunciar de corazón a cualquier queja o resentimiento que llevemos guardado, rezar por aquella persona que nos cuesta perdonar y ofrecerle la paz.\n\nOremos: Señor Dios compasivo y misericordioso, enséñanos a perdonar como Tú nos has perdonado y haz que nuestro corazón descanse siempre en tu amor. Por la intercesión de ${data.saint.name}, escucha nuestra oración.\n\nQue la bendición de Dios todopoderoso, Padre, Hijo y Espíritu Santo, descienda sobre ustedes y sus familias, y permanezca para siempre. Amén.»`;
-      const verifiedFallback = fallbackText.replace(
-        `Por la intercesión de ${data.saint.name}`, `Por la intercesión de ${saintName}`,
-      );
-      setReflection(verifiedFallback);
-      reflectionClientCache.set(reflectionKey, {
-        reflection: verifiedFallback,
-        priestName: 'Padre Mateo',
-      });
+    } catch (error) {
+      if (!isCurrent()) return;
+      console.warn('Reflexión no disponible:', error);
+      setReflection(null);
+      setReflectionError('La reflexión con IA no está disponible. Puedes reintentar o consultar Vatican News.');
     } finally {
-      setLoadingReflection(false);
+      if (isCurrent()) setLoadingReflection(false);
+    }
+  };
+
+  const retryReflection = async () => {
+    const date = selectedDate;
+    setSyncingLiturgy(true);
+    try {
+      const refreshed = await fetchLiturgicalDay(date);
+      if (date !== selectedDateRef.current) return;
+      setDayData(refreshed);
+      await fetchReflection(refreshed);
+    } catch (error) {
+      console.warn('No se pudo reintentar la liturgia:', error);
+      if (date === selectedDateRef.current) setReflectionError('No se pudo cargar la liturgia. Reintenta más tarde.');
+    } finally {
+      if (date === selectedDateRef.current) setSyncingLiturgy(false);
     }
   };
 
   const playAudio = (sectionId: string, textToPlay: string) => {
+    if (sectionId !== 'reflection' && dayData.readingsPending) return;
     if (currentPlayingSection === sectionId && isPlaying) {
       speechService.stop();
       setCurrentPlayingSection(null);
@@ -203,72 +212,52 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     }
   };
 
-  const handleSendCounsel = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!counselQuery.trim() || counselLoading) return;
-
-    const userQ = counselQuery.trim();
-    setCounselQuery('');
-    setCounselMessages((prev) => [...prev, { role: 'user', text: userQ }]);
-    setCounselLoading(true);
-
-    try {
-      const res = await fetch('/api/spiritual-counsel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: userQ,
-          context: `Evangelio del día: ${dayData.gospel.citation} - "${dayData.gospel.text}"`,
-        }),
-      });
-      const data = await res.json();
-      setCounselMessages((prev) => [
-        ...prev,
-        { role: 'priest', text: data.counsel || 'Que el Señor te conceda su paz y fortaleza.' },
-      ]);
-    } catch {
-      setCounselMessages((prev) => [
-        ...prev,
-        {
-          role: 'priest',
-          text: 'Querido hermano: persevera en la oración diaria y acércate al sacramento de la Reconciliación y a la Santa Eucaristía, donde hallarás la paz que el mundo no puede dar. Te bendigo en el nombre del Padre, del Hijo y del Espíritu Santo. Amén.',
-        },
-      ]);
-    } finally {
-      setCounselLoading(false);
-    }
-  };
-
   const handleSaveToNotes = async () => {
     if (!reflection) return;
     const note = {
       id: 'note_' + Date.now(),
       userId: user?.uid || 'guest',
-      title: `Homilía - ${currentCelebration.title}`,
+      title: `Reflexión con IA - ${currentCelebration.title}`,
       content: `${currentCelebration.gospel.citation}\n\n${reflection}`,
       date: dayData.date,
       createdAt: new Date().toISOString(),
     };
+    try {
     await saveNote(user?.uid || 'guest', note);
     setSavedNotification(true);
     setTimeout(() => setSavedNotification(false), 3000);
+    } catch (error) {
+      console.error('Error al guardar reflexión:', error);
+      setActionError('No se pudo confirmar el guardado de la nota.');
+    }
   };
 
   const handleShare = async () => {
-    const text = `🕊️ Liturgia - ${currentCelebration.title}\n\n📖 Evangelio (${currentCelebration.gospel.citation}):\n${currentCelebration.gospel.text}\n\n✨ Reflexión del ${priestName}:\n${reflection?.slice(0, 400)}...\n\nReza con Pan Vivo.`;
+    const text = `🕊️ Liturgia - ${currentCelebration.title}\n\n📖 Evangelio (${currentCelebration.gospel.citation}):\n${currentCelebration.gospel.text}${reflection ? `\n\n✨ Reflexión con IA:\n${reflection}` : ''}\n\nReza con Pan Vivo.`;
     if (navigator.share) {
       try {
         await navigator.share({ title: currentCelebration.title, text });
-      } catch {}
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+          console.warn('No se pudo compartir:', error);
+          setActionError('No se pudo compartir el contenido.');
+        }
+      }
     } else {
-      navigator.clipboard.writeText(text);
+      try {
+      await navigator.clipboard.writeText(text);
       setCopiedNotification(true);
       setTimeout(() => setCopiedNotification(false), 2500);
+      } catch (error) {
+        console.warn('No se pudo copiar:', error);
+        setActionError('No se pudo copiar el contenido.');
+      }
     }
   };
 
   return (
     <div id="liturgy-container" className="min-h-screen pb-36 text-slate-100">
+      {actionError && <p role="alert" className="fixed top-5 left-4 right-4 z-[100] rounded-xl bg-slate-900 border border-amber-500 p-4 text-sm text-amber-200">{actionError}</p>}
       {/* Top Hero Banner with Sacred Light & Pan Vivo Brand */}
       <div className="relative h-60 w-full overflow-hidden bg-slate-950">
         {/* Pure CSS Sacred Light & Altar Glow */}
@@ -288,6 +277,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               id="btn-date-prev"
               title="Día anterior"
               aria-label="Día anterior"
+              disabled={selectedDate === '1583-01-01'}
               onClick={() => setSelectedDate(shiftDate(selectedDate, -1))}
               className="p-1 rounded-xl text-slate-300 hover:text-white hover:bg-amber-500/20 transition-all active:scale-95"
             >
@@ -321,6 +311,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               id="btn-date-next"
               title="Día siguiente"
               aria-label="Día siguiente"
+              disabled={selectedDate === '9999-12-31'}
               onClick={() => setSelectedDate(shiftDate(selectedDate, 1))}
               className="p-1 rounded-xl text-slate-300 hover:text-white hover:bg-amber-500/20 transition-all active:scale-95"
             >
@@ -335,9 +326,11 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               <Calendar className="w-4 h-4" />
               <input
                 type="date"
+                min="1583-01-01"
+                max="9999-12-31"
                 value={selectedDate}
                 onChange={(e) => {
-                  if (e.target.value) setSelectedDate(e.target.value);
+                  if (isValidDateStr(e.target.value)) setSelectedDate(e.target.value);
                 }}
                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
               />
@@ -381,40 +374,20 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
             {syncingLiturgy && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 border border-amber-500/30 text-amber-300 animate-pulse">
-                Sincronizando leccionario canónico...
+                Consultando las fuentes...
               </span>
             )}
           </div>
 
-          {/* Alternative celebration selector (e.g. Fiesta vs Feria) */}
-          {dayData.alternativeCelebration && (
-            <div className="flex items-center justify-center gap-2 mt-2.5">
-              <button
-                type="button"
-                onClick={() => setUseAlternative(false)}
-                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
-                  !useAlternative
-                    ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
-                    : 'bg-slate-900/80 text-slate-300 hover:text-white border border-slate-700/60'
-                }`}
-              >
-                Celebración principal
-              </button>
-              <button
-                type="button"
-                onClick={() => setUseAlternative(true)}
-                className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
-                  useAlternative
-                    ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
-                    : 'bg-slate-900/80 text-slate-300 hover:text-white border border-slate-700/60'
-                }`}
-              >
-                Feria / Ordinario
-              </button>
-            </div>
-          )}
         </div>
       </div>
+
+      {!dayData.readingsPending && (
+        <p className="px-4 py-3 text-[11px] text-slate-400">
+          Lecturas: Evangelizo. La disponibilidad de textos no garantiza coincidencia con los propios
+          o traslados del calendario colombiano; contrasta esas celebraciones con el Ordo de tu diócesis.
+        </p>
+      )}
 
       {/* Sticky Fast-Navigation Bar for Liturgical Readings */}
       <div className="sticky top-0 z-20 px-4 py-2 bg-[#0e0a07]/95 backdrop-blur-md border-y border-amber-950/60 shadow-md">
@@ -450,7 +423,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             onClick={() => document.getElementById('card-reflexion-sacerdotal')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
             className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 hover:border-amber-500/40 active:scale-95 transition-all text-[11px] font-medium"
           >
-            Homilía
+            Reflexión
           </button>
         </div>
       </div>
@@ -520,6 +493,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
             <button
               id="btn-audio-primera-lectura"
+              disabled={!!dayData.readingsPending}
               onClick={() =>
                 playAudio('reading1', `Primera Lectura. ${currentCelebration.firstReading.citation}. ${currentCelebration.firstReading.text}. Palabra de Dios. Te alabamos, Señor.`)
               }
@@ -548,9 +522,9 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             {currentCelebration.firstReading.text}
           </p>
 
-          <div className="mt-2 flex items-center justify-between">
+          {!dayData.readingsPending && <div className="mt-2 flex items-center justify-between">
             <span className="text-[10px] text-slate-400 font-serif italic">Palabra de Dios</span>
-          </div>
+          </div>}
         </div>
 
         {/* 3. Card: Salmo Responsorial */}
@@ -568,6 +542,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
             <button
               id="btn-audio-salmo"
+              disabled={!!dayData.readingsPending}
               onClick={() =>
                 playAudio(
                   'psalm',
@@ -683,6 +658,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
             <button
               id="btn-audio-evangelio"
+              disabled={!!dayData.readingsPending}
               onClick={() =>
                 playAudio(
                   'gospel',
@@ -716,13 +692,13 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             <p className="whitespace-pre-line">{currentCelebration.gospel.text}</p>
           </div>
 
-          <div className="mt-3 pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] text-amber-300/80 font-serif">
+          {!dayData.readingsPending && <div className="mt-3 pt-2 border-t border-amber-500/20 flex items-center justify-between text-[11px] text-amber-300/80 font-serif">
             <span>Palabra del Señor</span>
             <span className="font-semibold text-amber-200">Gloria a ti, Señor Jesús</span>
-          </div>
+          </div>}
         </div>
 
-        {/* 5. Card: Reflexión Sacerdotal con IA (Padre Mateo) */}
+        {/* Shared daily reflection */}
         <div
           id="card-reflexion-sacerdotal"
           className="relative bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl overflow-hidden"
@@ -737,10 +713,10 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               </div>
               <div>
                 <span className="text-xs font-bold text-amber-300 font-serif block">
-                  Reflexión Sacerdotal
+                  Reflexión con IA
                 </span>
                 <span className="text-[11px] text-slate-400 font-serif">
-                  {priestName} • Guía Espiritual
+                  {priestName} • No sustituye a un sacerdote
                 </span>
               </div>
             </div>
@@ -748,10 +724,10 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             <div className="flex items-center gap-1.5">
               <button
                 id="btn-reload-reflection"
-                onClick={() => fetchReflection(dayData)}
-                disabled={loadingReflection}
+                onClick={retryReflection}
+                disabled={loadingReflection || syncingLiturgy}
                 className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors disabled:opacity-50"
-                title="Nueva meditación del sacerdote"
+                title="Reintentar carga de la reflexión compartida"
               >
                 <RefreshCw className={`w-4 h-4 ${loadingReflection ? 'animate-spin text-amber-400' : ''}`} />
               </button>
@@ -765,7 +741,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
                     ? 'bg-amber-400 text-slate-950 scale-105'
                     : 'bg-slate-800 text-amber-400 hover:bg-slate-750'
                 }`}
-                title="Escuchar homilía del sacerdote"
+                title="Escuchar reflexión con IA"
               >
                 {currentPlayingSection === 'reflection' && isPlaying ? (
                   <VolumeX className="w-4 h-4" />
@@ -780,8 +756,15 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             <div className="py-8 flex flex-col items-center justify-center text-center space-y-3">
               <div className="w-8 h-8 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin"></div>
               <p className="text-xs text-slate-400 font-serif">
-                El Padre Mateo está meditando la Palabra para ti...
+                Generando una reflexión sobre las lecturas...
               </p>
+            </div>
+          ) : reflectionError ? (
+            <div role="alert" className="text-sm text-amber-200 space-y-3">
+              <p>{reflectionError}</p>
+              <a href="https://www.vaticannews.va/es/evangelio-de-hoy.html" target="_blank" rel="noopener noreferrer" className="underline">
+                Consultar el evangelio de hoy en Vatican News (no corresponde necesariamente a la fecha seleccionada)
+              </a>
             </div>
           ) : (
             <div className="space-y-3">
@@ -791,15 +774,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-                <button
-                  id="btn-ask-priest"
-                  onClick={() => setCounselOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition-colors"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Pregúntale al Padre Mateo (Chat de Guía Espiritual)</span>
-                </button>
-
                 <div className="flex items-center gap-1">
                   <button
                     id="btn-save-reflection"
@@ -879,126 +853,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         </div>
       )}
 
-      {/* Drawer/Modal: Diálogo Espiritual con el Padre Mateo */}
-      {counselOpen && (
-        <div
-          id="modal-pastoral-counsel"
-          onClick={() => setCounselOpen(false)}
-          className="fixed inset-0 z-[75] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-sm animate-fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-[#17110b] border border-amber-950/60 rounded-t-3xl sm:rounded-3xl max-w-lg w-full h-[85vh] sm:h-[78vh] flex flex-col shadow-2xl overflow-hidden"
-          >
-            {/* Modal Header */}
-            <div className="p-4 border-b border-amber-950/60 flex items-center justify-between bg-[#140e09] shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-300 text-sm shadow-sm">
-                  ✝️
-                </div>
-                <div>
-                  <h3 className="text-sm font-serif font-bold text-amber-300">
-                    Chat de Acompañamiento Espiritual
-                  </h3>
-                  <p className="text-[11px] text-amber-200/60 font-serif">Padre Mateo • Asistente Pastoral Católico (IA)</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setCounselOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Chat Messages Body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs sm:text-sm">
-              <div className="bg-[#221810] border border-amber-900/30 p-3.5 rounded-2xl rounded-tl-none max-w-[90%] text-[#ece4d8] font-serif shadow-sm">
-                <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">Padre Mateo</p>
-                «¡La paz del Señor esté contigo! Este es un espacio de diálogo y consejería católica. Puedes hacerme preguntas sobre las lecturas de hoy, dudas de fe, consejos para tu oración o cómo vivir el Evangelio en tu vida diaria.»
-              </div>
-
-              {/* Sugerencias rápidas si aún no ha enviado mensajes */}
-              {counselMessages.length === 0 && (
-                <div className="pt-2 space-y-1.5">
-                  <p className="text-[11px] text-amber-200/50 font-serif px-1">Preguntas sugeridas:</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {[
-                      '¿Cómo aplicar el Evangelio de hoy a mi vida?',
-                      'Siento desánimo en mi oración, ¿qué me aconseja?',
-                      '¿Cómo prepararme para una buena confesión?',
-                    ].map((promptText, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => {
-                          setCounselQuery(promptText);
-                        }}
-                        className="text-left text-xs bg-[#221810]/70 hover:bg-[#2c1f15] border border-amber-900/30 rounded-xl px-3 py-1.5 text-amber-200/80 hover:text-amber-100 transition-colors"
-                      >
-                        {promptText}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {counselMessages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`p-3.5 rounded-2xl max-w-[88%] leading-relaxed shadow-sm ${
-                      msg.role === 'user'
-                        ? 'bg-amber-500 text-slate-950 font-medium rounded-br-none'
-                        : 'bg-[#221810] border border-amber-900/30 text-[#ece4d8] font-serif rounded-tl-none whitespace-pre-line'
-                    }`}
-                  >
-                    {msg.role !== 'user' && (
-                      <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">Padre Mateo</p>
-                    )}
-                    {msg.text}
-                  </div>
-                </div>
-              ))}
-
-              {counselLoading && (
-                <div className="flex justify-start">
-                  <div className="p-3 bg-[#221810] border border-amber-900/30 rounded-2xl rounded-tl-none text-amber-300 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce"></span>
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce delay-150"></span>
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce delay-300"></span>
-                    <span className="text-xs font-serif">El Padre Mateo está respondiendo...</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Chat Input */}
-            <form
-              onSubmit={handleSendCounsel}
-              className="p-3 pb-8 sm:pb-3 border-t border-amber-950/60 bg-[#140e09] flex items-center gap-2 shrink-0"
-            >
-              <input
-                type="text"
-                value={counselQuery}
-                onChange={(e) => setCounselQuery(e.target.value)}
-                placeholder="Escribe tu consulta o inquietud espiritual..."
-                className="flex-1 bg-[#1c130b] border border-amber-900/40 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#ece4d8] placeholder-stone-500 focus:outline-none focus:border-amber-400/80"
-              />
-              <button
-                type="submit"
-                disabled={!counselQuery.trim() || counselLoading}
-                className="p-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl disabled:opacity-40 transition-colors shadow-sm"
-                title="Enviar consulta"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

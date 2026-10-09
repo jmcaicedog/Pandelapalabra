@@ -5,7 +5,7 @@ export interface SaintVerification {
   date: string;
   checkedAt: string;
   sourceUrl?: string;
-  method?: 'web' | 'print';
+  method?: 'web';
   celebration?: string;
   colors?: string;
 }
@@ -53,19 +53,8 @@ export function selectColombianSaint(
   };
 }
 
-/** These two exact dates were checked against the user's Colombian print edition. */
-export function confirmedPrintSaint(date: string): ColombianSaint | null {
-  const names: Record<string, string> = {
-    '2026-10-08': 'Santa Pelagia',
-    '2026-10-09': 'San Luis Bertrán',
-  };
-  return names[date] ? selectColombianSaint(date, names[date], {
-    status: 'publisher', method: 'print',
-  }) : null;
-}
-
 export function hasFreshSaintVerification(value: SaintVerification | undefined, date: string): boolean {
-  if (!value || value.date !== date) return false;
+  if (!value || value.date !== date || !['publisher', 'ordo', 'pending'].includes(value.status)) return false;
   const age = Date.now() - Date.parse(value.checkedAt);
   const ttl = value.status === 'publisher' ? 24 * 60 * 60 * 1000 : 15 * 60 * 1000;
   return Number.isFinite(age) && age >= 0 && age < ttl;

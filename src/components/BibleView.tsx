@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   BookOpen,
@@ -23,12 +23,24 @@ import {
   searchBible,
   type BibleBook,
   type BibleChapter,
-  type BibleVerse
+  type BibleVerse,
+  type BibleSearchResult
 } from '../data/bible.ts';
 import { speechService } from '../lib/speech.ts';
 import { db } from '../lib/firebase.ts';
-import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, setDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
+import { readStoredJson, writeStorage } from '../lib/storage.ts';
+import { withTimeout } from '../lib/asyncUtils.ts';
+
+type SavedVerse = { id: string; bookName: string; chapter: number; verse: number; text: string };
+function isSavedVerse(value: unknown): value is SavedVerse {
+  return !!value && typeof value === 'object' && 'id' in value && typeof value.id === 'string'
+    && 'bookName' in value && typeof value.bookName === 'string'
+    && 'chapter' in value && typeof value.chapter === 'number'
+    && 'verse' in value && typeof value.verse === 'number'
+    && 'text' in value && typeof value.text === 'string';
+}
 
 interface BibleViewProps {
   user: User | null;
@@ -48,16 +60,26 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<BibleSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
 
   // Favorites
-  const [favoriteVerses, setFavoriteVerses] = useState<Array<{ id: string; bookName: string; chapter: number; verse: number; text: string }>>([]);
+  const [favoriteVerses, setFavoriteVerses] = useState<SavedVerse[]>([]);
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
 
   // Audio speech
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [copyToast, setCopyToast] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const readingVersion = useRef(0);
+  const searchVersion = useRef(0);
+  const favoritesVersion = useRef(0);
+  const favoriteSaving = useRef(false);
+  useEffect(() => () => {
+    readingVersion.current += 1;
+    searchVersion.current += 1;
+    favoritesVersion.current += 1;
+  }, []);
 
   useEffect(() => {
     const unsub = speechService.subscribe(setIsSpeaking);
@@ -70,46 +92,79 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
   // Load user favorites from firestore or local
   useEffect(() => {
     loadFavorites();
+    return () => { favoritesVersion.current += 1; };
   }, [user]);
 
   const loadFavorites = async () => {
+    const version = ++favoritesVersion.current;
+    setFavoriteVerses([]);
+    const key = user ? `lumen_fav_verses_${user.uid}` : 'lumen_fav_verses_guest';
+    const local = () => readStoredJson(key, (v): v is SavedVerse[] => Array.isArray(v) && v.every(isSavedVerse)) || [];
     if (!user) {
-      const local = localStorage.getItem('lumen_fav_verses');
-      if (local) setFavoriteVerses(JSON.parse(local));
+      const saved = readStoredJson(key, (v): v is SavedVerse[] => Array.isArray(v) && v.every(isSavedVerse));
+      if (saved !== null) setFavoriteVerses(saved);
+      else {
+        const legacy = readStoredJson('lumen_fav_verses', (v): v is SavedVerse[] =>
+          Array.isArray(v) && v.every(isSavedVerse)) || [];
+        // The legacy shared key can contain account data: migrate only explicit guests.
+        const guests = legacy.filter(v => 'userId' in v && v.userId === 'guest');
+        setFavoriteVerses(guests);
+        writeStorage(key, JSON.stringify(guests));
+      }
       return;
     }
     try {
-      const snap = await getDocs(collection(db, 'users', user.uid, 'favorites'));
-      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
+      const snap = await withTimeout(getDocs(collection(db, 'users', user.uid, 'favorites')));
+      const list = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+      if (!list.every(isSavedVerse)) throw new Error('Favoritos inválidos.');
+      if (version !== favoritesVersion.current) return;
       setFavoriteVerses(list);
-    } catch {
-      const local = localStorage.getItem(`lumen_fav_verses_${user.uid}`);
-      if (local) setFavoriteVerses(JSON.parse(local));
+      writeStorage(key, JSON.stringify(list));
+    } catch (error) {
+      console.warn('No se pudieron sincronizar favoritos:', error);
+      if (version === favoritesVersion.current) {
+        setFavoriteVerses(local());
+        showToast('Favoritos locales: no se pudo sincronizar con tu cuenta.');
+      }
     }
   };
 
   const handleSelectBook = async (book: BibleBook) => {
+    const version = ++readingVersion.current;
+    setLoadError(null);
+    setChapters([]);
+    setVerses([]);
+    speechService.stop();
     setSelectedBook(book);
     setSelectedChapter(null);
     setLoading(true);
     try {
       const chs = await fetchChaptersForBook(book.id);
-      setChapters(chs);
+      if (version === readingVersion.current) setChapters(chs);
+    } catch (error) {
+      console.warn('Libro no disponible:', error);
+      if (version === readingVersion.current) setLoadError('No se pudo cargar el libro.');
     } finally {
-      setLoading(false);
+      if (version === readingVersion.current) setLoading(false);
     }
   };
 
   const handleSelectChapter = async (chap: BibleChapter) => {
+    const version = ++readingVersion.current;
+    setLoadError(null);
+    setVerses([]);
     setSelectedChapter(chap);
     setSelectedVerseNumber(null);
     setLoading(true);
     speechService.stop();
     try {
       const vss = await fetchVersesForChapter(chap.id, selectedBook?.nombre, chap.numero);
-      setVerses(vss);
+      if (version === readingVersion.current) setVerses(vss);
+    } catch (error) {
+      console.warn('Capítulo no disponible:', error);
+      if (version === readingVersion.current) setLoadError('No se pudo cargar el capítulo. Selecciónalo de nuevo para reintentar.');
     } finally {
-      setLoading(false);
+      if (version === readingVersion.current) setLoading(false);
     }
   };
 
@@ -126,7 +181,11 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
   };
 
   const handleToggleFavorite = async (verse: BibleVerse) => {
-    if (!selectedBook || !selectedChapter) return;
+    if (!selectedBook || !selectedChapter || favoriteSaving.current) return;
+    favoriteSaving.current = true;
+    const version = favoritesVersion.current;
+    const key = user ? `lumen_fav_verses_${user.uid}` : 'lumen_fav_verses_guest';
+    try {
     const existing = favoriteVerses.find(
       (f) =>
         f.bookName === selectedBook.nombre &&
@@ -137,17 +196,15 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
     if (existing) {
       // Remove
       const updated = favoriteVerses.filter((f) => f.id !== existing.id);
-      setFavoriteVerses(updated);
       if (user) {
-        try {
-          await deleteDoc(doc(db, 'users', user.uid, 'favorites', existing.id));
-        } catch {}
+        await withTimeout(deleteDoc(doc(db, 'users', user.uid, 'favorites', existing.id)));
       }
-      localStorage.setItem('lumen_fav_verses', JSON.stringify(updated));
+      if (!writeStorage(key, JSON.stringify(updated)) && !user) throw new Error('Almacenamiento no disponible.');
+      if (version === favoritesVersion.current) setFavoriteVerses(updated);
     } else {
       // Add
       const newFav = {
-        id: 'fav_' + Date.now(),
+        id: `verse_${selectedBook.id}_${selectedChapter.numero}_${verse.numero}`,
         userId: user?.uid || 'guest',
         bookName: selectedBook.nombre,
         chapter: selectedChapter.numero,
@@ -156,15 +213,20 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
         createdAt: new Date().toISOString(),
       };
       const updated = [newFav, ...favoriteVerses];
-      setFavoriteVerses(updated);
       if (user) {
-        try {
-          const ref = await addDoc(collection(db, 'users', user.uid, 'favorites'), newFav);
-          newFav.id = ref.id;
-        } catch {}
+        await withTimeout(setDoc(doc(db, 'users', user.uid, 'favorites', newFav.id), newFav));
       }
-      localStorage.setItem('lumen_fav_verses', JSON.stringify(updated));
-      showToast('Versículo guardado en tus favoritos');
+      if (!writeStorage(key, JSON.stringify(updated)) && !user) throw new Error('Almacenamiento no disponible.');
+      if (version === favoritesVersion.current) {
+        setFavoriteVerses(updated);
+        showToast('Versículo guardado en tus favoritos');
+      }
+    }
+    } catch (error) {
+      console.error('Error al guardar favorito:', error);
+      if (version === favoritesVersion.current) showToast('No se pudo guardar el cambio de favoritos.');
+    } finally {
+      favoriteSaving.current = false;
     }
   };
 
@@ -180,12 +242,18 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
+    const version = ++searchVersion.current;
+    setLoadError(null);
+    setSearchResults([]);
     setSearching(true);
     try {
       const results = await searchBible(searchQuery);
-      setSearchResults(results);
+      if (version === searchVersion.current) setSearchResults(results);
+    } catch (error) {
+      console.warn('Búsqueda no disponible:', error);
+      if (version === searchVersion.current) setLoadError('La búsqueda bíblica no está disponible. Reintenta más tarde.');
     } finally {
-      setSearching(false);
+      if (version === searchVersion.current) setSearching(false);
     }
   };
 
@@ -194,9 +262,14 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
     setTimeout(() => setCopyToast(null), 2500);
   };
 
-  const handleCopyVerse = (text: string, refText: string) => {
-    navigator.clipboard.writeText(`«${text}» (${refText}) - Biblia de Jerusalén`);
-    showToast('Versículo copiado');
+  const handleCopyVerse = async (text: string, refText: string) => {
+    try {
+      await navigator.clipboard.writeText(`«${text}» (${refText}) - Biblia de Jerusalén`);
+      showToast('Versículo copiado');
+    } catch (error) {
+      console.warn('No se pudo copiar:', error);
+      showToast('No se pudo copiar el versículo.');
+    }
   };
 
   const handleSpeakChapter = () => {
@@ -209,6 +282,16 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
     }
   };
 
+  const leaveBook = () => {
+    readingVersion.current += 1;
+    speechService.stop();
+    setLoading(false);
+    setLoadError(null);
+    setSelectedBook(null);
+    setSelectedChapter(null);
+    setVerses([]);
+  };
+
   const filteredBooks = CATHOLIC_BOOKS.filter((b) => b.testamento === testament);
 
   // Group books by category
@@ -216,6 +299,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
 
   return (
     <div id="bible-container" className="min-h-screen pb-28 text-slate-100">
+      {loadError && <p role="alert" className="p-4 text-sm text-amber-200">{loadError}</p>}
       {copyToast && (
         <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-slate-950 font-semibold px-4 py-2 rounded-full text-xs shadow-xl flex items-center gap-2">
           <Check className="w-4 h-4" /> {copyToast}
@@ -264,6 +348,10 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
             <button
               id="btn-back-to-books"
               onClick={() => {
+                readingVersion.current += 1;
+                speechService.stop();
+                setLoading(false);
+                setLoadError(null);
                 setSelectedChapter(null);
                 setSelectedVerseNumber(null);
               }}
@@ -512,7 +600,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
               id="tab-nuevo-testamento"
               onClick={() => {
                 setTestament('NT');
-                setSelectedBook(null);
+                leaveBook();
               }}
               className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
                 testament === 'NT'
@@ -526,7 +614,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
               id="tab-antiguo-testamento"
               onClick={() => {
                 setTestament('AT');
-                setSelectedBook(null);
+                leaveBook();
               }}
               className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
                 testament === 'AT'
@@ -543,7 +631,12 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                searchVersion.current += 1;
+                setSearching(false);
+                setSearchResults([]);
+                setSearchQuery(e.target.value);
+              }}
               placeholder="Buscar en la Biblia católica (ej: amor, fe, perdón)..."
               className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl pl-10 pr-24 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400/80"
             />
@@ -643,7 +736,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
       {/* Chapter Selection Drawer / Modal */}
       {selectedBook && !selectedChapter && (
         <div
-          onClick={() => setSelectedBook(null)}
+          onClick={leaveBook}
           className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-sm animate-fade-in"
         >
           <div
@@ -660,7 +753,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
                 </p>
               </div>
               <button
-                onClick={() => setSelectedBook(null)}
+                onClick={leaveBook}
                 className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-[#221810]"
               >
                 <X className="w-5 h-5" />
