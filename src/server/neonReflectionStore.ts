@@ -44,7 +44,7 @@ export function createNeonReflectionStore(pool: pg.Pool, dailyLimit: number): Re
         if (budget.rowCount !== 1) throw new Error('Límite diario de generación alcanzado.');
         await client.query(
           `INSERT INTO public.daily_reflections (date, status, owner, attempts, retry_after)
-           VALUES ($1, 'generating', $2, 1, now() + interval '120 seconds')
+           VALUES ($1, 'generating', $2, 1, now() + interval '180 seconds')
            ON CONFLICT (date) DO UPDATE SET status = 'generating', owner = EXCLUDED.owner,
              attempts = daily_reflections.attempts + 1, retry_after = EXCLUDED.retry_after,
              updated_at = now()`, [date, owner],

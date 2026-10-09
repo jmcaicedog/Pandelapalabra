@@ -77,7 +77,7 @@ Una reflexión terminada se guarda en `public.daily_reflections` en Neon
 (PostgreSQL), con la fecha como clave primaria única.
 Todos los visitantes reciben el mismo texto, también tras reinicios o desde
 otra instancia del servidor. Una transacción reserva la generación y evita
-llamadas concurrentes con bloqueos transaccionales y reservas de 120 segundos.
+llamadas concurrentes con bloqueos transaccionales y reservas de 180 segundos.
 No se regenera al pulsar reintentar. El servidor usa una conexión pooled y
 consultas parametrizadas; nunca envía credenciales de Neon al navegador.
 
@@ -147,7 +147,11 @@ inexistentes, en lugar de devolver HTML como si fueran lecturas o scripts.
 ### Vercel
 
 [vercel.json](./vercel.json) define el build estático, la función API y un máximo
-de 60 segundos. Seleccionar Node 22 o posterior y configurar los secretos en
+de 120 segundos. Gemini tiene un plazo de 60 segundos por generación, sin
+reintentos automáticos facturables; el navegador espera hasta 125 segundos.
+El margen restante permite obtener lecturas, reservar y guardar en Neon.
+Si Gemini devuelve 504 antes de ese plazo, se informa el fallo y no se guarda
+una reflexión parcial. Seleccionar Node 22 o posterior y configurar los secretos en
 el entorno correspondiente. Comprobar que el plan permite ese tiempo de ejecución.
 
 La aplicación funciona sin IA cuando el servidor carece de credenciales. Esto

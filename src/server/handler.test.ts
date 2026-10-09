@@ -2,6 +2,23 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'node:http';
 import apiHandler from '../../api/index.ts';
+import { generateReflection } from './handler.ts';
+
+test('un 504 de Gemini informa el timeout y no devuelve texto parcial ni reintenta', async t => {
+  const previous = process.env.GEMINI_API_KEY;
+  process.env.GEMINI_API_KEY = 'test-key-not-used';
+  t.after(() => {
+    if (previous === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = previous;
+  });
+  const generateContent = t.mock.fn(async () => {
+    throw Object.assign(new Error('DEADLINE_EXCEEDED'), { status: 504 });
+  });
+  await assert.rejects(generateReflection('Evangelio de prueba', 'Instrucciones de prueba', { generateContent }), {
+    message: 'La generación tardó demasiado. Espera un minuto y vuelve a intentarlo.',
+  });
+  assert.equal(generateContent.mock.calls.length, 1);
+});
 
 test('contrato HTTP: rutas, métodos, fechas, JSON y fallos explícitos de IA', async t => {
   const previous = process.env.DATABASE_URL;

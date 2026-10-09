@@ -160,9 +160,14 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           signal, method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ date: data.date }),
         });
-        if (!res.ok) throw new Error('La reflexión no está disponible.');
+        if (!res.ok) {
+          const failure = await res.json();
+          throw new Error(failure?.code === 'generation_timeout'
+            ? 'La generación tardó demasiado. Espera un minuto y vuelve a intentarlo.'
+            : 'La reflexión no está disponible. Puedes reintentar o consultar Vatican News.');
+        }
         return res.json();
-      }, 60000, controller.signal);
+      }, 125000, controller.signal);
       if (json.date !== data.date || typeof json.reflection !== 'string' || !json.reflection.trim() || json.fallback) {
         throw new Error('Respuesta de reflexión no disponible.');
       }
@@ -173,7 +178,8 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       if (!isCurrent()) return;
       console.warn('Reflexión no disponible:', error);
       setReflection(null);
-      setReflectionError('La reflexión no está disponible. Puedes reintentar o consultar Vatican News.');
+      setReflectionError(error instanceof Error && error.message === 'La generación tardó demasiado. Espera un minuto y vuelve a intentarlo.'
+        ? error.message : 'La reflexión no está disponible. Puedes reintentar o consultar Vatican News.');
     } finally {
       if (isCurrent()) setLoadingReflection(false);
     }

@@ -26,6 +26,12 @@ class BodyError extends Error {
   constructor(message: string, readonly status: number) { super(message); }
 }
 
+class ReflectionTimeoutError extends Error {
+  constructor() {
+    super('La generación tardó demasiado. Espera un minuto y vuelve a intentarlo.');
+  }
+}
+
 async function parseBody(req: IncomingMessage): Promise<Record<string, unknown>> {
   if (req.headers['content-type']?.split(';')[0].trim().toLowerCase() !== 'application/json') {
     throw new BodyError('Se requiere Content-Type application/json.', 415);
@@ -62,7 +68,11 @@ function field(body: Record<string, unknown>, name: string, max: number, require
   return value.trim();
 }
 
-async function generate(prompt: string, systemInstruction: string): Promise<string> {
+export async function generateReflection(
+  prompt: string,
+  systemInstruction: string,
+  provider?: Pick<GoogleGenAI['models'], 'generateContent'>,
+): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key === 'MY_GEMINI_API_KEY') {
     console.warn('Gemini: GEMINI_API_KEY ausente o con valor de ejemplo.');
@@ -70,11 +80,11 @@ async function generate(prompt: string, systemInstruction: string): Promise<stri
   }
   if (Date.now() < quotaCooldownUntil) throw new Error('Servicio de IA temporalmente limitado.');
   try {
-    const ai = new GoogleGenAI({
+    const models = provider || new GoogleGenAI({
       apiKey: key,
-      httpOptions: { timeout: 30000, retryOptions: { attempts: 1 } },
-    });
-    const response = await ai.models.generateContent({
+      httpOptions: { timeout: 60000, retryOptions: { attempts: 1 } },
+    }).models;
+    const response = await models.generateContent({
       model: process.env.GEMINI_MODEL || 'gemini-flash-latest',
       contents: prompt,
       config: { systemInstruction, temperature: 0.65 },
@@ -102,6 +112,7 @@ async function generate(prompt: string, systemInstruction: string): Promise<stri
     const status = error && typeof error === 'object' && 'status' in error && typeof error.status === 'number'
       ? error.status : undefined;
     console.warn('El servicio de IA no pudo completar la solicitud.', { category, status });
+    if (category === 'timeout') throw new ReflectionTimeoutError();
     throw error;
   }
 }
@@ -164,7 +175,7 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
       const reflection = await getSharedReflection(date, async () => {
         const day = await loadLiturgy(date);
         if (!hasFreshReadings(day)) throw new Error('Lecturas verificadas no disponibles.');
-        return generate(
+        return generateReflection(
         `Fecha: ${date}. Celebración según Evangelizo: ${day.title}.\nEvangelio (${day.gospel.citation}): ${day.gospel.text}`,
         `${AI_IDENTITY}\nRedacta una meditación de 550–700 palabras en 8–10 párrafos centrada únicamente en el Evangelio proporcionado. Dedica al menos seis párrafos a explicar y meditar el Evangelio: su contexto, los gestos y palabras de Jesús, y su aplicación concreta a la vida familiar y comunitaria. Profundiza con dos o tres párrafos adicionales, sin repetir ideas ni inventar detalles ausentes del pasaje. Termina con un propósito cotidiano y una oración breve en párrafos separados. No presentes el texto como una homilía de un sacerdote real.`,
         );
@@ -176,7 +187,9 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
     else {
       console.warn('Reflexión compartida no disponible; revisar configuración, fuentes y cuota.');
       sendJson(res, 503, {
-      error: 'La orientación con IA no está disponible. Puedes reintentar o consultar Vatican News.',
+      error: error instanceof ReflectionTimeoutError
+        ? error.message : 'La reflexión no está disponible. Puedes reintentar o consultar Vatican News.',
+      code: error instanceof ReflectionTimeoutError ? 'generation_timeout' : 'reflection_unavailable',
       fallback: true,
       fallbackUrl: 'https://www.vaticannews.va/es/evangelio-de-hoy.html',
       });
