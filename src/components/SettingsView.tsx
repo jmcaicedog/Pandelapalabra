@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import {
-  User as UserIcon,
-  LogOut,
-  Globe,
   Sliders,
   Sparkles,
   Volume2,
@@ -11,28 +8,17 @@ import {
   Sun,
   Info,
   Check,
-  Flame,
-  ShieldCheck,
-  LogIn,
   Smartphone,
   Download,
   CheckCircle2,
   Share,
   PlusSquare
 } from 'lucide-react';
-import { logoutUser } from '../lib/firebase.ts';
 import { usePWAInstall } from '../lib/usePWAInstall.ts';
-import type { User } from 'firebase/auth';
 
 interface SettingsViewProps {
-  user: User | null;
-  onOpenAuth: () => void;
   fontSize: number;
   onUpdateFontSize: (size: number) => void;
-  calendarRegion: string;
-  onUpdateCalendarRegion: (reg: string) => void;
-  prayerStyle: 'sacred' | 'minimal';
-  onUpdatePrayerStyle: (st: 'sacred' | 'minimal') => void;
   audioEnabled: boolean;
   onUpdateAudioEnabled: (val: boolean) => void;
   darkMode?: boolean;
@@ -40,14 +26,8 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
-  user,
-  onOpenAuth,
   fontSize,
   onUpdateFontSize,
-  calendarRegion,
-  onUpdateCalendarRegion,
-  prayerStyle,
-  onUpdatePrayerStyle,
   audioEnabled,
   onUpdateAudioEnabled,
   darkMode = true,
@@ -78,14 +58,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
-  const handleLogout = async () => {
-    try { await logoutUser(); }
-    catch (error) {
-      console.error('No se pudo cerrar sesión:', error);
-      setClearedNotice('No se pudo cerrar sesión. Reintenta.');
-    }
-  };
-
   return (
     <div id="settings-view-container" className={`min-h-screen pb-28 transition-colors duration-300 ${darkMode ? 'text-slate-100' : 'text-stone-800'}`}>
       {clearedNotice && (
@@ -98,107 +70,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <div className="px-4 pt-6 pb-2 max-w-xl mx-auto">
         <h1 className={`text-2xl font-serif font-bold tracking-tight ${darkMode ? 'text-white' : 'text-stone-900'}`}>Ajustes</h1>
         <p className={`text-xs mt-0.5 ${darkMode ? 'text-slate-400' : 'text-stone-600'}`}>
-          Configuración personal, sincronización de cuenta y preferencias
+          Lectura, accesibilidad y preferencias
         </p>
       </div>
 
       <div className="px-4 py-3 max-w-xl mx-auto space-y-4">
-        {/* --- 1. Account & Cloud Sync Card (Image 4) --- */}
-        <div className={`border rounded-3xl p-4 sm:p-5 shadow-xl overflow-hidden transition-colors duration-300 ${
-          darkMode
-            ? 'bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border-amber-500/30'
-            : 'bg-gradient-to-r from-amber-100/60 via-stone-50 to-stone-50 border-amber-300'
-        }`}>
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl border flex items-center justify-center shrink-0 ${
-                darkMode ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-amber-500/20 border-amber-400 text-amber-700'
-              }`}>
-                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <span className={`text-[10px] uppercase font-bold tracking-wider block truncate ${
-                  darkMode ? 'text-amber-400' : 'text-amber-700'
-                }`}>
-                  {user ? 'Cuenta Sincronizada' : 'Modo Peregrino'}
-                </span>
-                <h3 className={`text-base font-serif font-bold truncate ${darkMode ? 'text-white' : 'text-stone-900'}`}>
-                  {user ? user.displayName || user.email?.split('@')[0] || 'Fiel Cristiano' : 'Invitado'}
-                </h3>
-                <p className={`text-xs truncate ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>
-                  {user?.email || 'Guardado localmente en este dispositivo'}
-                </p>
-              </div>
-            </div>
-
-            {user ? (
-              <button
-                id="btn-logout"
-                onClick={handleLogout}
-                className={`p-2.5 rounded-xl transition-colors shrink-0 ${
-                  darkMode ? 'text-slate-400 hover:text-red-400 hover:bg-slate-800' : 'text-stone-500 hover:text-red-500 hover:bg-stone-200'
-                }`}
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                id="btn-open-login"
-                onClick={onOpenAuth}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 sm:py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all shrink-0 whitespace-nowrap"
-              >
-                <LogIn className="w-3.5 h-3.5 shrink-0" />
-                <span>Iniciar Sesión</span>
-              </button>
-            )}
-          </div>
-
-          <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-2 text-xs ${
-            darkMode ? 'border-slate-800/80 text-slate-300' : 'border-stone-200 text-stone-600'
-          }`}>
-            <div className="flex items-center gap-1.5 text-emerald-500 text-[11px] sm:text-xs">
-              <ShieldCheck className="w-4 h-4 shrink-0" />
-              <span>Base de Datos Firestore Activa</span>
-            </div>
-            <div className={`flex items-center gap-1 text-[11px] sm:text-xs ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>
-              <Flame className="w-4 h-4 shrink-0" />
-              <span>Sincronización multi-dispositivo</span>
-            </div>
-          </div>
-        </div>
-
-        {/* --- 2. Liturgia y Calendario --- */}
-        <div className={`border rounded-3xl p-5 shadow-md space-y-4 transition-colors duration-300 ${
-          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
-        }`}>
-          <div className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${
-            darkMode ? 'text-amber-300' : 'text-amber-700'
-          }`}>
-            <Globe className="w-4 h-4 text-amber-500" />
-            <span>Calendario Litúrgico Regional</span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Región Litúrgica</span>
-              <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>Adapta los santos y lecturas locales</span>
-            </div>
-
-            <select
-              value="Colombia"
-              disabled
-              className={`border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-400 ${
-                darkMode ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-stone-100 border-stone-300 text-stone-800'
-              }`}
-            >
-              <option value="Colombia">Colombia</option>
-            </select>
-          </div>
-        </div>
-
-        {/* --- 3. Sagrada Biblia Settings (Image 4) --- */}
+        {/* Sagrada Biblia */}
         <div className={`border rounded-3xl p-5 shadow-md space-y-4 transition-colors duration-300 ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
         }`}>
@@ -259,7 +136,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
 
-        {/* --- 4. Oración y Estilo (Image 4) --- */}
+        {/* Oración y asistencia */}
         <div className={`border rounded-3xl p-5 shadow-md space-y-4 transition-colors duration-300 ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
         }`}>
@@ -270,39 +147,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <span>Oración y Asistencia</span>
           </div>
 
-          {/* Visual Style */}
-          <div className="flex items-center justify-between">
-            <div>
-              <span className={`text-xs font-medium block ${darkMode ? 'text-slate-200' : 'text-stone-800'}`}>Estilo Visual</span>
-              <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-stone-500'}`}>Iconografía del Rosario y Devocionario</span>
-            </div>
-
-            <div className={`flex items-center p-1 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-stone-100 border border-stone-200'}`}>
-              <button
-                onClick={() => onUpdatePrayerStyle('sacred')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  prayerStyle === 'sacred'
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
-                    : darkMode ? 'text-slate-400 hover:text-white' : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                Arte Sacro
-              </button>
-              <button
-                onClick={() => onUpdatePrayerStyle('minimal')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                  prayerStyle === 'minimal'
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
-                    : darkMode ? 'text-slate-400 hover:text-white' : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                Minimalista
-              </button>
-            </div>
-          </div>
-
           {/* Audio toggle */}
-          <div className={`flex items-center justify-between pt-2 border-t ${darkMode ? 'border-slate-800' : 'border-stone-200'}`}>
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <Volume2 className={`w-4 h-4 ${darkMode ? 'text-slate-400' : 'text-stone-500'}`} />
               <div>
@@ -323,7 +169,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
 
-        {/* --- 5. Instalación en Dispositivo (PWA) --- */}
+        {/* Instalación en dispositivo */}
         <div className={`border rounded-3xl p-5 shadow-md space-y-3 transition-colors duration-300 ${
           darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-stone-200'
         }`}>

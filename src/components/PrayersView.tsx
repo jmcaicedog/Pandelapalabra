@@ -29,12 +29,11 @@ import type { User } from 'firebase/auth';
 interface PrayersViewProps {
   user: User | null;
   onSelectTab?: (tab: string) => void;
-  prayerStyle?: 'sacred' | 'minimal';
 }
 
 type PrayerCategory = 'rosario' | 'coronillas' | 'letanias' | 'devocionario';
 
-export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 'sacred' }) => {
+export const PrayersView: React.FC<PrayersViewProps> = ({ user }) => {
   const [activeCategory, setActiveCategory] = useState<PrayerCategory>('rosario');
   const todayGroup = getTodayMysteries();
 
@@ -552,7 +551,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
               <div className="space-y-4 pb-24">
                 {/* Mystery Header Card */}
                 <div className="bg-[#140e09] border border-amber-950/60 rounded-3xl p-5 shadow-xl text-center relative overflow-hidden">
-                  {prayerStyle === 'sacred' && currentMystery.image && (
+                  {currentMystery.image && (
                     <div className="mb-4 rounded-2xl overflow-hidden max-h-44 w-full relative border border-amber-900/40 shadow-inner">
                       <img
                         src={currentMystery.image}

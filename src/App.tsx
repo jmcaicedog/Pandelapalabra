@@ -11,7 +11,6 @@ import { BibleView } from './components/BibleView.tsx';
 import { PrayersView } from './components/PrayersView.tsx';
 import { CalendarView } from './components/CalendarView.tsx';
 import { SettingsView } from './components/SettingsView.tsx';
-import { AuthModal } from './components/AuthModal.tsx';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt.tsx';
 import type { User } from 'firebase/auth';
 import { readStorage, writeStorage } from './lib/storage.ts';
@@ -21,20 +20,11 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<TabType>('liturgia');
   const [targetLiturgyDate, setTargetLiturgyDate] = useState<string | undefined>(undefined);
   const [user, setUser] = useState<User | null>(null);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   // App settings state with localStorage persistence
   const [fontSize, setFontSize] = useState<number>(() => {
     const saved = Number(readStorage('lumen_font_size'));
     return Number.isFinite(saved) && saved >= 14 && saved <= 28 ? saved : 18;
-  });
-
-  const [calendarRegion, setCalendarRegion] = useState<string>(() => {
-    return 'Colombia';
-  });
-
-  const [prayerStyle, setPrayerStyle] = useState<'sacred' | 'minimal'>(() => {
-    return readStorage('lumen_prayer_style') === 'minimal' ? 'minimal' : 'sacred';
   });
 
   const [audioEnabled, setAudioEnabled] = useState<boolean>(() => {
@@ -63,16 +53,6 @@ export default function App() {
   const handleUpdateFontSize = (size: number) => {
     setFontSize(size);
     writeStorage('lumen_font_size', size.toString());
-  };
-
-  const handleUpdateCalendarRegion = (reg: string) => {
-    setCalendarRegion('Colombia');
-    writeStorage('lumen_cal_region', 'Colombia');
-  };
-
-  const handleUpdatePrayerStyle = (st: 'sacred' | 'minimal') => {
-    setPrayerStyle(st);
-    writeStorage('lumen_prayer_style', st);
   };
 
   const handleUpdateAudioEnabled = (enabled: boolean) => {
@@ -135,7 +115,6 @@ export default function App() {
           {currentTab === 'oraciones' && (
             <PrayersView
               user={user}
-              prayerStyle={prayerStyle}
               onSelectTab={(tab) => setCurrentTab(tab as TabType)}
             />
           )}
@@ -149,14 +128,8 @@ export default function App() {
 
           {currentTab === 'ajustes' && (
             <SettingsView
-              user={user}
-              onOpenAuth={() => setAuthModalOpen(true)}
               fontSize={fontSize}
               onUpdateFontSize={handleUpdateFontSize}
-              calendarRegion={calendarRegion}
-              onUpdateCalendarRegion={handleUpdateCalendarRegion}
-              prayerStyle={prayerStyle}
-              onUpdatePrayerStyle={handleUpdatePrayerStyle}
               audioEnabled={audioEnabled}
               onUpdateAudioEnabled={handleUpdateAudioEnabled}
               darkMode={darkMode}
@@ -173,14 +146,6 @@ export default function App() {
             setCurrentTab(tab);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-        />
-
-        {/* Auth Modal for Firebase Login / Registration */}
-        <AuthModal
-          darkMode={darkMode}
-          isOpen={authModalOpen}
-          onClose={() => setAuthModalOpen(false)}
-          onSuccess={() => setAuthModalOpen(false)}
         />
 
         {/* Non-intrusive PWA Installation Prompt */}
