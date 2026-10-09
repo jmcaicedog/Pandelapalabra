@@ -458,7 +458,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             </span>
           </h3>
 
-          <p className="text-xs text-slate-300 mt-2 leading-relaxed whitespace-pre-line">
+          <p className="reading-text text-slate-300 mt-2 leading-relaxed whitespace-pre-line">
             {dayData.saint.fullBio || dayData.saint.shortBio}
           </p>
           <SaintSource verification={dayData.saintVerification} />
@@ -510,7 +510,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           </p>
 
           <p
-            className="text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line"
+            className="reading-text text-slate-200 leading-relaxed font-serif whitespace-pre-line"
           >
             {currentCelebration.firstReading.text}
           </p>
@@ -563,13 +563,13 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
 
           {/* Antiphon Callout */}
           <div className="bg-amber-950/30 border-l-2 border-amber-500 px-3 py-2 rounded-r-xl my-2">
-            <p className="text-xs text-amber-300 font-serif font-medium italic">
+            <p className="reading-text text-amber-300 font-serif font-medium italic">
               R/. {currentCelebration.psalm.response}
             </p>
           </div>
 
           <div
-            className="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif whitespace-pre-line"
+            className="reading-text space-y-2 text-slate-300 leading-relaxed font-serif whitespace-pre-line"
           >
             {currentCelebration.psalm.verses.map((verse, i) => (
               <p key={i}>{verse}</p>
@@ -625,7 +625,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             </p>
 
             <p
-              className="text-xs sm:text-sm text-slate-200 leading-relaxed font-serif whitespace-pre-line"
+              className="reading-text text-slate-200 leading-relaxed font-serif whitespace-pre-line"
             >
               {currentCelebration.secondReading.text}
             </p>
@@ -681,7 +681,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             {currentCelebration.gospel.acclamation}
           </p>
 
-          <div className="text-xs sm:text-sm text-slate-100 leading-relaxed font-serif space-y-2 border-l border-amber-500/20 pl-3">
+          <div className="reading-text text-slate-100 leading-relaxed font-serif space-y-2 border-l border-amber-500/20 pl-3">
             <p className="whitespace-pre-line">{currentCelebration.gospel.text}</p>
           </div>
 
@@ -758,7 +758,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="text-xs sm:text-sm text-slate-200 font-serif leading-relaxed whitespace-pre-line bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80">
+              <div className="reading-text text-slate-200 font-serif leading-relaxed whitespace-pre-line bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80">
                 {reflection}
               </div>
 
@@ -820,14 +820,14 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
                 <h4 className="font-semibold text-white uppercase text-xs tracking-wider mb-1">
                   Vida y Testimonio
                 </h4>
-                <p className="whitespace-pre-line">{dayData.saint.fullBio}</p>
+                <p className="reading-text whitespace-pre-line">{dayData.saint.fullBio}</p>
               </div>
 
               <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4">
                 <h4 className="font-serif font-bold text-amber-300 text-xs tracking-wide uppercase mb-1">
                   Oración de Intercesión
                 </h4>
-                <p className="font-serif italic text-slate-200 leading-relaxed">
+                <p className="reading-text font-serif italic text-slate-200 leading-relaxed">
                   «{dayData.saint.prayer}»
                 </p>
               </div>

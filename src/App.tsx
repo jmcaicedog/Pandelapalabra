@@ -96,6 +96,7 @@ export default function App() {
   return (
     <div
       id="pan-vivo-app-root"
+      style={{ '--reading-font-size': `${fontSize}px` } as React.CSSProperties}
       className={`min-h-screen flex justify-center selection:bg-amber-500/30 selection:text-amber-200 transition-colors duration-300 ${
         darkMode ? 'bg-[#0c0805] text-slate-100' : 'bg-[#f4efe8] text-stone-900'
       }`}

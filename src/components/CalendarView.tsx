@@ -605,7 +605,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-300 font-serif leading-relaxed whitespace-pre-line">
+                    <p className="reading-text text-slate-300 font-serif leading-relaxed whitespace-pre-line">
                       {n.content}
                     </p>
                   </div>
@@ -718,7 +718,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ user, onNavigateToLi
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
                   placeholder="Escribe lo que el Señor ha puesto en tu corazón hoy..."
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 leading-relaxed font-serif"
+                  className="reading-text w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 leading-relaxed font-serif"
                 ></textarea>
               </div>
 

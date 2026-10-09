@@ -536,7 +536,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
 
                 <div className="bg-[#140e09] border border-amber-950/60 rounded-2xl p-4 text-xs font-serif text-[#ece4d8] text-left">
                   <p className="font-bold text-amber-400 mb-1">Salve Regina</p>
-                  <p className="italic leading-relaxed">{COMMON_PRAYERS.salveRegina}</p>
+                  <p className="reading-text italic leading-relaxed">{COMMON_PRAYERS.salveRegina}</p>
                 </div>
 
                 <button
@@ -571,7 +571,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
                     {currentMystery.name}
                   </h3>
 
-                  <p className="text-xs font-serif text-amber-200/90 italic mt-2.5 bg-[#1b120a] p-3 rounded-xl border border-amber-900/40 leading-relaxed">
+                  <p className="reading-text font-serif text-amber-200/90 italic mt-2.5 bg-[#1b120a] p-3 rounded-xl border border-amber-900/40 leading-relaxed">
                     «{currentMystery.scriptureText}» ({currentMystery.scriptureRef})
                   </p>
 
@@ -625,7 +625,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
                       : 'Jaculatoria de Fátima'}
                   </span>
 
-                  <p className="text-xs sm:text-sm text-[#ece4d8] font-serif leading-relaxed mt-2.5">
+                  <p className="reading-text text-[#ece4d8] font-serif leading-relaxed mt-2.5">
                     {decadeStep === 'intro'
                       ? currentMystery.meditation
                       : decadeStep === 'padrenuestro'
@@ -750,7 +750,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
                       : 'Trisagio Final'}
                   </span>
 
-                  <p className="text-sm text-[#ece4d8] font-serif leading-relaxed mt-3">
+                  <p className="reading-text text-[#ece4d8] font-serif leading-relaxed mt-3">
                     {coronillaStep === 'intro'
                       ? 'Señal de la Cruz, Padre Nuestro, Ave María y Credo de los Apóstoles.'
                       : coronillaStep === 'padre_eterno'
@@ -819,7 +819,7 @@ export const PrayersView: React.FC<PrayersViewProps> = ({ user, prayerStyle = 's
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto mt-3 p-4 bg-[#140e09] rounded-2xl border border-amber-950/60 text-xs sm:text-sm font-serif text-[#ece4d8] leading-relaxed whitespace-pre-line">
+            <div className="reading-text flex-1 overflow-y-auto mt-3 p-4 bg-[#140e09] rounded-2xl border border-amber-950/60 font-serif text-[#ece4d8] leading-relaxed whitespace-pre-line">
               {selectedDevotion.text}
             </div>
 

@@ -178,7 +178,10 @@ reflexión nueva y su reutilización desde otro navegador/instancia.
   después; verificar el estado antes de repetirla.
 - Las lecturas completas se conservan para uso sin conexión con caché acotada;
   la verificación de santos se actualiza independientemente.
-- El audio respeta su ajuste global. Los permisos de notificaciones no
+- El audio respeta su ajuste global.
+- El tamaño de fuente se aplica a lecturas, reflexión, biografías y oraciones
+  en tarjetas y modales, notas y textos bíblicos; los controles conservan su tamaño.
+- Los permisos de notificaciones no
   implementan un programador de recordatorios; la interfaz lo advierte.
 - No se despliegan reglas, infraestructura ni secretos al ejecutar el build.
 

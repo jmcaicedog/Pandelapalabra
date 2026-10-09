@@ -682,7 +682,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
                         <Copy className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-slate-300 font-serif leading-relaxed">«{r.texto}»</p>
+                    <p className="reading-text text-slate-300 font-serif leading-relaxed">«{r.texto}»</p>
                   </div>
                 ))}
               </div>
@@ -827,7 +827,7 @@ export const BibleView: React.FC<BibleViewProps> = ({ user, fontSize, onUpdateFo
                         <Copy className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-[#ece4d8] font-serif leading-relaxed">«{fav.text}»</p>
+                    <p className="reading-text text-[#ece4d8] font-serif leading-relaxed">«{fav.text}»</p>
                   </div>
                 ))
               )}
