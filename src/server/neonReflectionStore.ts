@@ -59,12 +59,13 @@ export function createNeonReflectionStore(pool: pg.Pool, dailyLimit: number): Re
         client.release();
       }
     },
-    async complete(date, owner, reflection) {
+    async complete(date, owner, reflection, metadata) {
       const result = await pool.query(
         `UPDATE public.daily_reflections SET status = 'ready', reflection = $3, model = $4,
-           prompt_version = 'gospel-expanded-v1', retry_after = NULL, updated_at = now()
+           prompt_version = $5, retry_after = NULL, updated_at = now()
          WHERE date = $1 AND owner = $2 AND status = 'generating' RETURNING date`,
-        [date, owner, reflection, process.env.GEMINI_MODEL || 'gemini-flash-latest'],
+        [date, owner, reflection, metadata?.model || process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+          metadata?.promptVersion || 'gospel-four-paragraphs-v2'],
       );
       if (result.rowCount !== 1) throw new Error('Reserva de reflexión perdida.');
     },

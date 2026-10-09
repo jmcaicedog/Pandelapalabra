@@ -7,7 +7,7 @@ import { fetchColombianSantoral } from './colombianSantoral.js';
 import { hasFreshSaintVerification } from '../data/colombianSaints.js';
 import { isValidDateStr } from '../lib/dateUtils.js';
 import { ExpiringCache } from '../lib/cache.js';
-import { getSharedReflection } from './sharedReflections.js';
+import { getSharedReflection, type GeneratedReflection } from './sharedReflections.js';
 
 const liturgyCache = new ExpiringCache<LiturgicalDay>(120, 24 * 60 * 60 * 1000);
 const liturgyRequests = new Map<string, Promise<LiturgicalDay>>();
@@ -72,20 +72,24 @@ export async function generateReflection(
   prompt: string,
   systemInstruction: string,
   provider?: Pick<GoogleGenAI['models'], 'generateContent'>,
-): Promise<string> {
+): Promise<GeneratedReflection> {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key === 'MY_GEMINI_API_KEY') {
     console.warn('Gemini: GEMINI_API_KEY ausente o con valor de ejemplo.');
     throw new Error('Servicio de IA no configurado.');
   }
   if (Date.now() < quotaCooldownUntil) throw new Error('Servicio de IA temporalmente limitado.');
-  try {
-    const models = provider || new GoogleGenAI({
+  const models = provider || new GoogleGenAI({
       apiKey: key,
-      httpOptions: { timeout: 60000, retryOptions: { attempts: 1 } },
-    }).models;
+      httpOptions: { timeout: 40000, retryOptions: { attempts: 1 } },
+  }).models;
+  const candidates = [...new Set([
+    process.env.GEMINI_MODEL || 'gemini-3.8-flash', 'gemini-3.1-flash-lite',
+  ])];
+  for (const [index, model] of candidates.entries()) {
+    try {
     const response = await models.generateContent({
-      model: process.env.GEMINI_MODEL || 'gemini-flash-latest',
+      model,
       contents: prompt,
       config: { systemInstruction, temperature: 0.65 },
     });
@@ -94,7 +98,7 @@ export async function generateReflection(
       throw new Error('La IA no completó la reflexión; no se guarda un texto recortado.');
     }
     if (!response.text?.trim()) throw new Error('Respuesta de IA vacía.');
-    return response.text.trim();
+    return { reflection: response.text.trim(), model, promptVersion: 'gospel-four-paragraphs-v2' };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const quota = /429|quota|RESOURCE_EXHAUSTED/i.test(message);
@@ -111,10 +115,17 @@ export async function generateReflection(
       : 'provider_or_response';
     const status = error && typeof error === 'object' && 'status' in error && typeof error.status === 'number'
       ? error.status : undefined;
-    console.warn('El servicio de IA no pudo completar la solicitud.', { category, status });
+    console.warn('El servicio de IA no pudo completar la solicitud.', { category, status, model });
+    const transient = category === 'timeout' || status === 500 || status === 502 || status === 503 || status === 504;
+    if (!quota && transient && index + 1 < candidates.length) {
+      console.warn('Se intentará una única generación con el modelo alternativo.');
+      continue;
+    }
     if (category === 'timeout') throw new ReflectionTimeoutError();
     throw error;
   }
+  }
+  throw new Error('No hay un modelo de generación disponible.');
 }
 
 async function loadLiturgy(date: string): Promise<LiturgicalDay> {
@@ -177,7 +188,7 @@ export async function handleApiRoute(req: IncomingMessage, res: ServerResponse):
         if (!hasFreshReadings(day)) throw new Error('Lecturas verificadas no disponibles.');
         return generateReflection(
         `Fecha: ${date}. Celebración según Evangelizo: ${day.title}.\nEvangelio (${day.gospel.citation}): ${day.gospel.text}`,
-        `${AI_IDENTITY}\nRedacta una meditación de 550–700 palabras en 8–10 párrafos centrada únicamente en el Evangelio proporcionado. Dedica al menos seis párrafos a explicar y meditar el Evangelio: su contexto, los gestos y palabras de Jesús, y su aplicación concreta a la vida familiar y comunitaria. Profundiza con dos o tres párrafos adicionales, sin repetir ideas ni inventar detalles ausentes del pasaje. Termina con un propósito cotidiano y una oración breve en párrafos separados. No presentes el texto como una homilía de un sacerdote real.`,
+        `${AI_IDENTITY}\nRedacta una meditación de 300–400 palabras en exactamente cuatro párrafos separados por una línea en blanco, centrada únicamente en el Evangelio proporcionado. En los dos primeros, explica y medita las palabras y gestos de Jesús sin inventar detalles ausentes del pasaje. En el tercero, aplica el Evangelio a la vida familiar y comunitaria e incluye un propósito cotidiano concreto. En el cuarto, termina con una oración breve. No repitas ideas ni presentes el texto como una homilía de un sacerdote real.`,
         );
       });
       sendJson(res, 200, { reflection, priestName: 'Asistente católico (IA)', date, fallback: false });

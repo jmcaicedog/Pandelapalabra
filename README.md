@@ -81,16 +81,23 @@ llamadas concurrentes con bloqueos transaccionales y reservas de 180 segundos.
 No se regenera al pulsar reintentar. El servidor usa una conexión pooled y
 consultas parametrizadas; nunca envía credenciales de Neon al navegador.
 
-Las reflexiones nuevas solicitan 550–700 palabras en 8–10 párrafos, con al menos
-seis párrafos de explicación, meditación y aplicación del Evangelio, más
-propósito y oración final. Es una instrucción al modelo, no una garantía de
+Las reflexiones nuevas solicitan 300–400 palabras en cuatro párrafos: dos de
+meditación del Evangelio, uno de aplicación con propósito y uno de oración.
+Es una instrucción al modelo, no una garantía de
 conteo exacto. Las respuestas interrumpidas no se guardan como textos completos.
 El cambio de extensión no regenera reflexiones existentes. Se conservan modelo
 y versión del prompt como metadatos para trazabilidad.
 
 Se permiten como máximo tres intentos por fecha, con espera tras fallos, y un
 presupuesto global diario de nuevas reservas (`REFLECTION_DAILY_LIMIT`, 100 por
-defecto). Leer reflexiones existentes no consume ese presupuesto. Si se agotan
+defecto). Cada reserva permite como máximo dos llamadas: `gemini-3.8-flash`
+(o `GEMINI_MODEL`) y un único intento con `gemini-3.1-flash-lite` ante timeout
+o HTTP 500/502/503/504. No se cambia de modelo ante errores de cuota, permisos,
+modelo inexistente, texto vacío o respuesta interrumpida. No hay reintentos
+internos del SDK ni textos prefabricados que oculten un fallo. Por tanto, el
+límite diario de reservas no equivale al número de llamadas ni a un límite
+monetario exacto. Se guarda el modelo que realmente respondió.
+Leer reflexiones existentes no consume ese presupuesto. Si se agotan
 los intentos, el administrador debe revisar la causa antes de restablecer el
 documento. No borrar reflexiones terminadas durante un despliegue.
 
@@ -108,7 +115,10 @@ alojamiento. Nunca incluir credenciales privadas en archivos versionados ni en
 variables `VITE_*`.
 
 1. Configurar `GEMINI_API_KEY` y, opcionalmente, `GEMINI_MODEL` (por defecto,
-   `gemini-flash-latest`). Confirmar que el modelo admite generación en la
+   `gemini-3.8-flash`). El modelo alternativo es `gemini-3.1-flash-lite`.
+   Una variable `GEMINI_MODEL` existente prevalece sobre el nuevo valor por
+   defecto: actualizarla en cada entorno para restaurar el modelo anterior.
+   Confirmar que el modelo admite generación en la
    cuenta; una clave válida no garantiza acceso a todos los modelos.
 2. Configurar `DATABASE_URL` con la conexión **pooled** de Neon al proyecto
    Pandelapalabra, rama production y base neondb. Conservar los parámetros TLS
@@ -147,8 +157,8 @@ inexistentes, en lugar de devolver HTML como si fueran lecturas o scripts.
 ### Vercel
 
 [vercel.json](./vercel.json) define el build estático, la función API y un máximo
-de 120 segundos. Gemini tiene un plazo de 60 segundos por generación, sin
-reintentos automáticos facturables; el navegador espera hasta 125 segundos.
+de 120 segundos. Cada modelo tiene un plazo de 40 segundos (hasta dos llamadas);
+el navegador espera hasta 125 segundos.
 El margen restante permite obtener lecturas, reservar y guardar en Neon.
 Si Gemini devuelve 504 antes de ese plazo, se informa el fallo y no se guarda
 una reflexión parcial. Seleccionar Node 22 o posterior y configurar los secretos en

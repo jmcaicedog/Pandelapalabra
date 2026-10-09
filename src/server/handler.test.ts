@@ -3,8 +3,9 @@ import { test } from 'node:test';
 import { createServer } from 'node:http';
 import apiHandler from '../../api/index.ts';
 import { generateReflection } from './handler.ts';
+import { GenerateContentResponse } from '@google/genai';
 
-test('un 504 de Gemini informa el timeout y no devuelve texto parcial ni reintenta', async t => {
+test('dos 504 de Gemini agotan el único modelo alternativo sin devolver texto parcial', async t => {
   const previous = process.env.GEMINI_API_KEY;
   process.env.GEMINI_API_KEY = 'test-key-not-used';
   t.after(() => {
@@ -17,6 +18,48 @@ test('un 504 de Gemini informa el timeout y no devuelve texto parcial ni reinten
   await assert.rejects(generateReflection('Evangelio de prueba', 'Instrucciones de prueba', { generateContent }), {
     message: 'La generación tardó demasiado. Espera un minuto y vuelve a intentarlo.',
   });
+  assert.equal(generateContent.mock.calls.length, 2);
+});
+
+test('un fallo transitorio usa el modelo alternativo y conserva el modelo que respondió', async t => {
+  const key = process.env.GEMINI_API_KEY;
+  const model = process.env.GEMINI_MODEL;
+  process.env.GEMINI_API_KEY = 'test-key-not-used';
+  process.env.GEMINI_MODEL = 'gemini-3.8-flash';
+  t.after(() => {
+    if (key === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = key;
+    if (model === undefined) delete process.env.GEMINI_MODEL;
+    else process.env.GEMINI_MODEL = model;
+  });
+  const calls: string[] = [];
+  const generateContent = async (request: { model: string }) => {
+    calls.push(request.model);
+    if (calls.length === 1) throw Object.assign(new Error('Unavailable'), { status: 503 });
+    const response = new GenerateContentResponse();
+    response.candidates = [{
+      content: { parts: [{ text: 'Párrafo uno.\n\nPárrafo dos.\n\nPropósito.\n\nOración.' }] },
+    }];
+    return response;
+  };
+  const result = await generateReflection('Evangelio', 'Instrucciones', { generateContent });
+  assert.deepEqual(calls, ['gemini-3.8-flash', 'gemini-3.1-flash-lite']);
+  assert.equal(result.model, 'gemini-3.1-flash-lite');
+  assert.equal(result.promptVersion, 'gospel-four-paragraphs-v2');
+  assert.equal(result.reflection.split('\n\n').length, 4);
+});
+
+test('errores de permisos no consumen un intento con otro modelo', async t => {
+  const previous = process.env.GEMINI_API_KEY;
+  process.env.GEMINI_API_KEY = 'test-key-not-used';
+  t.after(() => {
+    if (previous === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = previous;
+  });
+  const generateContent = t.mock.fn(async () => {
+    throw Object.assign(new Error('PERMISSION_DENIED'), { status: 403 });
+  });
+  await assert.rejects(generateReflection('Evangelio', 'Instrucciones', { generateContent }), /PERMISSION_DENIED/);
   assert.equal(generateContent.mock.calls.length, 1);
 });
 

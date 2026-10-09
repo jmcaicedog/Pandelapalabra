@@ -55,3 +55,19 @@ test('un fallo o texto vacío no se guarda como reflexión válida y permite rei
   await assert.rejects(service.get('2026-10-09', async () => ''));
   assert.equal(await service.get('2026-10-09', async () => 'Recuperada'), 'Recuperada');
 });
+
+test('se guardan los metadatos del modelo efectivo sin regenerar contenido previo', async t => {
+  const persistent = store();
+  const complete = t.mock.method(persistent, 'complete');
+  const generated = {
+    reflection: 'Reflexión breve.', model: 'gemini-3.1-flash-lite',
+    promptVersion: 'gospel-four-paragraphs-v2',
+  };
+  const service = new SharedReflections(persistent);
+  assert.equal(await service.get('2026-10-10', async () => generated), generated.reflection);
+  assert.equal(complete.mock.calls[0].arguments[3]?.model, generated.model);
+  assert.equal(complete.mock.calls[0].arguments[3]?.promptVersion, generated.promptVersion);
+  assert.equal(await new SharedReflections(persistent).get('2026-10-10', async () => {
+    throw new Error('No debe regenerarse');
+  }), generated.reflection);
+});
