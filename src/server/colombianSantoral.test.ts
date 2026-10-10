@@ -55,6 +55,11 @@ test('las biografías de hoy y mañana tienen fuente explícita', () => {
   assert.match(tomorrow.saint.fullBio, /Concilio Vaticano II/);
   assert.equal(tomorrow.saintVerification.biographySourceName, 'Santa Sede');
   assert.match(tomorrow.saintVerification.biographySourceUrl || '', /^https:\/\/www\.vatican\.va\//);
+  const markup = renderToStaticMarkup(createElement(SaintSource, {
+    verification: tomorrow.saintVerification,
+  }));
+  assert.match(markup, /Biografía: Santa Sede/);
+  assert.doesNotMatch(markup, /pendiente de confirmar/i);
 });
 
 test('los nombres editoriales con variantes conservan la biografía local', () => {

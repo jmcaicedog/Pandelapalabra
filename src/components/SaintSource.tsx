@@ -6,11 +6,13 @@ export function SaintSource({ verification }: { verification?: SaintVerification
     ? 'Pan de la Palabra · Colombia'
     : verification?.status === 'ordo'
     ? 'Ordo Colombiano · selección del misal pendiente'
-    : 'Santoral colombiano pendiente de confirmar';
+    : null;
+
+  if (!label && !verification?.biographySourceUrl) return null;
 
   return (
     <div className="mt-2 text-[11px] text-amber-300/90">
-      {verification?.sourceUrl ? (
+      {label && (verification?.sourceUrl ? (
         <a
           href={verification.sourceUrl}
           target="_blank"
@@ -20,7 +22,7 @@ export function SaintSource({ verification }: { verification?: SaintVerification
         >
           Fuente: {label}
         </a>
-      ) : <span>{label}</span>}
+      ) : <span>{label}</span>)}
       {verification?.biographySourceUrl && (
         <div className="mt-1">
           <a
