@@ -67,6 +67,11 @@ export function isLiturgicalDay(value: unknown): value is LiturgicalDay {
     || !Number.isFinite(Date.parse(String(value.saintVerification.checkedAt)))
     || !['publisher', 'ordo', 'pending', 'editorial'].includes(String(value.saintVerification.status))
     || (value.saintVerification.status === 'editorial' && !strings(value.saintVerification, ['version', 'sourceReference', 'review']))
+    || (value.saintVerification.biographySourceUrl !== undefined
+      && (typeof value.saintVerification.biographySourceUrl !== 'string'
+        || !/^https:\/\/(?:es\.catholic\.net|www\.vatican\.va)\//.test(value.saintVerification.biographySourceUrl)))
+    || (value.saintVerification.biographySourceName !== undefined
+      && typeof value.saintVerification.biographySourceName !== 'string')
     || (value.saintVerification.sourceUrl !== undefined && (typeof value.saintVerification.sourceUrl !== 'string'
       || !/^https:\/\/(?:sanpablo\.co|ordocolombia\.cec\.org\.co)\//.test(value.saintVerification.sourceUrl))))) return false;
   return (value.source === 'local' || value.source === 'evangelizo')

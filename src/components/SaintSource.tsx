@@ -1,7 +1,7 @@
 import type { SaintVerification } from '../data/colombianSaints.ts';
 
 export function SaintSource({ verification }: { verification?: SaintVerification }) {
-  if (verification?.status === 'editorial') return null;
+  if (verification?.status === 'editorial' && !verification.biographySourceUrl) return null;
   const label = verification?.status === 'publisher'
     ? 'Pan de la Palabra · Colombia'
     : verification?.status === 'ordo'
@@ -21,6 +21,19 @@ export function SaintSource({ verification }: { verification?: SaintVerification
           Fuente: {label}
         </a>
       ) : <span>{label}</span>}
+      {verification?.biographySourceUrl && (
+        <div className="mt-1">
+          <a
+            href={verification.biographySourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(event) => event.stopPropagation()}
+            className="underline underline-offset-2"
+          >
+            Biografía: {verification.biographySourceName || 'fuente consultada'}
+          </a>
+        </div>
+      )}
       {verification?.status === 'publisher' && (verification.celebration || verification.colors) && (
         <p className="mt-1 text-slate-400">
           Ordo Colombiano: {[verification.celebration, verification.colors].filter(Boolean).join(' · ')}.

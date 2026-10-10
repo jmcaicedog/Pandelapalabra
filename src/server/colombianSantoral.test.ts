@@ -44,6 +44,26 @@ test('Pelagia y Luis Bertrán se resuelven localmente, sin consultas externas', 
   assert.equal(network.mock.calls.length, 0);
 });
 
+test('las biografías de hoy y mañana tienen fuente explícita', () => {
+  const today = getEditorialSaint('2026-10-10');
+  const tomorrow = getEditorialSaint('2026-10-11');
+  assert.equal(today.saint.name, 'San Daniel el Estilita');
+  assert.match(today.saint.fullBio, /Constantinopla/);
+  assert.equal(today.saintVerification.biographySourceName, 'Catholic.net');
+  assert.match(today.saintVerification.biographySourceUrl || '', /^https:\/\/es\.catholic\.net\//);
+  assert.equal(tomorrow.saint.name, 'San Juan XXIII');
+  assert.match(tomorrow.saint.fullBio, /Concilio Vaticano II/);
+  assert.equal(tomorrow.saintVerification.biographySourceName, 'Santa Sede');
+  assert.match(tomorrow.saintVerification.biographySourceUrl || '', /^https:\/\/www\.vatican\.va\//);
+});
+
+test('los nombres editoriales con variantes conservan la biografía local', () => {
+  const result = getEditorialSaint('2028-01-02');
+  assert.equal(result.saint.name, 'Santos Basilio Magno y Gregorio de Nacianzo');
+  assert.match(result.saint.fullBio, /Basilio/);
+  assert.doesNotMatch(result.saint.fullBio, /Todavía no hay/);
+});
+
 test('la revisión queda interna y cambiar de versión invalida la selección anterior', () => {
   const result = getEditorialSaint('2026-10-08');
   assert.equal(result.saintVerification.version, EDITORIAL_SANTORAL_VERSION);
