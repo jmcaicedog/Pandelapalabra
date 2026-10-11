@@ -1,6 +1,32 @@
 import type { SaintVerification } from '../data/colombianSaints.ts';
 
-export function SaintSource({ verification }: { verification?: SaintVerification }) {
+export function SaintSource({ verification, onRetry }: {
+  verification?: SaintVerification;
+  onRetry?: () => void;
+}) {
+  if (verification?.biographyError) {
+    return <div className="mt-2 text-[11px] text-amber-300/90" role="status">
+      <p>{verification.biographyError}</p>
+      {onRetry && <button
+        type="button"
+        className="mt-1 underline underline-offset-2"
+        onClick={event => { event.stopPropagation(); onRetry(); }}
+      >Reintentar biografía</button>}
+    </div>;
+  }
+  if (verification?.biographyMethod === 'grounded') {
+    return <div className="mt-2 text-[11px] text-amber-300/90">
+      <p>Síntesis con búsqueda (IA). Fuentes consultadas:</p>
+      {verification.biographySources?.map(source => <a
+        key={source.url}
+        href={source.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={event => event.stopPropagation()}
+        className="block underline underline-offset-2 mt-1"
+      >{source.title}</a>)}
+    </div>;
+  }
   if (verification?.status === 'editorial' && !verification.biographySourceUrl) return null;
   const label = verification?.status === 'publisher'
     ? 'Pan de la Palabra · Colombia'

@@ -79,7 +79,7 @@ export function createNeonReflectionStore(pool: pg.Pool, dailyLimit: number): Re
   };
 }
 
-export function neonReflectionStore(): ReflectionStore {
+export function createNeonPool(): pg.Pool {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL de Neon no configurada.');
   let url: URL;
@@ -88,13 +88,17 @@ export function neonReflectionStore(): ReflectionStore {
   if (!['postgres:', 'postgresql:'].includes(url.protocol)) throw new Error('Protocolo DATABASE_URL inválido.');
   url.searchParams.set('sslmode', 'verify-full');
   url.searchParams.delete('uselibpqcompat');
-  const dailyLimit = Number(process.env.REFLECTION_DAILY_LIMIT || 100);
-  if (!Number.isSafeInteger(dailyLimit) || dailyLimit < 1) throw new Error('Límite diario inválido.');
   const pool = new pg.Pool({
     connectionString: url.toString(), max: 3, connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 10000, statement_timeout: 10000, query_timeout: 12000,
     allowExitOnIdle: true, enableChannelBinding: true,
   });
   pool.on('error', () => console.error('Conexión inactiva de Neon interrumpida.'));
-  return createNeonReflectionStore(pool, dailyLimit);
+  return pool;
+}
+
+export function neonReflectionStore(): ReflectionStore {
+  const dailyLimit = Number(process.env.REFLECTION_DAILY_LIMIT || 100);
+  if (!Number.isSafeInteger(dailyLimit) || dailyLimit < 1) throw new Error('Límite diario inválido.');
+  return createNeonReflectionStore(createNeonPool(), dailyLimit);
 }

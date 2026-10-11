@@ -17,6 +17,10 @@ export interface SaintVerification {
   review?: string;
   biographySourceUrl?: string;
   biographySourceName?: string;
+  biographySources?: { url: string; title: string }[];
+  biographyMethod?: 'grounded';
+  biographyCheckedAt?: string;
+  biographyError?: string;
 }
 
 export interface ColombianSaint {
@@ -44,11 +48,11 @@ const BIOGRAPHIES_BY_NAME: Record<string, {
   },
 };
 
-const NAME_NOISE = new Set([
-  'san', 'santo', 'santa', 'santos', 'del', 'de', 'la', 'el', 'los', 'las',
-  'virgen', 'martir', 'obispo', 'papa', 'apostol', 'apostoles', 'presbitero',
-  'diacono', 'evangelista', 'abad', 'confesor', 'mártir',
-]);
+const IDENTITY_ALIASES: Record<string, string> = {
+  'Santa Pelagia de Antioquía': 'Santa Pelagia',
+  'Santos Basilio Magno y Gregorio de Nacianzo': 'San Basilio Magno y San Gregorio Nacianceno',
+  'San Juan Nepomuceno Neumann': 'San Juan Neumann',
+};
 
 export function publisherUrl(date: string): string {
   return `https://sanpablo.co/publicaciones-periodicas/pan-de-la-palabra/${date}/`;
@@ -69,29 +73,34 @@ export function normalizeSaintName(name: string): string {
     .replace(/[.,;:]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function saintNameTokens(name: string): Set<string> {
-  return new Set(normalizeSaintName(name)
-    .replace(/[^a-z0-9 ]/g, ' ')
-    .split(/\s+/)
-    .filter(token => token.length > 2 && !NAME_NOISE.has(token)));
+function findLocalBiography(name: string): SaintData | undefined {
+  const identity = normalizeSaintName(IDENTITY_ALIASES[name] || name);
+  // The date selects the saint, not the biography; never match only part of a name.
+  return Object.values(SAINTS_BY_DAY).find(local => normalizeSaintName(local.name) === identity);
 }
 
-function findLocalBiography(date: string, name: string): SaintData | undefined {
-  const local = SAINTS_BY_DAY[date.slice(5)];
-  if (!local) return undefined;
-  if (normalizeSaintName(local.name) === normalizeSaintName(name)) return local;
+export function hasSaintBiography(value: ColombianSaint): boolean {
+  return !!value.saint.fullBio.trim()
+    && !/^(?:Biografía no disponible\.|Todavía no hay una biografía|No se ha podido verificar el santo|La fuente confirma el nombre; no hay una biografía)/i.test(value.saint.fullBio.trim());
+}
 
-  const requested = saintNameTokens(name);
-  const available = saintNameTokens(local.name);
-  if (requested.size < 2 || available.size < 2) return undefined;
-  const overlap = [...requested].filter(token => available.has(token)).length;
-  const unmatched = requested.size + available.size - (overlap * 2);
-  // Accept inflection/spelling variants and one added liturgical descriptor,
-  // but reject names that could identify a different saint in a combined entry.
-  const completeIdentity = overlap >= 2
-    && overlap >= Math.min(requested.size, available.size) - 1
-    && unmatched <= 2;
-  return completeIdentity && overlap >= 2 ? local : undefined;
+export function isBiographySourceUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password
+      && [
+        'es.catholic.net', 'www.vatican.va', 'www.vaticannews.va',
+        'www.aciprensa.com', 'www.oca.org', 'vertexaisearch.cloud.google.com',
+      ].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+export function hasFreshSaintBiography(value: ColombianSaint): boolean {
+  if (!hasSaintBiography(value)) return false;
+  return value.saintVerification.biographyMethod !== 'grounded'
+    || !!value.saintVerification.biographySources?.length;
 }
 
 export function selectColombianSaint(
@@ -99,7 +108,7 @@ export function selectColombianSaint(
   name: string | null,
   verification: Omit<SaintVerification, 'date' | 'checkedAt'>,
 ): ColombianSaint {
-  const local = name ? findLocalBiography(date, name) : undefined;
+  const local = name ? findLocalBiography(name) : undefined;
   return {
     saint: !name ? pendingSaint() : local ? { ...local, name } : {
       name,
@@ -130,9 +139,7 @@ export function getEditorialSaint(date: string): ColombianSaint {
     status: 'editorial', version: EDITORIAL_SANTORAL_VERSION,
     sourceReference: entry.source, review: entry.review,
   });
-  // This is an identity alias, not a replacement based on a partial name match.
-  const aliases: Record<string, string> = { 'Santa Pelagia de Antioquía': 'Santa Pelagia' };
-  const local = findLocalBiography(date, aliases[entry.name] || entry.name);
+  const local = findLocalBiography(entry.name);
   if (local) {
     selected.saint = { ...local, name: entry.name };
   } else {

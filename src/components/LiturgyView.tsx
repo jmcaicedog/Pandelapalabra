@@ -201,6 +201,18 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     }
   };
 
+  const retryBiography = async () => {
+    const date = selectedDate;
+    setActionError(null);
+    try {
+      const refreshed = await fetchLiturgicalDay(date);
+      if (date === selectedDateRef.current) setDayData(refreshed);
+    } catch (error) {
+      console.warn('No se pudo reintentar la biografía:', error);
+      if (date === selectedDateRef.current) setActionError('No se pudo consultar la biografía.');
+    }
+  };
+
   const playAudio = (sectionId: string, textToPlay: string) => {
     if (sectionId !== 'reflection' && dayData.readingsPending) return;
     if (currentPlayingSection === sectionId && isPlaying) {
@@ -461,7 +473,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           <p className="reading-text text-slate-300 mt-2 leading-relaxed whitespace-pre-line">
             {dayData.saint.fullBio || dayData.saint.shortBio}
           </p>
-          <SaintSource verification={dayData.saintVerification} />
+          <SaintSource verification={dayData.saintVerification} onRetry={retryBiography} />
 
           <div className="mt-3 flex items-center justify-between text-[11px] text-amber-400/90 font-medium">
             <span>Toca para abrir biografía y oración</span>
@@ -821,6 +833,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
                   Vida y Testimonio
                 </h4>
                 <p className="reading-text whitespace-pre-line">{dayData.saint.fullBio}</p>
+                <SaintSource verification={dayData.saintVerification} onRetry={retryBiography} />
               </div>
 
               <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4">

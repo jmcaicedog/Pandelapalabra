@@ -4,7 +4,7 @@ import { buildCanonicalDay } from '../data/canonicalLectionary.js';
 import { fetchEvangelizoDay } from '../data/evangelizo.js';
 import { hasFreshReadings, type LiturgicalDay } from '../data/liturgy.js';
 import { fetchColombianSantoral } from './colombianSantoral.js';
-import { hasFreshSaintVerification } from '../data/colombianSaints.js';
+import { hasFreshSaintVerification, hasFreshSaintBiography } from '../data/colombianSaints.js';
 import { isValidDateStr } from '../lib/dateUtils.js';
 import { ExpiringCache } from '../lib/cache.js';
 import { getSharedReflection, type GeneratedReflection } from './sharedReflections.js';
@@ -130,7 +130,10 @@ export async function generateReflection(
 
 async function loadLiturgy(date: string): Promise<LiturgicalDay> {
   const cached = liturgyCache.get(date);
-  if (cached && hasFreshReadings(cached) && hasFreshSaintVerification(cached.saintVerification, date)) return cached;
+  if (cached && hasFreshReadings(cached) && hasFreshSaintVerification(cached.saintVerification, date)
+    && cached.saintVerification && hasFreshSaintBiography({
+      saint: cached.saint, saintVerification: cached.saintVerification,
+    })) return cached;
   const running = liturgyRequests.get(date);
   if (running) return running;
   const request = (async () => {

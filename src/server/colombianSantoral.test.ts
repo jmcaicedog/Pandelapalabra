@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { fetchColombianSantoral } from './colombianSantoral.ts';
-import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint, hasFreshSaintVerification } from '../data/colombianSaints.ts';
+import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint, hasFreshSaintVerification, hasSaintBiography } from '../data/colombianSaints.ts';
 import { SaintSource } from '../components/SaintSource.tsx';
 import editorial from '../data/colombianEditorialSaints.json' with { type: 'json' };
 
@@ -75,4 +75,43 @@ test('la revisión queda interna y cambiar de versión invalida la selección an
   assert.equal(renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification })), '');
   assert.ok(!hasFreshSaintVerification({ ...result.saintVerification, version: 'old' }, '2026-10-08'));
   assert.ok(!hasFreshSaintVerification(result.saintVerification, '2026-10-09'));
+});
+
+test('consulta biografías por identidad para fechas arbitrarias y conserva la selección', async () => {
+  const dates = Object.keys(editorial.entries)
+    .filter(day => !hasSaintBiography(getEditorialSaint(`2028-${day}`))).slice(0, 3);
+  assert.equal(dates.length, 3);
+  for (const day of dates) {
+    for (const year of [2028, 2035]) {
+      const date = `${year}-${day}`;
+      const selected = getEditorialSaint(date);
+      const result = await fetchColombianSantoral(date, async name => {
+        assert.equal(name, selected.saint.name);
+        return {
+          fullBio: `${name}. ${'Resumen con hechos respaldados por las fuentes consultadas. '.repeat(5)}`,
+          sources: [{ url: 'https://www.vatican.va/biografia', title: 'Santa Sede' }],
+          checkedAt: '2026-10-11T01:00:00Z',
+        };
+      });
+      assert.equal(result.saint.name, selected.saint.name);
+      assert.equal(result.saintVerification.date, date);
+      assert.equal(result.saintVerification.biographyMethod, 'grounded');
+      assert.ok(hasSaintBiography(result));
+      const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
+      assert.match(markup, /Síntesis con búsqueda/);
+      assert.match(markup, /https:\/\/www.vatican.va\/biografia/);
+    }
+  }
+});
+
+test('un fallo de consulta se muestra explícitamente con reintento', async () => {
+  const day = Object.keys(editorial.entries)
+    .find(day => !hasSaintBiography(getEditorialSaint(`2028-${day}`)))!;
+  const result = await fetchColombianSantoral(`2028-${day}`, async () => { throw new Error('Sin fuentes'); });
+  assert.ok(!hasSaintBiography(result));
+  const markup = renderToStaticMarkup(createElement(SaintSource, {
+    verification: result.saintVerification, onRetry: () => {},
+  }));
+  assert.match(markup, /No se pudo obtener una biografía con fuentes/);
+  assert.match(markup, /Reintentar biografía/);
 });

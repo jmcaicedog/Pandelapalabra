@@ -34,8 +34,12 @@ de fuentes, migración de cachés, contratos HTTP y generación compartida.
   de coincidencia con Pan de la Palabra impreso: 174 entradas proceden del
   calendario y 192 del santoral complementario. En 2026 se usan 191 de estas últimas.
   La fuente y revisión se conservan internamente; no se muestran en las tarjetas.
-  Solo se reutilizan biografías locales si coincide la identidad; no se generan
-  biografías ni se cambian lecturas, celebraciones o colores por el santo destacado.
+  Solo se reutilizan biografías locales por identidad exacta o alias explícito,
+  independientemente de la fecha de su registro. Si falta la biografía, el servidor
+  solicita una síntesis a Gemini con Google Search. Solo acepta segmentos con
+  referencias de búsqueda para esa identidad y muestra las fuentes. Esto no
+  equivale a una revisión histórica editorial ni garantiza cobertura de todos
+  los santos. No cambia lecturas, celebraciones ni colores.
 - Solo se importan nombres y metadatos del Excel. Vatican News se
   enlaza, sin reproducir sus textos o imágenes. Su enlace al evangelio de hoy
   no equivale a la fecha histórica o futura seleccionada.
@@ -68,6 +72,33 @@ y desplegar. Las cachés de lecturas anteriores conservan sus textos, pero su
 santo se sustituye por la selección editorial vigente, también sin conexión.
 
 ## Reflexión compartida, sin chat
+
+### Biografías compartidas
+
+Aplicar [002_saint_biographies.sql](./migrations/002_saint_biographies.sql) en la
+misma base PostgreSQL configurada en `DATABASE_URL`. Las biografías recuperadas se
+guardan en `public.saint_biographies` por nombre normalizado, con texto, enlaces
+de búsqueda, fecha de consulta, modelo y versión del prompt. Una entrada terminada
+se lee antes de reservar generación: otros clientes, años o instancias no llaman
+de nuevo a Gemini por ese santo. No hay regeneración automática por vencimiento.
+Las correcciones editoriales deben revisarse; no borrar las entradas al desplegar.
+
+Una reserva transaccional de 180 segundos evita generaciones simultáneas entre
+instancias. Hay un máximo de tres intentos por identidad y 60 segundos de espera
+tras fallos. `BIOGRAPHY_DAILY_LIMIT` limita nuevas reservas (100 por defecto), no
+lecturas de biografías existentes. Si se agotan intentos, revisar la fuente y el
+servicio antes de restablecerlos. La caché en memoria acelera lecturas y el
+almacenamiento del navegador permite reutilizar la biografía sin conexión incluso
+si las lecturas del día no están disponibles.
+
+Sin persistencia, migración o clave de Gemini configuradas, no se genera ni se
+presenta información como guardada: aparece un aviso de indisponibilidad.
+El modelo debe admitir Google Search. Si el modelo configurado devuelve HTTP 404,
+se intenta una sola vez `gemini-3.8-flash` y se guarda el modelo realmente usado.
+Las fuentes se toman de los metadatos de
+búsqueda, no de URLs inventadas en el texto; el proveedor puede devolver enlaces
+de redirección de Google. Se descartan segmentos sin citas. La búsqueda reduce
+el riesgo de invención, pero no sustituye la revisión de las fuentes.
 
 La API acepta únicamente `{ "date": "YYYY-MM-DD" }` en `POST /api/reflection`.
 Obtiene el evangelio en el servidor: el visitante no puede introducir preguntas

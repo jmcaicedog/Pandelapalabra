@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildCanonicalDay } from './canonicalLectionary.ts';
 import { cleanSaintText, mapEvangelizoDay } from './evangelizo.ts';
-import { fetchLiturgicalDay, getLiturgicalDay } from './liturgy.ts';
-import { EDITORIAL_SANTORAL_VERSION } from './colombianSaints.ts';
+import { fetchLiturgicalDay, getLiturgicalDay, withCurrentSaint } from './liturgy.ts';
+import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint } from './colombianSaints.ts';
 
 function officialFixture(date: string) {
   return {
@@ -21,6 +21,64 @@ function officialFixture(date: string) {
     ],
   };
 }
+
+function researchedDay(date: string) {
+  const day = buildCanonicalDay(date);
+  day.saint = { ...day.saint, fullBio: `${day.saint.name}. ${'Resumen respaldado con fuentes. '.repeat(10)}` };
+  day.saintVerification = {
+    ...getEditorialSaint(date).saintVerification,
+    biographyMethod: 'grounded',
+    biographyCheckedAt: '2026-10-11T01:00:00Z',
+    biographySources: [{ url: 'https://www.vatican.va/biografia', title: 'Santa Sede' }],
+  };
+  return day;
+}
+
+test('conserva biografías con fuentes y descarta identidades o versiones distintas', () => {
+  const day = researchedDay('2040-01-03');
+  assert.equal(withCurrentSaint(day).saint.fullBio, day.saint.fullBio);
+  assert.deepEqual(withCurrentSaint(day).saintVerification?.biographySources,
+    day.saintVerification?.biographySources);
+  assert.notEqual(withCurrentSaint({ ...day, saint: { ...day.saint, name: 'Otro santo' } }).saint.fullBio,
+    day.saint.fullBio);
+  assert.notEqual(withCurrentSaint({ ...day, saintVerification: { ...day.saintVerification!,
+    version: 'old' } }).saint.fullBio, day.saint.fullBio);
+});
+
+test('persiste biografías sin lecturas y las reutiliza en otro año sin perderlas por fallos de red', async t => {
+  const entries = new Map<string, string>();
+  const descriptors = new Map(['window', 'localStorage'].map(key =>
+    [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => {
+    for (const [key, descriptor] of descriptors) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
+  });
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: {} });
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
+    getItem: (key: string) => entries.get(key) || null,
+    setItem: (key: string, value: string) => entries.set(key, value),
+  } });
+  const day = researchedDay('2041-01-03');
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(day)));
+  const first = await fetchLiturgicalDay(day.date);
+  assert.ok(first.readingsPending);
+  assert.equal(first.saint.fullBio, day.saint.fullBio);
+  assert.ok([...entries.keys()].some(key => key.startsWith('panvivo_saint_v1_')));
+  assert.ok(![...entries.keys()].some(key => key.startsWith('panvivo_liturgy_v6_')));
+  const nextYear = getLiturgicalDay('2042-01-03');
+  assert.equal(nextYear.saint.fullBio, day.saint.fullBio);
+  assert.equal(nextYear.saintVerification?.date, '2042-01-03');
+  t.mock.restoreAll();
+  t.mock.method(globalThis, 'fetch', async (input: string | URL | Request) => {
+    if (String(input).startsWith('/api/')) throw new Error('Sin conexión al servidor');
+    return new Response(JSON.stringify({ data: officialFixture('2042-01-03') }));
+  });
+  const recovered = await fetchLiturgicalDay('2042-01-03');
+  assert.equal(recovered.saint.fullBio, day.saint.fullBio);
+  assert.equal(recovered.source, 'evangelizo');
+});
 
 test('el santoral editorial recurrente no depende del año ni del orden de Evangelizo', () => {
   for (const year of [2026, 2027, 2030, 2100]) {
