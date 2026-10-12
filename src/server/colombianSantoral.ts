@@ -1,4 +1,4 @@
-import { getEditorialSaint, hasSaintBiography, type ColombianSaint } from '../data/colombianSaints.js';
+import { getEditorialSaint, hasSaintBiography, isBiographyBlockedForReview, type ColombianSaint } from '../data/colombianSaints.js';
 import { getSharedBiography, type ResearchedBiography } from './saintBiographies.js';
 
 export async function fetchColombianSantoral(
@@ -6,7 +6,7 @@ export async function fetchColombianSantoral(
   biographyLookup: (name: string) => Promise<ResearchedBiography> = getSharedBiography,
 ): Promise<ColombianSaint> {
   const selected = getEditorialSaint(date);
-  if (hasSaintBiography(selected)) return selected;
+  if (hasSaintBiography(selected) || isBiographyBlockedForReview(selected)) return selected;
   try {
     const biography = await biographyLookup(selected.saint.name);
     return {

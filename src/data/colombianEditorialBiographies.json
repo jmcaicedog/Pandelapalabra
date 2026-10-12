@@ -1,0 +1,1832 @@
+{
+  "version": "colombia-biographies-2026-v1.0.4",
+  "workbook": "Calendario_Liturgico_Colombia_2026_V1_0_4_Resenas_365.xlsx",
+  "sheet": "Reseñas biográficas",
+  "records": {
+    "01-01": {
+      "name": "Santa María, Madre de Dios",
+      "text": "La Iglesia honra a María como Madre de Dios porque dio a luz a Jesucristo, verdadero Dios y verdadero hombre. Su maternidad ocupa un lugar central en la historia de la salvación.",
+      "excluded": false
+    },
+    "01-02": {
+      "name": "Santos Basilio Magno y Gregorio de Nacianzo",
+      "text": "Basilio, obispo de Cesarea, y Gregorio, obispo de Constantinopla, fueron grandes teólogos del siglo IV. Defendieron la fe trinitaria y promovieron la vida monástica y la enseñanza cristiana.",
+      "excluded": false
+    },
+    "01-03": {
+      "name": "Santísimo Nombre de Jesús",
+      "text": "La devoción al Santísimo Nombre de Jesús recuerda que el nombre dado al Salvador expresa su misión de traer la salvación. No se trata de la biografía de un santo.",
+      "excluded": false
+    },
+    "01-04": {
+      "name": "Santa Isabel Ana Seton",
+      "text": "Isabel Ana Seton (1774-1821), viuda y madre estadounidense, se convirtió al catolicismo y fundó una comunidad religiosa dedicada a la educación y la caridad.",
+      "excluded": false
+    },
+    "01-05": {
+      "name": "San Juan Nepomuceno Neumann",
+      "text": "Juan Nepomuceno Neumann (1811-1860), obispo de Filadelfia, impulsó las escuelas parroquiales y acompañó a comunidades de inmigrantes en Estados Unidos.",
+      "excluded": false
+    },
+    "01-06": {
+      "name": "Epifanía del Señor",
+      "text": "La Epifanía celebra la manifestación de Jesucristo a todos los pueblos, simbolizada por la adoración de los magos. Su celebración litúrgica en Colombia se traslada al domingo establecido.",
+      "excluded": false
+    },
+    "01-07": {
+      "name": "San Raimundo de Peñafort",
+      "text": "Raimundo de Peñafort (c. 1175-1275) fue un fraile dominico y especialista en derecho canónico. Trabajó por la formación del clero y la organización de las normas eclesiásticas.",
+      "excluded": false
+    },
+    "01-08": {
+      "name": "San Apolinar el Apologista",
+      "text": "Apolinar, obispo de Hierápolis en el siglo II, es recordado como apologista cristiano por sus escritos en defensa de la fe. Se conserva poca información sobre su vida.",
+      "excluded": false
+    },
+    "01-09": {
+      "name": "San Julián el Hospitalario",
+      "text": "Julián el Hospitalario es un personaje venerado por la tradición medieval, especialmente por su hospitalidad hacia los viajeros y necesitados. Su relato contiene elementos legendarios que no pueden confirmarse históricamente.",
+      "excluded": false
+    },
+    "01-10": {
+      "name": "San Guillermo de Bourges",
+      "text": "Guillermo de Bourges (fallecido en 1209) fue un monje cisterciense y arzobispo de Bourges, recordado por su austeridad y dedicación pastoral.",
+      "excluded": false
+    },
+    "01-11": {
+      "name": "San Higinio",
+      "text": "Higinio fue obispo de Roma durante el siglo II. Las fuentes antiguas ofrecen escasos datos sobre su pontificado; su memoria se conserva entre los primeros pastores de la Iglesia romana.",
+      "excluded": false
+    },
+    "01-12": {
+      "name": "San Benito Biscop",
+      "text": "Benito Biscop (c. 628-690), abad inglés, fundó monasterios y promovió la formación bíblica y litúrgica, así como la conservación de libros y obras de arte sacro.",
+      "excluded": false
+    },
+    "01-13": {
+      "name": "San Hilario",
+      "text": "Hilario de Poitiers (c. 315-367) fue obispo y doctor de la Iglesia. Defendió la divinidad de Cristo durante las controversias arrianas.",
+      "excluded": false
+    },
+    "01-14": {
+      "name": "San Félix de Nola",
+      "text": "Félix de Nola fue un presbítero de Campania que padeció persecución por su fe en el siglo III. San Paulino de Nola contribuyó a difundir su memoria mediante sus escritos.",
+      "excluded": false
+    },
+    "01-15": {
+      "name": "San Pablo el Ermitaño",
+      "text": "Pablo de Tebas es venerado como uno de los primeros ermitaños cristianos. Su vida, transmitida por la tradición monástica, representa la búsqueda de Dios en la soledad y la oración.",
+      "excluded": false
+    },
+    "01-16": {
+      "name": "San Marcelo I",
+      "text": "Marcelo I fue obispo de Roma a comienzos del siglo IV, en una etapa difícil posterior a las persecuciones. Su memoria se relaciona con la reorganización de la comunidad cristiana.",
+      "excluded": false
+    },
+    "01-17": {
+      "name": "San Antonio, abad",
+      "text": "Antonio Abad (c. 251-356) vivió como ermitaño en Egipto y llegó a ser referente de los primeros monjes cristianos por su oración, austeridad y dirección espiritual.",
+      "excluded": false
+    },
+    "01-18": {
+      "name": "Santa Prisca",
+      "text": "Prisca es venerada en Roma como mártir cristiana. Los datos de su vida son inciertos y su memoria está asociada a una antigua iglesia romana dedicada a ella.",
+      "excluded": false
+    },
+    "01-19": {
+      "name": "San Canuto IV",
+      "text": "Canuto IV, rey de Dinamarca en el siglo XI, promovió la vida eclesial y murió violentamente en Odense en 1086. Es venerado como mártir en la tradición danesa.",
+      "excluded": false
+    },
+    "01-20": {
+      "name": "San Fabián; San Sebastián",
+      "text": "Fabián fue obispo de Roma y murió mártir en el año 250. Sebastián es venerado como mártir romano, cuyo testimonio adquirió gran difusión en la tradición cristiana.",
+      "excluded": false
+    },
+    "01-21": {
+      "name": "Santa Inés",
+      "text": "Inés fue una joven mártir romana de los primeros siglos del cristianismo. Su memoria destaca la fidelidad a Cristo y la fortaleza de la fe.",
+      "excluded": false
+    },
+    "01-22": {
+      "name": "San Vicente, diácono y mártir",
+      "text": "Vicente, diácono de Zaragoza, sufrió el martirio a comienzos del siglo IV. Es uno de los mártires más venerados de la antigua Hispania.",
+      "excluded": false
+    },
+    "01-23": {
+      "name": "San Ildefonso de Toledo",
+      "text": "Ildefonso fue arzobispo de Toledo en el siglo VII. Sus escritos teológicos y su devoción a la Virgen María lo hicieron una figura importante de la Iglesia visigoda.",
+      "excluded": false
+    },
+    "01-24": {
+      "name": "San Francisco de Sales",
+      "text": "Francisco de Sales (1567-1622), obispo de Ginebra y doctor de la Iglesia, enseñó que la santidad es posible en la vida cotidiana y destacó por su trato amable y su dirección espiritual.",
+      "excluded": false
+    },
+    "01-25": {
+      "name": "Conversión de San Pablo",
+      "text": "La conversión de san Pablo recuerda el encuentro transformador de Saulo con Cristo resucitado en el camino de Damasco, narrado en los Hechos de los Apóstoles.",
+      "excluded": false
+    },
+    "01-26": {
+      "name": "Santos Timoteo y Tito",
+      "text": "Timoteo y Tito fueron colaboradores de san Pablo en la misión apostólica. Las cartas pastorales del Nuevo Testamento conservan enseñanzas dirigidas a ambos.",
+      "excluded": false
+    },
+    "01-27": {
+      "name": "Santa Ángela Merici",
+      "text": "Ángela Merici (c. 1474-1540) fundó la Compañía de Santa Úrsula y dedicó su obra a la formación cristiana de las jóvenes.",
+      "excluded": false
+    },
+    "01-28": {
+      "name": "Santo Tomás de Aquino",
+      "text": "Tomás de Aquino (1225-1274), fraile dominico y doctor de la Iglesia, integró filosofía y teología en una obra que marcó profundamente el pensamiento católico.",
+      "excluded": false
+    },
+    "01-29": {
+      "name": "San Gildas",
+      "text": "Gildas fue un escritor y monje británico del siglo VI. Su obra sobre la situación moral y política de Britania constituye una fuente importante para el período.",
+      "excluded": false
+    },
+    "01-30": {
+      "name": "Santa Martina",
+      "text": "Martina es venerada como mártir romana. Los relatos sobre su martirio son tardíos y no permiten reconstruir con certeza su biografía.",
+      "excluded": false
+    },
+    "01-31": {
+      "name": "San Juan Bosco",
+      "text": "Juan Bosco (1815-1888), sacerdote italiano y fundador de los salesianos, dedicó su vida a la educación y acompañamiento de los jóvenes, especialmente los más vulnerables.",
+      "excluded": false
+    },
+    "02-01": {
+      "name": "San Sigeberto III",
+      "text": "Sigeberto III fue rey de Austrasia en el siglo VII y es venerado por su piedad y apoyo a las fundaciones monásticas. Su figura pertenece a la historia del reino franco.",
+      "excluded": false
+    },
+    "02-02": {
+      "name": "Presentación del Señor",
+      "text": "La Presentación del Señor recuerda cuando María y José llevaron al niño Jesús al templo de Jerusalén, donde fue reconocido por Simeón y Ana.",
+      "excluded": false
+    },
+    "02-03": {
+      "name": "San Blas; San Óscar",
+      "text": "Blas fue obispo de Sebaste y es venerado como mártir. Óscar (Ansgario), obispo del siglo IX, evangelizó regiones de Escandinavia.",
+      "excluded": false
+    },
+    "02-04": {
+      "name": "San Andrés Corsini",
+      "text": "Andrés Corsini fue un religioso carmelita italiano del siglo XIV que llegó a ser obispo de Fiesole. Se le recuerda por su servicio pastoral y sus esfuerzos de reconciliación.",
+      "excluded": false
+    },
+    "02-05": {
+      "name": "Santa Águeda",
+      "text": "Águeda es venerada como virgen y mártir de Catania, Sicilia, durante las persecuciones antiguas. Su memoria es signo de fidelidad y firmeza en la fe.",
+      "excluded": false
+    },
+    "02-06": {
+      "name": "Santos Pablo Miki y compañeros",
+      "text": "Pablo Miki, jesuita japonés, y sus compañeros fueron martirizados en Nagasaki en 1597. Su testimonio recuerda los inicios y las persecuciones del cristianismo en Japón.",
+      "excluded": false
+    },
+    "02-07": {
+      "name": "San Ricardo de Lucca",
+      "text": "Ricardo de Lucca, nombre presente en algunas recopilaciones locales de santos, requiere identificación documental más precisa para atribuirle fechas y episodios biográficos concretos.",
+      "excluded": false
+    },
+    "02-08": {
+      "name": "San Jerónimo Emiliani",
+      "text": "Jerónimo Emiliani (1486-1537) fundó una congregación dedicada a la atención de huérfanos y personas necesitadas.",
+      "excluded": false
+    },
+    "02-09": {
+      "name": "Santa Apolonia",
+      "text": "Apolonia fue una mártir de Alejandría en el siglo III, recordada por su valentía durante la persecución de los cristianos.",
+      "excluded": false
+    },
+    "02-10": {
+      "name": "Santa Escolástica",
+      "text": "Escolástica, hermana de san Benito según la tradición, se dedicó a la vida consagrada y es venerada como referente del monacato femenino.",
+      "excluded": false
+    },
+    "02-11": {
+      "name": "Nuestra Señora de Lourdes",
+      "text": "La memoria de Nuestra Señora de Lourdes recuerda las apariciones marianas relatadas por Bernadette Soubirous en 1858 y la invitación a la oración y la conversión.",
+      "excluded": false
+    },
+    "02-12": {
+      "name": "Santa Eulalia de Barcelona",
+      "text": "Eulalia de Barcelona es venerada como una joven mártir de la antigüedad cristiana. Los relatos de su pasión conservan tradiciones cuyo detalle histórico es discutido.",
+      "excluded": false
+    },
+    "02-13": {
+      "name": "Santa Catalina de Ricci",
+      "text": "Catalina de Ricci (1522-1590) fue una religiosa dominica italiana, conocida por su vida de oración y su dedicación a la comunidad conventual.",
+      "excluded": false
+    },
+    "02-14": {
+      "name": "Santos Cirilo y Metodio",
+      "text": "Cirilo y Metodio, hermanos del siglo IX, evangelizaron pueblos eslavos y promovieron la traducción de textos cristianos a su lengua. Son copatronos de Europa.",
+      "excluded": false
+    },
+    "02-15": {
+      "name": "Santos Faustino y Jovita",
+      "text": "Faustino y Jovita son venerados como mártires de Brescia. La tradición los presenta como hermanos que dieron testimonio de la fe durante las persecuciones romanas.",
+      "excluded": false
+    },
+    "02-16": {
+      "name": "San Onésimo",
+      "text": "Onésimo aparece en la Carta de san Pablo a Filemón, como un hombre cuya relación con su antiguo amo es transformada por la fe cristiana. La tradición lo vincula a la misión de la Iglesia primitiva.",
+      "excluded": false
+    },
+    "02-17": {
+      "name": "Siete santos fundadores de los Servitas",
+      "text": "Los siete fundadores de los Siervos de María fueron laicos florentinos del siglo XIII que iniciaron una vida comunitaria de oración y servicio bajo la protección de la Virgen.",
+      "excluded": false
+    },
+    "02-18": {
+      "name": "San Simeón de Jerusalén",
+      "text": "Simeón de Jerusalén es recordado por la tradición antigua como sucesor de Santiago en la dirección de la comunidad cristiana de Jerusalén y como mártir.",
+      "excluded": false
+    },
+    "02-19": {
+      "name": "San Álvaro de Córdoba",
+      "text": "Álvaro de Córdoba fue un dominico español del siglo XV, asociado a la predicación y a la espiritualidad de la pasión de Cristo; promovió una forma temprana del vía crucis.",
+      "excluded": false
+    },
+    "02-20": {
+      "name": "San Eucario de Tréveris",
+      "text": "Eucario es venerado como uno de los primeros obispos de Tréveris. Las tradiciones sobre su misión son antiguas, aunque varios detalles cronológicos resultan inciertos.",
+      "excluded": false
+    },
+    "02-21": {
+      "name": "San Pedro Damián",
+      "text": "Pedro Damián (1007-1072), monje, obispo y doctor de la Iglesia, trabajó por la reforma eclesial y defendió la disciplina y la vida espiritual del clero.",
+      "excluded": false
+    },
+    "02-22": {
+      "name": "Cátedra de San Pedro",
+      "text": "La Cátedra de san Pedro celebra la misión apostólica y pastoral confiada a Pedro y, en la tradición católica, su continuidad en el ministerio del obispo de Roma.",
+      "excluded": false
+    },
+    "02-23": {
+      "name": "San Policarpo",
+      "text": "Policarpo, obispo de Esmirna en el siglo II, fue discípulo de la tradición apostólica y murió mártir, según un relato cristiano antiguo.",
+      "excluded": false
+    },
+    "02-24": {
+      "name": "San Modesto de Tréveris",
+      "text": "Modesto es recordado entre los primeros obispos de Tréveris. Se conservan pocos datos históricos seguros sobre su vida y ministerio.",
+      "excluded": false
+    },
+    "02-25": {
+      "name": "San Valentín de África",
+      "text": "Valentín de África figura en repertorios martiriales, pero su identidad y los acontecimientos de su muerte no pueden reconstruirse con seguridad a partir de fuentes disponibles.",
+      "excluded": false
+    },
+    "02-26": {
+      "name": "San Porfirio de Gaza",
+      "text": "Porfirio de Gaza (c. 347-420) fue obispo en Palestina y promovió la consolidación de la comunidad cristiana de Gaza. Su vida se conoce a través de una biografía antigua que requiere lectura crítica.",
+      "excluded": false
+    },
+    "02-27": {
+      "name": "San Gregorio de Narek",
+      "text": "Gregorio de Narek (c. 950-1003), monje y poeta armenio, compuso profundas oraciones y escritos espirituales; fue declarado doctor de la Iglesia.",
+      "excluded": false
+    },
+    "02-28": {
+      "name": "San Román de Condat",
+      "text": "Román de Condat fue un monje del siglo V considerado fundador de comunidades monásticas en el macizo del Jura, en la actual Francia.",
+      "excluded": false
+    },
+    "03-01": {
+      "name": "San David de Gales",
+      "text": "David de Gales (siglo VI) fue un obispo y fundador monástico, considerado patrono de Gales. Su memoria está vinculada a la vida austera y la predicación.",
+      "excluded": false
+    },
+    "03-02": {
+      "name": "San Simplicio",
+      "text": "Simplicio fue papa entre 468 y 483. Su pontificado se desarrolló durante los cambios políticos de la caída del Imperio romano de Occidente.",
+      "excluded": false
+    },
+    "03-03": {
+      "name": "Santa Catalina Drexel",
+      "text": "Catalina Drexel (1858-1955), religiosa estadounidense, fundó las Hermanas del Santísimo Sacramento y trabajó por la educación de comunidades afroamericanas e indígenas.",
+      "excluded": false
+    },
+    "03-04": {
+      "name": "San Casimiro",
+      "text": "Casimiro (1458-1484), príncipe de Polonia y Lituania, es venerado por su caridad, vida de oración y compromiso con la justicia.",
+      "excluded": false
+    },
+    "03-05": {
+      "name": "San Adrián de Cesarea",
+      "text": "Adrián de Cesarea es venerado como mártir de Palestina durante la persecución de Diocleciano. Eusebio de Cesarea registró el martirio de cristianos de aquella región.",
+      "excluded": false
+    },
+    "03-06": {
+      "name": "Santa Coleta de Corbie",
+      "text": "Coleta de Corbie (1381-1447) fue una religiosa franciscana francesa que impulsó la reforma de monasterios de clarisas y una vida de mayor austeridad.",
+      "excluded": false
+    },
+    "03-07": {
+      "name": "Santas Perpetua y Felicidad",
+      "text": "Perpetua y Felicidad fueron mártires cristianas ejecutadas en Cartago en el año 203. Su testimonio se conserva en uno de los relatos martiriales más antiguos.",
+      "excluded": false
+    },
+    "03-08": {
+      "name": "San Juan de Dios",
+      "text": "Juan de Dios (1495-1550) se dedicó al cuidado de los enfermos y necesitados en Granada. Inspiró la Orden Hospitalaria que lleva su nombre.",
+      "excluded": false
+    },
+    "03-09": {
+      "name": "Santa Francisca Romana",
+      "text": "Francisca Romana (1384-1440) combinó la vida familiar con un intenso servicio a los pobres y enfermos. Fundó una comunidad de oblatas en Roma.",
+      "excluded": false
+    },
+    "03-10": {
+      "name": "San Macario de Jerusalén",
+      "text": "Macario fue obispo de Jerusalén en el siglo IV. Participó en el Concilio de Nicea y está vinculado a la construcción de santuarios cristianos en Tierra Santa.",
+      "excluded": false
+    },
+    "03-11": {
+      "name": "San Eulogio de Córdoba",
+      "text": "Eulogio de Córdoba (fallecido en 859) fue sacerdote y escritor, recordado por acompañar a los cristianos perseguidos en la Córdoba medieval.",
+      "excluded": false
+    },
+    "03-12": {
+      "name": "San Gregorio Magno (fecha discordante: revisión)",
+      "text": "Esta fecha figura con una atribución discordante en la base de consulta. No corresponde a la memoria universal de san Gregorio Magno, que se celebra el 3 de septiembre. Requiere corrección antes de publicar.",
+      "excluded": true
+    },
+    "03-13": {
+      "name": "San Rodrigo de Córdoba",
+      "text": "Rodrigo fue un sacerdote de Córdoba martirizado en el siglo IX, durante el período de dominio musulmán. Su memoria pertenece a los mártires cordobeses.",
+      "excluded": false
+    },
+    "03-14": {
+      "name": "Santa Matilde",
+      "text": "Matilde (c. 895-968), reina de Germania, es recordada por su ayuda a los pobres y el apoyo a comunidades religiosas después de enviudar.",
+      "excluded": false
+    },
+    "03-15": {
+      "name": "Santa Lucrecia de Mérida",
+      "text": "Lucrecia de Mérida figura en tradiciones hagiográficas antiguas; sin embargo, la documentación accesible no permite establecer con seguridad una biografía individual detallada.",
+      "excluded": false
+    },
+    "03-16": {
+      "name": "San Abraham de Mesopotamia",
+      "text": "Abraham de Mesopotamia es un nombre asociado a antiguos ascetas de Oriente. Las tradiciones disponibles no permiten identificar sin ambigüedad al santo concreto de esta fecha.",
+      "excluded": false
+    },
+    "03-17": {
+      "name": "San Patricio",
+      "text": "Patricio (siglo V), obispo y misionero, es recordado por la evangelización de Irlanda. Su figura reúne datos históricos y tradiciones posteriores.",
+      "excluded": false
+    },
+    "03-18": {
+      "name": "San Cirilo de Jerusalén",
+      "text": "Cirilo de Jerusalén (c. 315-386), obispo y doctor de la Iglesia, es conocido por sus catequesis sobre la fe y los sacramentos.",
+      "excluded": false
+    },
+    "03-19": {
+      "name": "San José, esposo de la Virgen María",
+      "text": "José, esposo de la Virgen María y padre legal de Jesús, aparece en los evangelios como hombre justo y custodio de la Sagrada Familia.",
+      "excluded": false
+    },
+    "03-20": {
+      "name": "San Cuthberto",
+      "text": "Cutberto fue obispo de Lindisfarne en el siglo VII. Es recordado por su vida monástica, su oración y su servicio a las comunidades del norte de Inglaterra.",
+      "excluded": false
+    },
+    "03-21": {
+      "name": "San Nicolás de Flüe",
+      "text": "Nicolás de Flüe (1417-1487) fue un ermitaño suizo que, después de su vida familiar, se dedicó a la oración y fue consultado como mediador en conflictos de su país.",
+      "excluded": false
+    },
+    "03-22": {
+      "name": "Santa Catalina de Suecia",
+      "text": "Catalina de Suecia (c. 1331-1381), hija de santa Brígida, dirigió la comunidad de Vadstena y colaboró en la difusión del legado espiritual de su madre.",
+      "excluded": false
+    },
+    "03-23": {
+      "name": "Santo Toribio de Mogrovejo",
+      "text": "Toribio de Mogrovejo (1538-1606), arzobispo de Lima, impulsó la evangelización, la formación del clero y la defensa pastoral de los pueblos indígenas.",
+      "excluded": false
+    },
+    "03-24": {
+      "name": "San Óscar Romero",
+      "text": "Óscar Arnulfo Romero (1917-1980), arzobispo de San Salvador, defendió la dignidad humana y fue asesinado mientras celebraba la misa.",
+      "excluded": false
+    },
+    "03-25": {
+      "name": "Anunciación del Señor",
+      "text": "La Anunciación del Señor conmemora el anuncio del ángel Gabriel a María y su respuesta de fe ante la encarnación del Hijo de Dios.",
+      "excluded": false
+    },
+    "03-26": {
+      "name": "San Braulio de Zaragoza",
+      "text": "Braulio fue obispo de Zaragoza en el siglo VII, escritor y consejero de san Isidoro de Sevilla. Su correspondencia ilumina la vida intelectual de la Hispania visigoda.",
+      "excluded": false
+    },
+    "03-27": {
+      "name": "San Ruperto de Salzburgo",
+      "text": "Ruperto fue obispo misionero entre los siglos VII y VIII y está relacionado con los orígenes de la sede episcopal de Salzburgo.",
+      "excluded": false
+    },
+    "03-28": {
+      "name": "San Sixto III",
+      "text": "Sixto III fue papa entre 432 y 440. Durante su pontificado se completó la basílica de Santa María la Mayor en Roma.",
+      "excluded": false
+    },
+    "03-29": {
+      "name": "San Jonás de Persia",
+      "text": "Jonás de Persia es venerado con otros mártires cristianos del Imperio sasánida. Los pormenores de su pasión proceden de relatos hagiográficos antiguos.",
+      "excluded": false
+    },
+    "03-30": {
+      "name": "San Juan Clímaco",
+      "text": "Juan Clímaco (siglos VI-VII) fue monje y abad del Sinaí, autor de La escala del paraíso, una obra clásica sobre el crecimiento en la vida espiritual.",
+      "excluded": false
+    },
+    "03-31": {
+      "name": "San Benjamín de Persia",
+      "text": "Benjamín de Persia fue un diácono y mártir cristiano del siglo V, recordado por perseverar en su fe durante las persecuciones en Persia.",
+      "excluded": false
+    },
+    "04-01": {
+      "name": "San Hugo de Grenoble",
+      "text": "Hugo de Grenoble (1053-1132) fue obispo francés y apoyó la vida monástica, especialmente los primeros pasos de la comunidad cartuja.",
+      "excluded": false
+    },
+    "04-02": {
+      "name": "San Francisco de Paula",
+      "text": "Francisco de Paula (1416-1507), ermitaño italiano, fundó la Orden de los Mínimos, caracterizada por la austeridad, la penitencia y la caridad.",
+      "excluded": false
+    },
+    "04-03": {
+      "name": "San Ricardo de Chichester",
+      "text": "Ricardo de Chichester (1197-1253) fue obispo inglés, destacado por su austeridad y su defensa de la disciplina pastoral.",
+      "excluded": false
+    },
+    "04-04": {
+      "name": "San Isidoro de Sevilla",
+      "text": "Isidoro de Sevilla (c. 560-636), obispo y doctor de la Iglesia, destacó por su labor educativa y por recopilar saberes en sus Etimologías.",
+      "excluded": false
+    },
+    "04-05": {
+      "name": "San Vicente Ferrer",
+      "text": "Vicente Ferrer (1350-1419), dominico valenciano, recorrió diversas regiones europeas predicando la conversión y la reconciliación.",
+      "excluded": false
+    },
+    "04-06": {
+      "name": "San Sixto I",
+      "text": "Sixto I es venerado entre los primeros obispos de Roma, a comienzos del siglo II. La documentación de su vida es escasa.",
+      "excluded": false
+    },
+    "04-07": {
+      "name": "San Juan Bautista de la Salle",
+      "text": "Juan Bautista de La Salle (1651-1719), sacerdote francés, fundó el Instituto de los Hermanos de las Escuelas Cristianas y renovó la educación popular.",
+      "excluded": false
+    },
+    "04-08": {
+      "name": "San Alberto de Jerusalén",
+      "text": "Alberto de Jerusalén (c. 1149-1214), patriarca latino de Jerusalén, redactó una regla de vida para los ermitaños del monte Carmelo, origen de la Orden Carmelita.",
+      "excluded": false
+    },
+    "04-09": {
+      "name": "Santa Casilda de Toledo",
+      "text": "Casilda de Toledo es una santa venerada por la tradición española medieval. Su historia incluye episodios legendarios de compasión por los cautivos cristianos.",
+      "excluded": false
+    },
+    "04-10": {
+      "name": "San Miguel de los Santos",
+      "text": "Miguel de los Santos (1591-1625) fue un religioso trinitario español, recordado por su vida de oración y por su espiritualidad eucarística.",
+      "excluded": false
+    },
+    "04-11": {
+      "name": "San Estanislao",
+      "text": "Estanislao (1030-1079), obispo de Cracovia, es recordado por defender la justicia y por su martirio en el contexto de un conflicto con el poder real.",
+      "excluded": false
+    },
+    "04-12": {
+      "name": "San Zenón de Verona",
+      "text": "Zenón fue obispo de Verona en el siglo IV. Se conservan sermones atribuidos a él que permiten conocer su predicación.",
+      "excluded": false
+    },
+    "04-13": {
+      "name": "San Martín I",
+      "text": "Martín I fue papa desde 649 y sufrió destierro por defender sus convicciones doctrinales en las controversias cristológicas de su época. Murió en 655.",
+      "excluded": false
+    },
+    "04-14": {
+      "name": "Santos Tiburcio, Valeriano y Máximo",
+      "text": "Tiburcio, Valeriano y Máximo son venerados como mártires romanos. Sus historias están ligadas a la tradición de santa Cecilia, aunque los detalles históricos son inciertos.",
+      "excluded": false
+    },
+    "04-15": {
+      "name": "Santa Anastasia Patricia",
+      "text": "Anastasia Patricia es venerada en tradiciones orientales como mujer consagrada que vivió en retiro. Los relatos transmitidos son de carácter hagiográfico.",
+      "excluded": false
+    },
+    "04-16": {
+      "name": "Santa Bernadette",
+      "text": "Bernadette Soubirous (1844-1879) relató las apariciones de la Virgen en Lourdes y después ingresó a la vida religiosa en Nevers, Francia.",
+      "excluded": false
+    },
+    "04-17": {
+      "name": "San Aniceto",
+      "text": "Aniceto fue obispo de Roma en el siglo II; durante su ministerio se produjo un conocido diálogo con san Policarpo sobre la fecha de Pascua.",
+      "excluded": false
+    },
+    "04-18": {
+      "name": "San Perfecto de Córdoba",
+      "text": "Perfecto fue un sacerdote de Córdoba ejecutado en el año 850. Su memoria forma parte de los relatos de los mártires cordobeses.",
+      "excluded": false
+    },
+    "04-19": {
+      "name": "Santa Inés de Montepulciano",
+      "text": "Inés de Montepulciano (1268-1317) fue una religiosa dominica italiana, fundadora y superiora de comunidades religiosas.",
+      "excluded": false
+    },
+    "04-20": {
+      "name": "San Marcelino",
+      "text": "Marcelino, mencionado en algunos santorales de esta fecha, necesita una identificación más precisa, porque varios santos y papas llevan el mismo nombre.",
+      "excluded": false
+    },
+    "04-21": {
+      "name": "San Anselmo",
+      "text": "Anselmo de Canterbury (1033-1109), monje benedictino, arzobispo y doctor de la Iglesia, destacó por su reflexión teológica sobre la fe y la razón.",
+      "excluded": false
+    },
+    "04-22": {
+      "name": "San Sotero",
+      "text": "Sotero fue obispo de Roma en el siglo II y es recordado por las antiguas noticias sobre su ayuda a comunidades cristianas necesitadas.",
+      "excluded": false
+    },
+    "04-23": {
+      "name": "San Adalberto; San Jorge",
+      "text": "Jorge es venerado como mártir de los primeros siglos, aunque muchos detalles de su vida pertenecen a la tradición. Adalberto fue obispo misionero y mártir en el siglo X.",
+      "excluded": false
+    },
+    "04-24": {
+      "name": "San Fidel de Sigmaringa",
+      "text": "Fidel de Sigmaringa (1578-1622), capuchino y predicador, murió durante una misión en territorio suizo en un contexto de tensiones religiosas.",
+      "excluded": false
+    },
+    "04-25": {
+      "name": "San Marcos, evangelista",
+      "text": "Marcos es identificado por la tradición cristiana como autor del segundo Evangelio y colaborador de los primeros misioneros de la Iglesia.",
+      "excluded": false
+    },
+    "04-26": {
+      "name": "Nuestra Señora del Buen Consejo",
+      "text": "Nuestra Señora del Buen Consejo es una advocación mariana especialmente vinculada al santuario de Genazzano, en Italia, y a la confianza de los fieles en la intercesión de María.",
+      "excluded": false
+    },
+    "04-27": {
+      "name": "San Pedro Canisio (fecha discordante: revisión)",
+      "text": "Pedro Canisio (1521-1597) fue un jesuita neerlandés y doctor de la Iglesia que escribió catecismos influyentes. Su memoria litúrgica universal es el 21 de diciembre; la fecha aquí consignada requiere corrección.",
+      "excluded": false
+    },
+    "04-28": {
+      "name": "San Pedro Chanel; San Luis María Grignion de Montfort",
+      "text": "Pedro Chanel (1803-1841), misionero marista francés, murió mártir en Futuna. Luis María Grignion de Montfort (1673-1716) predicó misiones populares y promovió la espiritualidad mariana.",
+      "excluded": false
+    },
+    "04-29": {
+      "name": "Santa Catalina de Siena",
+      "text": "Catalina de Siena (1347-1380) fue terciaria dominica y doctora de la Iglesia. Sus cartas y su intervención en asuntos eclesiales muestran su influencia espiritual.",
+      "excluded": false
+    },
+    "04-30": {
+      "name": "San Pío V",
+      "text": "Pío V (1504-1572), papa dominico, impulsó reformas litúrgicas y pastorales tras el Concilio de Trento.",
+      "excluded": false
+    },
+    "05-01": {
+      "name": "San José Obrero",
+      "text": "La memoria de san José Obrero presenta a José, artesano de Nazaret y custodio de Jesús, como ejemplo de dignidad del trabajo y responsabilidad familiar.",
+      "excluded": false
+    },
+    "05-02": {
+      "name": "San Atanasio",
+      "text": "Atanasio (c. 296-373), obispo de Alejandría y doctor de la Iglesia, defendió la fe en la plena divinidad de Jesucristo.",
+      "excluded": false
+    },
+    "05-03": {
+      "name": "Exaltación de la Santa Cruz",
+      "text": "La Exaltación de la Santa Cruz invita a contemplar la cruz de Cristo como signo de entrega y victoria pascual. Su observancia en Colombia debe seguir el calendario propio y las precedencias.",
+      "excluded": false
+    },
+    "05-04": {
+      "name": "Santos Felipe y Santiago, apóstoles",
+      "text": "Felipe y Santiago fueron apóstoles de Jesús. Su fiesta recuerda el testimonio y la misión de los primeros enviados por Cristo.",
+      "excluded": false
+    },
+    "05-05": {
+      "name": "San Hilario de Arlés",
+      "text": "Hilario de Arlés (c. 401-449) fue obispo de esa ciudad y se destacó por su vida austera y su actividad pastoral.",
+      "excluded": false
+    },
+    "05-06": {
+      "name": "San Juan ante Portam Latinam",
+      "text": "La conmemoración de san Juan ante la Puerta Latina recuerda una antigua tradición del apóstol Juan en Roma. El relato no puede verificarse como episodio histórico con los mismos detalles que transmite la leyenda.",
+      "excluded": false
+    },
+    "05-07": {
+      "name": "San Augusto Czartoryski",
+      "text": "Augusto Czartoryski (1858-1893) fue un sacerdote salesiano de origen polaco, beatificado por la Iglesia. Renunció a las expectativas de su familia noble para seguir la vida religiosa.",
+      "excluded": false
+    },
+    "05-08": {
+      "name": "Aparición de San Miguel",
+      "text": "La aparición de san Miguel es una conmemoración tradicional relacionada con el santuario del monte Gargano, en Italia; pertenece a la historia de la devoción al arcángel.",
+      "excluded": false
+    },
+    "05-09": {
+      "name": "San Pacomio",
+      "text": "Pacomio (c. 292-346) fue un monje egipcio que organizó comunidades cenobíticas y contribuyó decisivamente al desarrollo de la vida monástica.",
+      "excluded": false
+    },
+    "05-10": {
+      "name": "San Juan de Ávila",
+      "text": "Juan de Ávila (c. 1499-1569), sacerdote y doctor de la Iglesia, fue predicador, maestro espiritual y promotor de la formación sacerdotal en España.",
+      "excluded": false
+    },
+    "05-11": {
+      "name": "San Mamerto",
+      "text": "Mamerto fue obispo de Vienne en el siglo V y está relacionado con el origen de las rogativas, oraciones comunitarias en tiempos de calamidad.",
+      "excluded": false
+    },
+    "05-12": {
+      "name": "Santos Nereo y Aquileo; San Pancracio",
+      "text": "Nereo y Aquileo son venerados como mártires de Roma. Pancracio, también mártir romano, está asociado a una antigua devoción popular; sus biografías contienen elementos tradicionales.",
+      "excluded": false
+    },
+    "05-13": {
+      "name": "Nuestra Señora de Fátima",
+      "text": "La advocación de Nuestra Señora de Fátima recuerda las apariciones marianas relatadas por tres niños portugueses en 1917 y el llamado a la oración y la conversión.",
+      "excluded": false
+    },
+    "05-14": {
+      "name": "San Matías, apóstol",
+      "text": "Matías fue elegido por la comunidad apostólica para ocupar el lugar de Judas Iscariote, según los Hechos de los Apóstoles.",
+      "excluded": false
+    },
+    "05-15": {
+      "name": "San Isidro Labrador",
+      "text": "Isidro Labrador es venerado como trabajador del campo en el Madrid medieval. La tradición destaca su oración, su trabajo y su generosidad con los necesitados.",
+      "excluded": false
+    },
+    "05-16": {
+      "name": "Santa Margarita de Escocia (fecha discordante)",
+      "text": "Margarita de Escocia (c. 1045-1093) fue reina y favoreció obras de caridad y reforma eclesial. Su memoria en el calendario romano es el 16 de noviembre, no esta fecha.",
+      "excluded": false
+    },
+    "05-17": {
+      "name": "San Pascual Baylón",
+      "text": "Pascual Baylón (1540-1592) fue un franciscano español conocido por su vida sencilla, servicio a los hermanos y devoción eucarística.",
+      "excluded": false
+    },
+    "05-18": {
+      "name": "San Juan I",
+      "text": "Juan I fue papa entre 523 y 526. Murió después de sufrir encarcelamiento por orden del rey ostrogodo Teodorico.",
+      "excluded": false
+    },
+    "05-19": {
+      "name": "Santa María Bernarda Bütler",
+      "text": "María Bernarda Bütler (1848-1924), religiosa suiza, fundó las Franciscanas Misioneras de María Auxiliadora y desarrolló su misión en Ecuador y Colombia.",
+      "excluded": false
+    },
+    "05-20": {
+      "name": "San Bernardino de Siena",
+      "text": "Bernardino de Siena (1380-1444), franciscano italiano, se destacó por su predicación popular y por difundir la devoción al Santo Nombre de Jesús.",
+      "excluded": false
+    },
+    "05-21": {
+      "name": "Santos Cristóbal Magallanes y compañeros",
+      "text": "Cristóbal Magallanes y sus compañeros fueron mártires mexicanos de las persecuciones religiosas de las primeras décadas del siglo XX.",
+      "excluded": false
+    },
+    "05-22": {
+      "name": "Santa Rita de Casia",
+      "text": "Rita de Casia (c. 1381-1457), religiosa agustina italiana, es recordada por su vida de reconciliación, oración y confianza ante las dificultades.",
+      "excluded": false
+    },
+    "05-23": {
+      "name": "San Juan Bautista de Rossi",
+      "text": "Juan Bautista de Rossi (1698-1764) fue un sacerdote italiano que se dedicó a la confesión y al acompañamiento de pobres y enfermos en Roma.",
+      "excluded": false
+    },
+    "05-24": {
+      "name": "San Simón Stock",
+      "text": "Simón Stock es una figura temprana de la tradición carmelita, a quien se atribuye la difusión del escapulario. Los detalles de su vida deben distinguirse de tradiciones posteriores.",
+      "excluded": false
+    },
+    "05-25": {
+      "name": "San Beda el Venerable",
+      "text": "Beda el Venerable (c. 673-735) fue monje inglés, historiador y doctor de la Iglesia, autor de obras bíblicas e históricas de gran importancia.",
+      "excluded": false
+    },
+    "05-26": {
+      "name": "San Felipe Neri",
+      "text": "Felipe Neri (1515-1595), sacerdote italiano, fundó el Oratorio y acompañó espiritualmente a numerosos jóvenes y adultos en Roma.",
+      "excluded": false
+    },
+    "05-27": {
+      "name": "San Agustín de Canterbury",
+      "text": "Agustín de Canterbury (fallecido c. 604), monje enviado por el papa Gregorio Magno, fue misionero y primer arzobispo de Canterbury.",
+      "excluded": false
+    },
+    "05-28": {
+      "name": "San Germán de París",
+      "text": "Germán de París (c. 496-576) fue obispo de esa ciudad y es recordado por su labor pastoral y la atención a los necesitados.",
+      "excluded": false
+    },
+    "05-29": {
+      "name": "San Pablo VI",
+      "text": "Pablo VI (1897-1978) fue papa entre 1963 y 1978. Condujo la fase final del Concilio Vaticano II y orientó su aplicación.",
+      "excluded": false
+    },
+    "05-30": {
+      "name": "Santa Juana de Arco",
+      "text": "Juana de Arco (c. 1412-1431) fue una joven francesa que participó en la guerra de los Cien Años y murió ejecutada en Ruan. Fue canonizada en 1920.",
+      "excluded": false
+    },
+    "05-31": {
+      "name": "Visitación de la Virgen María",
+      "text": "La Visitación de María recuerda su encuentro con Isabel y el cántico del Magníficat, proclamado en el Evangelio de Lucas.",
+      "excluded": false
+    },
+    "06-01": {
+      "name": "San Justino",
+      "text": "Justino (siglo II), filósofo y mártir, defendió la fe cristiana mediante escritos dirigidos a sus contemporáneos y dio testimonio hasta la muerte.",
+      "excluded": false
+    },
+    "06-02": {
+      "name": "Santos Marcelino y Pedro",
+      "text": "Marcelino y Pedro son mártires romanos de comienzos del siglo IV, venerados desde la antigüedad cristiana.",
+      "excluded": false
+    },
+    "06-03": {
+      "name": "Santos Carlos Luanga y compañeros",
+      "text": "Carlos Lwanga y sus compañeros murieron mártires en Uganda en 1886 por permanecer fieles a la fe cristiana.",
+      "excluded": false
+    },
+    "06-04": {
+      "name": "San Francisco Caracciolo",
+      "text": "Francisco Caracciolo (1563-1608) fue un sacerdote italiano, cofundador de los Clérigos Regulares Menores, dedicados a la oración y al ministerio pastoral.",
+      "excluded": false
+    },
+    "06-05": {
+      "name": "San Bonifacio",
+      "text": "Bonifacio (c. 675-754), obispo y misionero, evangelizó territorios germánicos y murió mártir durante su misión.",
+      "excluded": false
+    },
+    "06-06": {
+      "name": "San Norberto",
+      "text": "Norberto de Xanten (c. 1080-1134) fundó la Orden Premonstratense y llegó a ser arzobispo de Magdeburgo.",
+      "excluded": false
+    },
+    "06-07": {
+      "name": "San Pablo I de Constantinopla",
+      "text": "Pablo I de Constantinopla fue patriarca de esa sede en el siglo IV y sufrió destierros durante las controversias arrianas.",
+      "excluded": false
+    },
+    "06-08": {
+      "name": "San Medardo",
+      "text": "Medardo fue obispo de Noyon en el siglo VI y figura entre los santos más venerados en la antigua Galia.",
+      "excluded": false
+    },
+    "06-09": {
+      "name": "San Efrén",
+      "text": "Efrén de Siria (c. 306-373), diácono y doctor de la Iglesia, transmitió enseñanzas de la fe mediante himnos, poemas y comentarios bíblicos.",
+      "excluded": false
+    },
+    "06-10": {
+      "name": "Beato Álvaro del Portillo",
+      "text": "Álvaro del Portillo (1914-1994), sacerdote y primer sucesor de san Josemaría al frente del Opus Dei, fue beatificado en 2014. Su memoria habitual se celebra el 12 de mayo; esta fecha requiere revisión.",
+      "excluded": false
+    },
+    "06-11": {
+      "name": "San Bernabé, apóstol",
+      "text": "Bernabé fue un colaborador decisivo de la primera comunidad cristiana y compañero de san Pablo en la evangelización.",
+      "excluded": false
+    },
+    "06-12": {
+      "name": "San Onofre",
+      "text": "Onofre es venerado como ermitaño de Egipto. Los detalles de su existencia nos llegan principalmente a través de tradiciones de los monjes del desierto.",
+      "excluded": false
+    },
+    "06-13": {
+      "name": "San Antonio de Padua",
+      "text": "Antonio de Padua (1195-1231), franciscano portugués, fue famoso por su predicación, conocimiento de las Escrituras y atención espiritual a los fieles.",
+      "excluded": false
+    },
+    "06-14": {
+      "name": "San Metodio I de Constantinopla",
+      "text": "Metodio I fue patriarca de Constantinopla en el siglo IX y defendió la restauración de la veneración de los iconos.",
+      "excluded": false
+    },
+    "06-15": {
+      "name": "San Vito",
+      "text": "Vito es venerado como mártir de los primeros siglos. Su vida se conoce principalmente mediante relatos hagiográficos posteriores.",
+      "excluded": false
+    },
+    "06-16": {
+      "name": "San Juan Francisco de Regis",
+      "text": "Juan Francisco de Regis (1597-1640), jesuita francés, recorrió regiones rurales predicando y acompañando a personas en situación de pobreza.",
+      "excluded": false
+    },
+    "06-17": {
+      "name": "San Herve",
+      "text": "Hervé es venerado en Bretaña como monje y hombre de oración. Su biografía se conserva principalmente en tradiciones medievales.",
+      "excluded": false
+    },
+    "06-18": {
+      "name": "San Romualdo (fuente secundaria: revisar fecha)",
+      "text": "Romualdo (c. 951-1027) fue fundador de la tradición camaldulense y promotor de la vida eremítica. Su memoria universal se celebra el 19 de junio; esta entrada está duplicada.",
+      "excluded": false
+    },
+    "06-19": {
+      "name": "San Romualdo",
+      "text": "Romualdo (c. 951-1027) fue un monje italiano que impulsó comunidades eremíticas y fundó la tradición camaldulense, dedicada a la oración y la vida austera.",
+      "excluded": false
+    },
+    "06-20": {
+      "name": "San Silverio",
+      "text": "Silverio fue papa en el siglo VI y sufrió deposición y destierro durante conflictos políticos y eclesiales del Imperio bizantino.",
+      "excluded": false
+    },
+    "06-21": {
+      "name": "San Luis Gonzaga",
+      "text": "Luis Gonzaga (1568-1591), joven jesuita italiano, murió mientras asistía a personas afectadas por una epidemia en Roma.",
+      "excluded": false
+    },
+    "06-22": {
+      "name": "San Paulino de Nola; Santos Juan Fisher y Tomás Moro",
+      "text": "Paulino de Nola (c. 354-431) fue obispo y escritor cristiano. Juan Fisher, obispo, y Tomás Moro, canciller inglés, fueron ejecutados en 1535 por negarse a aceptar las exigencias religiosas de Enrique VIII.",
+      "excluded": false
+    },
+    "06-23": {
+      "name": "San José Cafasso",
+      "text": "José Cafasso (1811-1860) fue un sacerdote italiano dedicado a la formación del clero y la asistencia espiritual a presos y condenados.",
+      "excluded": false
+    },
+    "06-24": {
+      "name": "Nacimiento de san Juan Bautista",
+      "text": "El nacimiento de san Juan Bautista celebra al profeta que preparó la llegada de Jesús y anunció la necesidad de conversión.",
+      "excluded": false
+    },
+    "06-25": {
+      "name": "San Guillermo de Vercelli",
+      "text": "Guillermo de Vercelli (c. 1085-1142) fue ermitaño y fundador de la congregación monástica de Montevergine, en Italia.",
+      "excluded": false
+    },
+    "06-26": {
+      "name": "San Josemaría Escrivá",
+      "text": "Josemaría Escrivá (1902-1975), sacerdote español, fundó el Opus Dei y promovió la búsqueda de la santidad en la vida cotidiana y el trabajo.",
+      "excluded": false
+    },
+    "06-27": {
+      "name": "San Cirilo de Alejandría",
+      "text": "Cirilo de Alejandría (c. 376-444), obispo y doctor de la Iglesia, participó en los debates cristológicos sobre la identidad de Jesús.",
+      "excluded": false
+    },
+    "06-28": {
+      "name": "San Ireneo",
+      "text": "Ireneo de Lyon (siglo II) fue obispo y escritor cristiano, defensor de la continuidad de la fe apostólica. Su memoria se celebra el 28 de junio.",
+      "excluded": false
+    },
+    "06-29": {
+      "name": "Santos Pedro y Pablo, apóstoles",
+      "text": "Pedro y Pablo son dos pilares de la Iglesia apostólica. Pedro es recordado por su misión pastoral y Pablo por su predicación entre las naciones.",
+      "excluded": false
+    },
+    "06-30": {
+      "name": "Primeros mártires de la Iglesia de Roma",
+      "text": "Los primeros mártires de la Iglesia romana murieron durante la persecución de Nerón después del incendio de Roma, según testimonios antiguos.",
+      "excluded": false
+    },
+    "07-01": {
+      "name": "San Junípero Serra",
+      "text": "Junípero Serra (1713-1784), franciscano mallorquín, fundó misiones en California. Su actividad histórica es objeto de estudio también por su relación con los pueblos indígenas.",
+      "excluded": false
+    },
+    "07-02": {
+      "name": "San Bernardino Realino",
+      "text": "Bernardino Realino (1530-1616) fue sacerdote jesuita italiano, conocido por su servicio pastoral en Lecce.",
+      "excluded": false
+    },
+    "07-03": {
+      "name": "Santo Tomás, apóstol",
+      "text": "Tomás, uno de los doce apóstoles, confesó a Jesús resucitado como su Señor y su Dios, según el Evangelio de Juan.",
+      "excluded": false
+    },
+    "07-04": {
+      "name": "Santa Isabel de Portugal",
+      "text": "Isabel de Portugal (1271-1336) fue reina y mediadora en conflictos políticos. Tras enviudar vivió vinculada a la espiritualidad franciscana.",
+      "excluded": false
+    },
+    "07-05": {
+      "name": "San Antonio María Zaccaria",
+      "text": "Antonio María Zaccaria (1502-1539) fue un sacerdote italiano, fundador de los barnabitas y promotor de la renovación espiritual del clero.",
+      "excluded": false
+    },
+    "07-06": {
+      "name": "Santa María Goretti",
+      "text": "María Goretti (1890-1902), joven italiana, murió tras resistir una agresión. La Iglesia destaca su testimonio de fe y perdón.",
+      "excluded": false
+    },
+    "07-07": {
+      "name": "San Fermín",
+      "text": "Fermín es venerado como obispo y mártir de la tradición navarra y francesa. Muchos detalles de su vida proceden de relatos medievales.",
+      "excluded": false
+    },
+    "07-08": {
+      "name": "San Adrián III",
+      "text": "Adrián III fue papa entre 884 y 885. Su breve pontificado dejó escasos testimonios biográficos.",
+      "excluded": false
+    },
+    "07-09": {
+      "name": "Bienaventurada Virgen María del Rosario de Chiquinquirá, patrona de Colombia",
+      "text": "La Virgen del Rosario de Chiquinquirá es patrona de Colombia. Su advocación está vinculada a la veneración de una imagen mariana en Chiquinquirá, Boyacá.",
+      "excluded": false
+    },
+    "07-10": {
+      "name": "Santos Agustín Zhao Rong y compañeros",
+      "text": "Agustín Zhao Rong y sus compañeros representan a los numerosos mártires de China, de distintas épocas, canonizados conjuntamente por la Iglesia.",
+      "excluded": false
+    },
+    "07-11": {
+      "name": "San Benito",
+      "text": "Benito de Nursia (c. 480-547) organizó la vida monástica occidental mediante una regla centrada en la oración, el trabajo y la vida fraterna.",
+      "excluded": false
+    },
+    "07-12": {
+      "name": "San Juan Gualberto",
+      "text": "Juan Gualberto (c. 995-1073) fue monje benedictino italiano y fundador de la congregación de Vallombrosa.",
+      "excluded": false
+    },
+    "07-13": {
+      "name": "San Enrique",
+      "text": "Enrique II (973-1024), emperador del Sacro Imperio, apoyó instituciones eclesiales y fue canonizado por la Iglesia.",
+      "excluded": false
+    },
+    "07-14": {
+      "name": "San Camilo de Lellis",
+      "text": "Camilo de Lelis (1550-1614) fundó una congregación dedicada al cuidado de los enfermos y renovó la atención hospitalaria desde la caridad cristiana.",
+      "excluded": false
+    },
+    "07-15": {
+      "name": "San Buenaventura",
+      "text": "Buenaventura (c. 1217-1274), franciscano, teólogo y doctor de la Iglesia, destacó por integrar la vida espiritual y el estudio.",
+      "excluded": false
+    },
+    "07-16": {
+      "name": "Bienaventurada Virgen María del Carmen (devoción; verificar calendario local)",
+      "text": "Nuestra Señora del Carmen es una advocación mariana ligada a la tradición de la Orden del Carmelo y a la confianza en la protección de María.",
+      "excluded": false
+    },
+    "07-17": {
+      "name": "Carmelitas de Compiègne",
+      "text": "Las carmelitas de Compiègne fueron dieciséis religiosas guillotinadas en París en 1794 durante la Revolución francesa. La Iglesia las venera como mártires.",
+      "excluded": false
+    },
+    "07-18": {
+      "name": "San Federico de Utrecht",
+      "text": "Federico fue obispo de Utrecht en el siglo IX. Las narraciones sobre su muerte incluyen tradiciones cuyo contexto histórico es debatido.",
+      "excluded": false
+    },
+    "07-19": {
+      "name": "Santa Macrina la Joven",
+      "text": "Macrina la Joven (c. 327-379) fue hermana de Basilio Magno y Gregorio de Nisa; promovió una comunidad de vida ascética y cristiana.",
+      "excluded": false
+    },
+    "07-20": {
+      "name": "San Apolinar",
+      "text": "Apolinar es venerado como primer obispo de Rávena y mártir. Los relatos sobre su ministerio conservan tradiciones antiguas no todas comprobables.",
+      "excluded": false
+    },
+    "07-21": {
+      "name": "San Lorenzo de Brindis",
+      "text": "Lorenzo de Brindis (1559-1619), capuchino y doctor de la Iglesia, destacó por su predicación y sus conocimientos bíblicos y lingüísticos.",
+      "excluded": false
+    },
+    "07-22": {
+      "name": "Santa María Magdalena",
+      "text": "María Magdalena fue discípula de Jesús y testigo de su resurrección. Los evangelios la presentan anunciando a los discípulos que ha visto al Señor.",
+      "excluded": false
+    },
+    "07-23": {
+      "name": "Santa Brígida de Suecia",
+      "text": "Brígida de Suecia (c. 1303-1373) fue mística, fundadora de la Orden del Santísimo Salvador y autora de revelaciones espirituales.",
+      "excluded": false
+    },
+    "07-24": {
+      "name": "San Chárbel Makhluf",
+      "text": "Chárbel Makhluf (1828-1898) fue monje y ermitaño maronita libanés, conocido por su intensa vida de oración y austeridad.",
+      "excluded": false
+    },
+    "07-25": {
+      "name": "Santiago, apóstol",
+      "text": "Santiago, hijo de Zebedeo, fue uno de los doce apóstoles y testigo cercano de Jesús. Su memoria está especialmente vinculada a Compostela.",
+      "excluded": false
+    },
+    "07-26": {
+      "name": "Santos Joaquín y Ana",
+      "text": "Joaquín y Ana son venerados por la tradición cristiana como padres de la Virgen María y abuelos de Jesús. Sus nombres proceden de la tradición antigua, no de los evangelios canónicos.",
+      "excluded": false
+    },
+    "07-27": {
+      "name": "San Pantaleón",
+      "text": "Pantaleón es venerado como médico y mártir en la tradición cristiana oriental. Los relatos de su vida contienen elementos legendarios.",
+      "excluded": false
+    },
+    "07-28": {
+      "name": "San Víctor I",
+      "text": "Víctor I fue papa a fines del siglo II; su ministerio estuvo marcado por debates sobre la fecha de la celebración de Pascua.",
+      "excluded": false
+    },
+    "07-29": {
+      "name": "Santos Marta, María y Lázaro",
+      "text": "Marta, María y Lázaro de Betania fueron amigos de Jesús. Los evangelios los presentan como testigos de su cercanía, enseñanza y poder sobre la muerte.",
+      "excluded": false
+    },
+    "07-30": {
+      "name": "San Pedro Crisólogo",
+      "text": "Pedro Crisólogo (c. 380-450), arzobispo de Rávena y doctor de la Iglesia, fue reconocido por sus sermones breves y claros.",
+      "excluded": false
+    },
+    "07-31": {
+      "name": "San Ignacio de Loyola",
+      "text": "Ignacio de Loyola (1491-1556), fundador de la Compañía de Jesús, desarrolló los Ejercicios Espirituales y promovió la misión educativa y evangelizadora.",
+      "excluded": false
+    },
+    "08-01": {
+      "name": "San Alfonso María de Ligorio",
+      "text": "Alfonso María de Ligorio (1696-1787), obispo y doctor de la Iglesia, fundó los redentoristas y destacó por su enseñanza moral y pastoral.",
+      "excluded": false
+    },
+    "08-02": {
+      "name": "San Eusebio de Vercelli",
+      "text": "Eusebio de Vercelli (c. 283-371) fue obispo y defensor de la doctrina nicena durante las controversias arrianas.",
+      "excluded": false
+    },
+    "08-03": {
+      "name": "San Nicodemo",
+      "text": "Nicodemo aparece en el Evangelio de Juan como fariseo que dialogó con Jesús y participó en su sepultura. Otros datos de su vida proceden de la tradición.",
+      "excluded": false
+    },
+    "08-04": {
+      "name": "San Juan María Vianney",
+      "text": "Juan María Vianney (1786-1859), párroco de Ars, Francia, es recordado por su dedicación al sacramento de la reconciliación y al acompañamiento pastoral.",
+      "excluded": false
+    },
+    "08-05": {
+      "name": "Dedicación de la Basílica de Santa María la Mayor",
+      "text": "La dedicación de la basílica de Santa María la Mayor recuerda el antiguo templo romano consagrado a la Virgen María, importante en la historia de la devoción mariana.",
+      "excluded": false
+    },
+    "08-06": {
+      "name": "Transfiguración del Señor",
+      "text": "La Transfiguración del Señor recuerda la manifestación de la gloria de Jesús ante Pedro, Santiago y Juan, según los evangelios.",
+      "excluded": false
+    },
+    "08-07": {
+      "name": "San Cayetano; Santos Sixto II y compañeros",
+      "text": "Cayetano de Thiene (1480-1547) cofundó los teatinos; Sixto II fue papa y murió mártir en 258 junto con varios diáconos durante la persecución de Valeriano.",
+      "excluded": false
+    },
+    "08-08": {
+      "name": "Santo Domingo de Guzmán",
+      "text": "Domingo de Guzmán (c. 1170-1221), sacerdote español, fundó la Orden de Predicadores para anunciar el Evangelio mediante estudio, predicación y vida comunitaria.",
+      "excluded": false
+    },
+    "08-09": {
+      "name": "Santa Teresa Benedicta de la Cruz",
+      "text": "Teresa Benedicta de la Cruz, Edith Stein (1891-1942), filósofa y carmelita de origen judío, fue asesinada en Auschwitz. Es copatrona de Europa. En Colombia esta fecha debe cotejarse con el propio de san Ezequiel Moreno.",
+      "excluded": false
+    },
+    "08-10": {
+      "name": "San Lorenzo, diácono y mártir",
+      "text": "Lorenzo fue diácono de la Iglesia de Roma y murió mártir en el año 258. La tradición destaca su servicio a los pobres.",
+      "excluded": false
+    },
+    "08-11": {
+      "name": "Santa Clara",
+      "text": "Clara de Asís (1193/1194-1253) siguió el ideal de pobreza evangélica de Francisco de Asís y fundó la comunidad de las Clarisas.",
+      "excluded": false
+    },
+    "08-12": {
+      "name": "Santa Juana Francisca de Chantal",
+      "text": "Juana Francisca de Chantal (1572-1641), viuda y madre francesa, fundó con san Francisco de Sales la Orden de la Visitación.",
+      "excluded": false
+    },
+    "08-13": {
+      "name": "Santos Ponciano e Hipólito",
+      "text": "Ponciano fue papa e Hipólito presbítero romano; ambos murieron desterrados en Cerdeña en el siglo III y son venerados conjuntamente como mártires.",
+      "excluded": false
+    },
+    "08-14": {
+      "name": "San Maximiliano María Kolbe",
+      "text": "Maximiliano María Kolbe (1894-1941), franciscano polaco, murió en Auschwitz al ofrecerse para ocupar el lugar de otro prisionero.",
+      "excluded": false
+    },
+    "08-15": {
+      "name": "Asunción de la Virgen María",
+      "text": "La Asunción celebra que María fue llevada a la gloria celestial en cuerpo y alma, conforme a la fe definida por la Iglesia católica.",
+      "excluded": false
+    },
+    "08-16": {
+      "name": "San Esteban de Hungría",
+      "text": "Esteban I de Hungría (c. 975-1038) consolidó el reino cristiano húngaro y favoreció la organización de la Iglesia en su territorio.",
+      "excluded": false
+    },
+    "08-17": {
+      "name": "San Jacinto",
+      "text": "Jacinto (c. 1185-1257) fue fraile dominico polaco, recordado por su predicación y su labor misionera en Europa oriental.",
+      "excluded": false
+    },
+    "08-18": {
+      "name": "San Alberto de Praga",
+      "text": "Alberto de Praga es una designación que requiere aclaración: san Adalberto de Praga fue obispo y mártir y su memoria ordinaria es el 23 de abril. No deben fusionarse nombres sin comprobar la fuente.",
+      "excluded": false
+    },
+    "08-19": {
+      "name": "San Ezequiel Moreno, obispo",
+      "text": "Ezequiel Moreno (1848-1906), agustino recoleto nacido en España, realizó una intensa labor misionera en Colombia y fue obispo de Pasto. Destacó por su compromiso pastoral y religioso.",
+      "excluded": false
+    },
+    "08-20": {
+      "name": "San Bernardo",
+      "text": "Bernardo de Claraval (1090-1153), abad cisterciense y doctor de la Iglesia, fue un influyente predicador y escritor espiritual medieval.",
+      "excluded": false
+    },
+    "08-21": {
+      "name": "San Pío X",
+      "text": "Pío X (1835-1914) fue papa de 1903 a 1914 e impulsó reformas litúrgicas y catequéticas, promoviendo una participación más frecuente en la Eucaristía.",
+      "excluded": false
+    },
+    "08-22": {
+      "name": "Bienaventurada Virgen María Reina",
+      "text": "La memoria de María Reina expresa la fe católica en la participación de la Virgen en la gloria de su Hijo y su intercesión por la Iglesia.",
+      "excluded": false
+    },
+    "08-23": {
+      "name": "Santa Rosa de Lima",
+      "text": "Rosa de Lima (1586-1617), terciaria dominica peruana, vivió la oración, la penitencia y el servicio a necesitados. Es patrona de América Latina.",
+      "excluded": false
+    },
+    "08-24": {
+      "name": "San Bartolomé, apóstol",
+      "text": "Bartolomé fue uno de los doce apóstoles. La tradición cristiana lo relaciona con misiones evangelizadoras después de la resurrección de Jesús.",
+      "excluded": false
+    },
+    "08-25": {
+      "name": "San Luis de Francia; San José de Calasanz",
+      "text": "Luis IX (1214-1270), rey de Francia, destacó por su religiosidad y justicia; José de Calasanz (1557-1648) fundó las Escuelas Pías para educar a niños pobres.",
+      "excluded": false
+    },
+    "08-26": {
+      "name": "Santa Teresa de Jesús Jornet",
+      "text": "Teresa de Jesús Jornet (1843-1897) fundó las Hermanitas de los Ancianos Desamparados, dedicadas al cuidado de personas mayores sin recursos.",
+      "excluded": false
+    },
+    "08-27": {
+      "name": "Santa Mónica",
+      "text": "Mónica (c. 331-387), madre de san Agustín, es recordada por su constancia en la oración y su preocupación por la vida espiritual de su familia.",
+      "excluded": false
+    },
+    "08-28": {
+      "name": "San Agustín",
+      "text": "Agustín de Hipona (354-430), obispo y doctor de la Iglesia, dejó obras fundamentales como las Confesiones y La ciudad de Dios.",
+      "excluded": false
+    },
+    "08-29": {
+      "name": "Martirio de san Juan Bautista",
+      "text": "El martirio de Juan Bautista recuerda su muerte por orden de Herodes Antipas, relatada en los evangelios.",
+      "excluded": false
+    },
+    "08-30": {
+      "name": "Santos Félix y Adauto",
+      "text": "Félix y Adauto son venerados como mártires romanos. Su culto es antiguo, pero existen pocos datos seguros sobre sus vidas.",
+      "excluded": false
+    },
+    "08-31": {
+      "name": "San Ramón Nonato",
+      "text": "Ramón Nonato es un religioso mercedario del siglo XIII cuya biografía se conoce en gran parte por la tradición de su orden.",
+      "excluded": false
+    },
+    "09-01": {
+      "name": "San Gil",
+      "text": "Gil es venerado como ermitaño y abad en la antigua Galia. Su historia se transmitió principalmente mediante relatos hagiográficos medievales.",
+      "excluded": false
+    },
+    "09-02": {
+      "name": "San Esteban de Hungría (fecha discordante: revisión)",
+      "text": "Esteban I de Hungría fue rey y promotor de la Iglesia en su país. Su memoria universal se celebra el 16 de agosto: esta segunda fecha requiere depuración.",
+      "excluded": false
+    },
+    "09-03": {
+      "name": "San Gregorio Magno",
+      "text": "Gregorio Magno (c. 540-604), papa y doctor de la Iglesia, impulsó la pastoral, la liturgia y la misión cristiana en Europa.",
+      "excluded": false
+    },
+    "09-04": {
+      "name": "Santa Rosa de Viterbo",
+      "text": "Rosa de Viterbo (c. 1233-1251) fue una joven italiana de espiritualidad franciscana, conocida por su predicación y vida penitente.",
+      "excluded": false
+    },
+    "09-05": {
+      "name": "Santa Teresa de Calcuta",
+      "text": "Teresa de Calcuta (1910-1997) fundó las Misioneras de la Caridad y dedicó su vida al servicio de las personas más pobres y abandonadas.",
+      "excluded": false
+    },
+    "09-06": {
+      "name": "Beato Bertrand de Garrigues",
+      "text": "Bertrand de Garrigues fue uno de los primeros compañeros de santo Domingo de Guzmán y colaboró en los comienzos de la Orden de Predicadores.",
+      "excluded": false
+    },
+    "09-07": {
+      "name": "Santa Regina",
+      "text": "Regina es venerada como mártir de Alise-Sainte-Reine, en Francia. Su culto antiguo se acompaña de relatos tradicionales difíciles de verificar.",
+      "excluded": false
+    },
+    "09-08": {
+      "name": "Natividad de la Bienaventurada Virgen María",
+      "text": "La Natividad de la Virgen María celebra su nacimiento y el lugar singular que ocupa en la historia de la salvación.",
+      "excluded": false
+    },
+    "09-09": {
+      "name": "San Pedro Claver",
+      "text": "Pedro Claver (1580-1654), jesuita que vivió en Cartagena de Indias, dedicó su ministerio a atender a africanos esclavizados y defender su dignidad.",
+      "excluded": false
+    },
+    "09-10": {
+      "name": "San Nicolás de Tolentino",
+      "text": "Nicolás de Tolentino (1245-1305) fue un sacerdote agustino italiano recordado por su oración, austeridad y atención a los fieles.",
+      "excluded": false
+    },
+    "09-11": {
+      "name": "San Juan Gabriel Perboyre",
+      "text": "Juan Gabriel Perboyre (1802-1840) fue un misionero vicentino francés ejecutado en China por su fe.",
+      "excluded": false
+    },
+    "09-12": {
+      "name": "Santísimo Nombre de María",
+      "text": "El Santísimo Nombre de María es una memoria devocional que honra a la Madre de Jesús y recuerda la confianza de los fieles en su intercesión.",
+      "excluded": false
+    },
+    "09-13": {
+      "name": "San Juan Crisóstomo",
+      "text": "Juan Crisóstomo (c. 349-407), arzobispo de Constantinopla y doctor de la Iglesia, fue célebre por su predicación y su llamado a la justicia y la caridad.",
+      "excluded": false
+    },
+    "09-14": {
+      "name": "Exaltación de la Santa Cruz",
+      "text": "La Exaltación de la Santa Cruz celebra la victoria de Cristo por medio de su entrega en la cruz y su resurrección.",
+      "excluded": false
+    },
+    "09-15": {
+      "name": "Nuestra Señora de los Dolores",
+      "text": "Nuestra Señora de los Dolores invita a recordar la participación de María en los sufrimientos de su Hijo, especialmente junto a la cruz.",
+      "excluded": false
+    },
+    "09-16": {
+      "name": "Santos Cornelio y Cipriano",
+      "text": "Cornelio, papa, y Cipriano, obispo de Cartago, defendieron la unidad de la Iglesia en el siglo III y murieron en tiempos de persecución.",
+      "excluded": false
+    },
+    "09-17": {
+      "name": "San Roberto Belarmino; Santa Hildegarda de Bingen",
+      "text": "Roberto Belarmino (1542-1621), jesuita y doctor de la Iglesia, fue teólogo y cardenal; Hildegarda de Bingen (1098-1179), abadesa y doctora, escribió obras espirituales y musicales.",
+      "excluded": false
+    },
+    "09-18": {
+      "name": "San José de Cupertino",
+      "text": "José de Cupertino (1603-1663), fraile franciscano conventual italiano, es recordado por su sencillez y profunda vida de oración.",
+      "excluded": false
+    },
+    "09-19": {
+      "name": "San Jenaro",
+      "text": "Jenaro, obispo de Benevento, es venerado como mártir del siglo IV. Su culto está particularmente arraigado en Nápoles.",
+      "excluded": false
+    },
+    "09-20": {
+      "name": "Santos Andrés Kim y compañeros",
+      "text": "Andrés Kim Taegon, primer sacerdote coreano, y sus compañeros dieron testimonio de la fe durante las persecuciones del cristianismo en Corea.",
+      "excluded": false
+    },
+    "09-21": {
+      "name": "San Mateo, apóstol",
+      "text": "Mateo fue uno de los doce apóstoles y, según la tradición cristiana, está vinculado al Evangelio que lleva su nombre.",
+      "excluded": false
+    },
+    "09-22": {
+      "name": "San Mauricio",
+      "text": "Mauricio es venerado como comandante de la legendaria Legión Tebana, cuyos miembros habrían muerto por su fe. Los detalles del relato no son históricamente seguros.",
+      "excluded": false
+    },
+    "09-23": {
+      "name": "San Pío de Pietrelcina",
+      "text": "Pío de Pietrelcina (1887-1968), sacerdote capuchino italiano, se dedicó a la oración, la confesión y la atención espiritual de numerosos fieles.",
+      "excluded": false
+    },
+    "09-24": {
+      "name": "Nuestra Señora de la Merced",
+      "text": "Nuestra Señora de la Merced es una advocación vinculada a la Orden Mercedaria y a su misión histórica de redención de cautivos.",
+      "excluded": false
+    },
+    "09-25": {
+      "name": "San Germán de Auxerre",
+      "text": "Germán de Auxerre (c. 378-448) fue obispo en la Galia y participó en misiones pastorales en Britania. Su memoria principal suele situarse el 31 de julio.",
+      "excluded": false
+    },
+    "09-26": {
+      "name": "Santos Cosme y Damián",
+      "text": "Cosme y Damián son venerados como médicos y mártires cristianos de la antigüedad. Su memoria dio origen a una amplia devoción ligada al cuidado de los enfermos.",
+      "excluded": false
+    },
+    "09-27": {
+      "name": "San Vicente de Paúl",
+      "text": "Vicente de Paúl (1581-1660), sacerdote francés, impulsó obras de servicio a personas pobres y fundó comunidades dedicadas a la misión y la caridad.",
+      "excluded": false
+    },
+    "09-28": {
+      "name": "San Wenceslao; Santos Lorenzo Ruiz y compañeros",
+      "text": "Wenceslao (c. 907-935), duque de Bohemia, murió asesinado; Lorenzo Ruiz y sus compañeros fueron mártires en Japón en el siglo XVII.",
+      "excluded": false
+    },
+    "09-29": {
+      "name": "Santos Miguel, Gabriel y Rafael, arcángeles",
+      "text": "Miguel, Gabriel y Rafael son los arcángeles mencionados en la Escritura y venerados en la tradición de la Iglesia por su misión al servicio de Dios.",
+      "excluded": false
+    },
+    "09-30": {
+      "name": "San Jerónimo",
+      "text": "Jerónimo (c. 347-420), sacerdote y doctor de la Iglesia, realizó una influyente traducción latina de la Biblia, conocida como la Vulgata.",
+      "excluded": false
+    },
+    "10-01": {
+      "name": "Santa Teresa del Niño Jesús",
+      "text": "Teresa del Niño Jesús (1873-1897), carmelita francesa y doctora de la Iglesia, enseñó un camino de confianza y amor a Dios en los actos sencillos.",
+      "excluded": false
+    },
+    "10-02": {
+      "name": "Santos Ángeles Custodios",
+      "text": "Los santos ángeles custodios son recordados por la Iglesia como signo de la providencia y el cuidado de Dios sobre las personas.",
+      "excluded": false
+    },
+    "10-03": {
+      "name": "San Gerardo de Brogne",
+      "text": "Gerardo de Brogne (c. 895-959) fue un abad benedictino de los Países Bajos que impulsó reformas monásticas.",
+      "excluded": false
+    },
+    "10-04": {
+      "name": "San Francisco de Asís",
+      "text": "Francisco de Asís (1181/1182-1226) abrazó la pobreza evangélica, promovió la paz y fundó la familia franciscana.",
+      "excluded": false
+    },
+    "10-05": {
+      "name": "Santa Faustina Kowalska",
+      "text": "Faustina Kowalska (1905-1938), religiosa polaca, difundió la devoción a la Divina Misericordia a través de su experiencia espiritual y sus escritos.",
+      "excluded": false
+    },
+    "10-06": {
+      "name": "San Bruno",
+      "text": "Bruno de Colonia (c. 1030-1101) fue fundador de la Orden Cartuja, caracterizada por la soledad, el silencio y la oración.",
+      "excluded": false
+    },
+    "10-07": {
+      "name": "Bienaventurada Virgen María del Rosario",
+      "text": "Nuestra Señora del Rosario invita a contemplar la vida de Jesucristo con María mediante la oración del rosario.",
+      "excluded": false
+    },
+    "10-08": {
+      "name": "Santa Pelagia de Antioquía",
+      "text": "Pelagia es venerada como mártir cristiana de Antioquía. Las tradiciones antiguas ofrecen relatos diferentes sobre su vida; su memoria destaca la fidelidad a Cristo en medio de la persecución.",
+      "excluded": false
+    },
+    "10-09": {
+      "name": "San Luis Bertrán",
+      "text": "Luis Bertrán (1526-1581), dominico español, ejerció la predicación y la misión, incluida una estancia evangelizadora en el territorio de la actual Colombia.",
+      "excluded": false
+    },
+    "10-10": {
+      "name": "San Daniel el Estilita",
+      "text": "Daniel Comboni (1831-1881) fue obispo y misionero italiano, fundador de institutos dedicados a la evangelización y servicio a pueblos africanos. La base lo llama erróneamente «Daniel el Estilita», cuya memoria corresponde a otra fecha.",
+      "excluded": true
+    },
+    "10-11": {
+      "name": "San Juan XXIII",
+      "text": "Juan XXIII (1881-1963), papa entre 1958 y 1963, convocó el Concilio Vaticano II y promovió la renovación pastoral de la Iglesia.",
+      "excluded": false
+    },
+    "10-12": {
+      "name": "Nuestra Señora del Pilar",
+      "text": "Nuestra Señora del Pilar es una advocación mariana profundamente vinculada a Zaragoza, España, y a la tradición de una manifestación de María al apóstol Santiago.",
+      "excluded": false
+    },
+    "10-13": {
+      "name": "San Eduardo el Confesor",
+      "text": "Eduardo el Confesor (c. 1003-1066) fue rey de Inglaterra, venerado por su piedad y por el apoyo a instituciones religiosas.",
+      "excluded": false
+    },
+    "10-14": {
+      "name": "San Calixto I",
+      "text": "Calixto I fue obispo de Roma en el siglo III y murió hacia el año 222. Las antiguas fuentes conservan noticias sobre conflictos de su época.",
+      "excluded": false
+    },
+    "10-15": {
+      "name": "Santa Teresa de Jesús",
+      "text": "Teresa de Jesús (1515-1582), carmelita española y doctora de la Iglesia, reformó el Carmelo y escribió obras fundamentales de espiritualidad y oración.",
+      "excluded": false
+    },
+    "10-16": {
+      "name": "Santa Eduviges; Santa Margarita María de Alacoque",
+      "text": "Eduviges de Silesia (c. 1174-1243) dedicó sus recursos a los necesitados; Margarita María de Alacoque (1647-1690), visitandina francesa, promovió la devoción al Sagrado Corazón.",
+      "excluded": false
+    },
+    "10-17": {
+      "name": "San Ignacio de Antioquía",
+      "text": "Ignacio de Antioquía, obispo de comienzos del siglo II, murió mártir en Roma y dejó cartas valiosas para conocer la fe de la Iglesia primitiva.",
+      "excluded": false
+    },
+    "10-18": {
+      "name": "San Lucas, evangelista",
+      "text": "Lucas es reconocido por la tradición cristiana como autor del tercer Evangelio y de los Hechos de los Apóstoles, que narran la vida de Jesús y la expansión inicial de la Iglesia.",
+      "excluded": false
+    },
+    "10-19": {
+      "name": "Santos Juan de Brébeuf, Isaac Jogues y compañeros; San Pablo de la Cruz",
+      "text": "Juan de Brébeuf e Isaac Jogues, jesuitas misioneros en América del Norte, murieron mártires en el siglo XVII. Pablo de la Cruz (1694-1775) fundó los pasionistas.",
+      "excluded": false
+    },
+    "10-20": {
+      "name": "San Juan de Capistrano (fecha discordante: revisión)",
+      "text": "Juan de Capistrano (1386-1456) fue franciscano y predicador itinerante. Su memoria universal se celebra el 23 de octubre; la entrada del día 20 está duplicada.",
+      "excluded": false
+    },
+    "10-21": {
+      "name": "Santa Laura de Santa Catalina de Siena Montoya y Upegui",
+      "text": "Laura Montoya (1874-1949), religiosa colombiana, fundó las Misioneras de María Inmaculada y Santa Catalina de Siena y se dedicó a la evangelización y acompañamiento de comunidades indígenas.",
+      "excluded": false
+    },
+    "10-22": {
+      "name": "San Juan Pablo II",
+      "text": "Juan Pablo II (1920-2005), papa de 1978 a 2005, promovió el diálogo, la evangelización y numerosos viajes pastorales por el mundo.",
+      "excluded": false
+    },
+    "10-23": {
+      "name": "San Juan de Capistrano",
+      "text": "Juan de Capistrano (1386-1456), fraile franciscano italiano, se distinguió por su predicación popular y su participación en asuntos eclesiales de su época.",
+      "excluded": false
+    },
+    "10-24": {
+      "name": "San Antonio María Claret",
+      "text": "Antonio María Claret (1807-1870), arzobispo y misionero español, fundó la Congregación de los Misioneros Hijos del Inmaculado Corazón de María.",
+      "excluded": false
+    },
+    "10-25": {
+      "name": "Santos Crisanto y Daría",
+      "text": "Crisanto y Daría son venerados como mártires romanos. Los relatos sobre su vida pertenecen mayormente a una tradición hagiográfica posterior.",
+      "excluded": false
+    },
+    "10-26": {
+      "name": "San Evaristo",
+      "text": "Evaristo fue obispo de Roma a fines del siglo I o comienzos del II; se conservan muy pocos datos seguros sobre su ministerio.",
+      "excluded": false
+    },
+    "10-27": {
+      "name": "San Frumencio",
+      "text": "Frumencio (siglo IV) es recordado como primer obispo de Aksum y figura fundamental en los orígenes del cristianismo etíope.",
+      "excluded": false
+    },
+    "10-28": {
+      "name": "Santos Simón y Judas, apóstoles",
+      "text": "Simón y Judas Tadeo fueron apóstoles de Jesús. La Iglesia celebra conjuntamente su testimonio y servicio a la expansión del Evangelio.",
+      "excluded": false
+    },
+    "10-29": {
+      "name": "San Narciso de Jerusalén",
+      "text": "Narciso fue obispo de Jerusalén a finales del siglo II y comienzos del III. Eusebio de Cesarea recoge noticias sobre su vida.",
+      "excluded": false
+    },
+    "10-30": {
+      "name": "San Alonso Rodríguez",
+      "text": "Alonso Rodríguez (1533-1617) fue un hermano jesuita español que sirvió durante muchos años como portero en el colegio de Montesión, en Mallorca.",
+      "excluded": false
+    },
+    "10-31": {
+      "name": "San Wolfango",
+      "text": "Wolfango (c. 934-994) fue obispo de Ratisbona y promovió reformas monásticas y pastorales en tierras germánicas.",
+      "excluded": false
+    },
+    "11-01": {
+      "name": "Todos los Santos",
+      "text": "Todos los Santos celebra a quienes participan de la vida gloriosa de Dios, incluidos numerosos cristianos cuyos nombres no figuran en el calendario.",
+      "excluded": false
+    },
+    "11-02": {
+      "name": "Fieles Difuntos",
+      "text": "La conmemoración de todos los fieles difuntos invita a orar por quienes han muerto y a renovar la esperanza cristiana en la resurrección.",
+      "excluded": false
+    },
+    "11-03": {
+      "name": "San Martín de Porres",
+      "text": "Martín de Porres (1579-1639), religioso dominico peruano, dedicó su vida al servicio de los enfermos, los pobres y las personas marginadas.",
+      "excluded": false
+    },
+    "11-04": {
+      "name": "San Carlos Borromeo",
+      "text": "Carlos Borromeo (1538-1584), arzobispo de Milán, impulsó la formación del clero y la aplicación de las reformas del Concilio de Trento.",
+      "excluded": false
+    },
+    "11-05": {
+      "name": "Santos Zacarías e Isabel",
+      "text": "Zacarías e Isabel son los padres de Juan Bautista, presentados en el Evangelio de Lucas como personas justas y fieles a Dios.",
+      "excluded": false
+    },
+    "11-06": {
+      "name": "San Leonardo de Noblac",
+      "text": "Leonardo de Noblac es venerado en la tradición francesa como ermitaño y protector de prisioneros. Su biografía contiene numerosos elementos legendarios.",
+      "excluded": false
+    },
+    "11-07": {
+      "name": "San Ernesto de Zwiefalten",
+      "text": "Ernesto de Zwiefalten fue abad benedictino del siglo XII, recordado como mártir en tradiciones relacionadas con las cruzadas.",
+      "excluded": false
+    },
+    "11-08": {
+      "name": "San Godofredo de Amiens",
+      "text": "Godofredo de Amiens (c. 1066-1115) fue un monje y obispo francés que promovió la reforma de la vida clerical.",
+      "excluded": false
+    },
+    "11-09": {
+      "name": "Dedicación de la Basílica de Letrán",
+      "text": "La dedicación de la basílica de Letrán recuerda la catedral del obispo de Roma y simboliza la unidad de la Iglesia.",
+      "excluded": false
+    },
+    "11-10": {
+      "name": "San León Magno",
+      "text": "León Magno, papa entre 440 y 461, es doctor de la Iglesia y destacó por sus enseñanzas sobre Jesucristo y su cuidado pastoral.",
+      "excluded": false
+    },
+    "11-11": {
+      "name": "San Martín de Tours",
+      "text": "Martín de Tours (c. 316-397), soldado convertido en monje y después obispo, es célebre por su caridad con los pobres.",
+      "excluded": false
+    },
+    "11-12": {
+      "name": "San Josafat",
+      "text": "Josafat (c. 1580-1623), obispo de la tradición oriental católica, trabajó por la unidad eclesial y murió mártir.",
+      "excluded": false
+    },
+    "11-13": {
+      "name": "San Leandro de Sevilla",
+      "text": "Leandro de Sevilla (c. 534-600), arzobispo hispano, desempeñó un papel importante en la conversión del reino visigodo al catolicismo.",
+      "excluded": false
+    },
+    "11-14": {
+      "name": "San Lorenzo O'Toole",
+      "text": "Lorenzo O'Toole (1128-1180), arzobispo de Dublín, trabajó por la reforma eclesial y la reconciliación en Irlanda.",
+      "excluded": false
+    },
+    "11-15": {
+      "name": "San Alberto Magno",
+      "text": "Alberto Magno (c. 1200-1280), dominico y doctor de la Iglesia, cultivó la filosofía, la teología y el estudio de la naturaleza.",
+      "excluded": false
+    },
+    "11-16": {
+      "name": "Santa Margarita de Escocia; Santa Gertrudis",
+      "text": "Margarita de Escocia (c. 1045-1093), reina y benefactora de pobres, es recordada junto con Gertrudis la Grande (1256-1302), monja benedictina y escritora mística.",
+      "excluded": false
+    },
+    "11-17": {
+      "name": "Santa Isabel de Hungría",
+      "text": "Isabel de Hungría (1207-1231), viuda y terciaria franciscana, dedicó sus bienes y esfuerzos al cuidado de los pobres y enfermos.",
+      "excluded": false
+    },
+    "11-18": {
+      "name": "Dedicación de las basílicas de San Pedro y San Pablo",
+      "text": "La dedicación de las basílicas de San Pedro y San Pablo recuerda dos templos de Roma vinculados al testimonio de los grandes apóstoles.",
+      "excluded": false
+    },
+    "11-19": {
+      "name": "Santa Matilde de Hackeborn",
+      "text": "Matilde de Hackeborn (c. 1241-1298) fue monja benedictina alemana, recordada por sus experiencias místicas y enseñanzas espirituales.",
+      "excluded": false
+    },
+    "11-20": {
+      "name": "San Félix de Valois",
+      "text": "Félix de Valois figura en la tradición de los orígenes de la Orden Trinitaria. La documentación histórica sobre su identidad presenta dificultades.",
+      "excluded": false
+    },
+    "11-21": {
+      "name": "Presentación de la Virgen María",
+      "text": "La Presentación de la Virgen María es una memoria vinculada a una antigua tradición cristiana sobre su infancia y su dedicación a Dios.",
+      "excluded": false
+    },
+    "11-22": {
+      "name": "Santa Cecilia",
+      "text": "Cecilia es venerada como mártir romana de los primeros siglos y es patrona de la música en la tradición católica.",
+      "excluded": false
+    },
+    "11-23": {
+      "name": "San Clemente I; San Columbano",
+      "text": "Clemente I fue uno de los primeros obispos de Roma, autor de una carta antigua a los corintios; Columbano (c. 543-615) fue abad y misionero irlandés en Europa.",
+      "excluded": false
+    },
+    "11-24": {
+      "name": "Santos Andrés Dung-Lac y compañeros",
+      "text": "Andrés Dung-Lac y sus compañeros representan a los mártires de Vietnam, ejecutados en diversas persecuciones entre los siglos XVII y XIX.",
+      "excluded": false
+    },
+    "11-25": {
+      "name": "Santa Catalina de Alejandría",
+      "text": "Catalina de Alejandría es venerada como mártir cristiana. La narración tradicional de su vida es de carácter legendario y carece de documentación contemporánea.",
+      "excluded": false
+    },
+    "11-26": {
+      "name": "San Silvestre Gozzolini",
+      "text": "Silvestre Gozzolini (1177-1267), monje italiano, fundó la congregación benedictina de los silvestrinos.",
+      "excluded": false
+    },
+    "11-27": {
+      "name": "San Virgilio",
+      "text": "Virgilio fue obispo de Salzburgo en el siglo VIII; originario de Irlanda, favoreció el trabajo misionero y la actividad intelectual.",
+      "excluded": false
+    },
+    "11-28": {
+      "name": "San Jacobo de la Marca",
+      "text": "Jacobo de la Marca (1393-1476) fue un franciscano italiano destacado por su predicación y la promoción de obras sociales.",
+      "excluded": false
+    },
+    "11-29": {
+      "name": "San Saturnino",
+      "text": "Saturnino, obispo de Tolosa, es venerado como mártir de los primeros siglos, según una antigua tradición local.",
+      "excluded": false
+    },
+    "11-30": {
+      "name": "San Andrés, apóstol",
+      "text": "Andrés, hermano de san Pedro, fue uno de los primeros discípulos llamados por Jesús. La tradición lo recuerda como predicador y mártir.",
+      "excluded": false
+    },
+    "12-01": {
+      "name": "San Eloy",
+      "text": "Eloy (c. 588-660) fue orfebre, consejero real y después obispo de Noyon. Es recordado por su caridad y su labor evangelizadora.",
+      "excluded": false
+    },
+    "12-02": {
+      "name": "Santa Bibiana",
+      "text": "Bibiana es venerada como virgen y mártir de Roma. La documentación de su vida procede de tradiciones tardías.",
+      "excluded": false
+    },
+    "12-03": {
+      "name": "San Francisco Javier",
+      "text": "Francisco Javier (1506-1552), jesuita navarro, anunció el Evangelio en la India y otras regiones de Asia y es patrono de las misiones.",
+      "excluded": false
+    },
+    "12-04": {
+      "name": "San Juan Damasceno",
+      "text": "Juan Damasceno (c. 675-749), monje y doctor de la Iglesia, defendió la veneración de las imágenes sagradas y escribió síntesis de la fe cristiana.",
+      "excluded": false
+    },
+    "12-05": {
+      "name": "San Sabas",
+      "text": "Sabas (439-532) fue un monje palestino, fundador de monasterios en el desierto de Judea y organizador de la vida monástica.",
+      "excluded": false
+    },
+    "12-06": {
+      "name": "San Nicolás de Bari",
+      "text": "Nicolás fue obispo de Mira en el siglo IV. Su memoria está relacionada con la caridad y con numerosas tradiciones populares posteriores.",
+      "excluded": false
+    },
+    "12-07": {
+      "name": "San Ambrosio",
+      "text": "Ambrosio (c. 339-397), obispo de Milán y doctor de la Iglesia, sobresalió por su enseñanza, su defensa de la fe y su atención pastoral.",
+      "excluded": false
+    },
+    "12-08": {
+      "name": "Inmaculada Concepción de la Virgen María",
+      "text": "La Inmaculada Concepción celebra que María, por gracia singular de Dios y en atención a los méritos de Cristo, fue preservada del pecado original desde su concepción.",
+      "excluded": false
+    },
+    "12-09": {
+      "name": "San Juan Diego Cuauhtlatoatzin",
+      "text": "Juan Diego Cuauhtlatoatzin (c. 1474-1548), indígena mexicano, está vinculado a los acontecimientos guadalupanos y a la devoción mariana del Tepeyac.",
+      "excluded": false
+    },
+    "12-10": {
+      "name": "Bienaventurada Virgen María de Loreto",
+      "text": "Nuestra Señora de Loreto es una advocación mariana ligada al santuario italiano de Loreto y a la tradición de la Santa Casa de Nazaret.",
+      "excluded": false
+    },
+    "12-11": {
+      "name": "San Dámaso I",
+      "text": "Dámaso I fue papa entre 366 y 384. Promovió la veneración de los mártires y encomendó a san Jerónimo trabajos bíblicos.",
+      "excluded": false
+    },
+    "12-12": {
+      "name": "Bienaventurada Virgen María de Guadalupe",
+      "text": "Nuestra Señora de Guadalupe es una advocación mariana de profunda importancia en América, ligada a la tradición de las apariciones de 1531 en el Tepeyac.",
+      "excluded": false
+    },
+    "12-13": {
+      "name": "Santa Lucía",
+      "text": "Lucía es venerada como virgen y mártir de Siracusa, durante las persecuciones de los primeros siglos del cristianismo.",
+      "excluded": false
+    },
+    "12-14": {
+      "name": "San Juan de la Cruz",
+      "text": "Juan de la Cruz (1542-1591), carmelita español y doctor de la Iglesia, colaboró en la reforma del Carmelo y escribió poesía y tratados sobre la vida mística.",
+      "excluded": false
+    },
+    "12-15": {
+      "name": "San Valeriano",
+      "text": "Valeriano es un nombre compartido por diversos mártires y santos de la antigüedad; la base necesita identificar al personaje concreto antes de añadir datos personales.",
+      "excluded": false
+    },
+    "12-16": {
+      "name": "San Eusebio de Vercelli (fecha discordante: revisión)",
+      "text": "Eusebio de Vercelli (c. 283-371), obispo y defensor de la doctrina de Nicea, tiene su memoria universal el 2 de agosto. Esta entrada de diciembre requiere corrección.",
+      "excluded": false
+    },
+    "12-17": {
+      "name": "San Lázaro de Betania",
+      "text": "Lázaro de Betania aparece en el Evangelio de Juan como amigo de Jesús y hermano de Marta y María; Jesús lo llamó de nuevo a la vida según el relato evangélico.",
+      "excluded": false
+    },
+    "12-18": {
+      "name": "Nuestra Señora de la O",
+      "text": "Nuestra Señora de la O es una advocación mariana ligada a la espera del nacimiento de Jesús y a la espiritualidad del Adviento.",
+      "excluded": false
+    },
+    "12-19": {
+      "name": "San Anastasio I",
+      "text": "Anastasio I fue papa entre 399 y 401, recordado por su oposición a determinadas doctrinas consideradas erróneas en su época.",
+      "excluded": false
+    },
+    "12-20": {
+      "name": "Santo Domingo de Silos",
+      "text": "Domingo de Silos (c. 1000-1073) fue abad benedictino y reformador de la vida monástica en Castilla.",
+      "excluded": false
+    },
+    "12-21": {
+      "name": "San Pedro Canisio",
+      "text": "Pedro Canisio (1521-1597), jesuita y doctor de la Iglesia, fue catequista, predicador y autor de textos de formación cristiana en Europa.",
+      "excluded": false
+    },
+    "12-22": {
+      "name": "San Flaviano de Constantinopla",
+      "text": "Flaviano de Constantinopla fue patriarca en el siglo V y sufrió violencia durante disputas cristológicas de su tiempo.",
+      "excluded": false
+    },
+    "12-23": {
+      "name": "San Juan Cancio",
+      "text": "Juan Cancio (1390-1473) fue sacerdote y profesor de la Universidad de Cracovia, apreciado por su erudición y su generosidad con los pobres.",
+      "excluded": false
+    },
+    "12-24": {
+      "name": "San Adalberto de Praga (fecha discordante: revisión)",
+      "text": "Adalberto de Praga (c. 956-997) fue obispo y misionero martirizado entre pueblos bálticos. Su memoria habitual es el 23 de abril; la fecha del 24 de diciembre es discordante.",
+      "excluded": false
+    },
+    "12-25": {
+      "name": "Natividad del Señor",
+      "text": "La Navidad celebra el nacimiento de Jesucristo, Hijo de Dios hecho hombre, en Belén. Es una de las solemnidades centrales del año litúrgico.",
+      "excluded": false
+    },
+    "12-26": {
+      "name": "San Esteban, protomártir",
+      "text": "Esteban, uno de los siete elegidos para el servicio de la comunidad según los Hechos de los Apóstoles, es recordado como el primer mártir cristiano.",
+      "excluded": false
+    },
+    "12-27": {
+      "name": "San Juan evangelista",
+      "text": "Juan, apóstol y evangelista, pertenece al grupo de los Doce. La tradición cristiana vincula su testimonio al cuarto Evangelio.",
+      "excluded": false
+    },
+    "12-28": {
+      "name": "Santos Inocentes",
+      "text": "Los Santos Inocentes recuerdan a los niños de Belén asesinados por orden de Herodes, según el relato del Evangelio de Mateo.",
+      "excluded": false
+    },
+    "12-29": {
+      "name": "San Tomás Becket",
+      "text": "Tomás Becket (1118-1170), arzobispo de Canterbury, fue asesinado en su catedral tras un conflicto sobre la libertad de la Iglesia frente al poder real.",
+      "excluded": false
+    },
+    "12-30": {
+      "name": "San Anisio",
+      "text": "Anisio fue obispo de Tesalónica a fines del siglo IV y comienzos del V. Es mencionado en la correspondencia eclesiástica de su época.",
+      "excluded": false
+    },
+    "12-31": {
+      "name": "San Silvestre I",
+      "text": "Silvestre I fue obispo de Roma entre 314 y 335, durante los primeros años de libertad del cristianismo en el Imperio romano.",
+      "excluded": false
+    }
+  }
+}

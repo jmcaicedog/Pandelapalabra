@@ -1,8 +1,14 @@
 import { SAINTS_BY_DAY, type SaintData } from './saintsCalendar.js';
 import editorial from './colombianEditorialSaints.json' with { type: 'json' };
+import editorialBiographies from './colombianEditorialBiographies.json' with { type: 'json' };
 import { parseDateStr } from '../lib/dateUtils.js';
 
 export const EDITORIAL_SANTORAL_VERSION = editorial.version;
+export const EDITORIAL_BIOGRAPHIES_VERSION = editorialBiographies.version;
+
+export interface EditorialBiographyReview {
+  version: string;
+}
 
 export interface SaintVerification {
   status: 'publisher' | 'ordo' | 'pending' | 'editorial';
@@ -18,9 +24,10 @@ export interface SaintVerification {
   biographySourceUrl?: string;
   biographySourceName?: string;
   biographySources?: { url: string; title: string }[];
-  biographyMethod?: 'grounded';
+  biographyMethod?: 'grounded' | 'editorial';
   biographyCheckedAt?: string;
   biographyError?: string;
+  biographyEditorial?: EditorialBiographyReview;
 }
 
 export interface ColombianSaint {
@@ -80,8 +87,21 @@ function findLocalBiography(name: string): SaintData | undefined {
 }
 
 export function hasSaintBiography(value: ColombianSaint): boolean {
-  return !!value.saint.fullBio.trim()
-    && !/^(?:Biografía no disponible\.|Todavía no hay una biografía|No se ha podido verificar el santo|La fuente confirma el nombre; no hay una biografía)/i.test(value.saint.fullBio.trim());
+  if (isBiographyBlockedForReview(value)
+    && (value.saintVerification.biographyMethod === 'grounded'
+      || !value.saintVerification.biographySourceUrl)) return false;
+  return !isPlaceholderBiography(value.saint.fullBio);
+}
+
+export function isBiographyBlockedForReview(value: ColombianSaint): boolean {
+  const record = editorialBiographies.records[value.saintVerification.date.slice(5)];
+  return !!record
+    && normalizeSaintName(record.name) === normalizeSaintName(value.saint.name)
+    && record.excluded;
+}
+
+function isPlaceholderBiography(text: string): boolean {
+  return !text.trim() || /^(?:Biografía no disponible\.|Todavía no hay una biografía|No se ha podido verificar el santo|La fuente confirma el nombre; no hay una biografía)/i.test(text.trim());
 }
 
 export function isBiographySourceUrl(value: string): boolean {
@@ -162,6 +182,25 @@ export function getEditorialSaint(date: string): ColombianSaint {
       biographySourceUrl: biography.sourceUrl,
       biographySourceName: biography.sourceName,
     };
+  }
+  const editorialReview = editorialBiographies.records[date.slice(5)];
+  if (editorialReview && normalizeSaintName(editorialReview.name) === normalizeSaintName(entry.name)) {
+    if (editorialReview.excluded) {
+      if (isPlaceholderBiography(selected.saint.fullBio)) {
+        selected.saint.shortBio = 'Biografía no disponible.';
+        selected.saint.fullBio = 'Biografía no disponible.';
+      }
+    } else {
+      selected.saint.shortBio = editorialReview.text;
+      selected.saint.fullBio = editorialReview.text;
+      selected.saintVerification = {
+        ...selected.saintVerification,
+        biographySourceUrl: undefined,
+        biographySourceName: undefined,
+        biographyMethod: 'editorial',
+        biographyEditorial: { version: EDITORIAL_BIOGRAPHIES_VERSION },
+      };
+    }
   }
   return selected;
 }

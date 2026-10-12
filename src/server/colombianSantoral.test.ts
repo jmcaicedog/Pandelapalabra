@@ -3,9 +3,10 @@ import { test } from 'node:test';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { fetchColombianSantoral } from './colombianSantoral.ts';
-import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint, hasFreshSaintVerification, hasSaintBiography } from '../data/colombianSaints.ts';
+import { EDITORIAL_BIOGRAPHIES_VERSION, EDITORIAL_SANTORAL_VERSION, getEditorialSaint, hasFreshSaintVerification, hasSaintBiography, isBiographyBlockedForReview } from '../data/colombianSaints.ts';
 import { SaintSource } from '../components/SaintSource.tsx';
 import editorial from '../data/colombianEditorialSaints.json' with { type: 'json' };
+import editorialBiographies from '../data/colombianEditorialBiographies.json' with { type: 'json' };
 
 test('el santoral recurrente cubre todos los días, incluidos bisiestos y años futuros', () => {
   assert.equal(Object.keys(editorial.entries).length, 366);
@@ -36,10 +37,10 @@ test('Pelagia y Luis Bertrán se resuelven localmente, sin consultas externas', 
   for (const year of [2026, 2027, 2035]) {
     const pelagia = await fetchColombianSantoral(`${year}-10-08`);
     assert.equal(pelagia.saint.name, 'Santa Pelagia de Antioquía');
-    assert.match(pelagia.saint.fullBio, /Nono/);
+    assert.match(pelagia.saint.fullBio, /mártir cristiana de Antioquía/);
     const luis = await fetchColombianSantoral(`${year}-10-09`);
     assert.equal(luis.saint.name, 'San Luis Bertrán');
-    assert.match(luis.saint.fullBio, /1526/);
+    assert.match(luis.saint.fullBio, /estancia evangelizadora/);
   }
   assert.equal(network.mock.calls.length, 0);
 });
@@ -53,13 +54,13 @@ test('las biografías de hoy y mañana tienen fuente explícita', () => {
   assert.match(today.saintVerification.biographySourceUrl || '', /^https:\/\/es\.catholic\.net\//);
   assert.equal(tomorrow.saint.name, 'San Juan XXIII');
   assert.match(tomorrow.saint.fullBio, /Concilio Vaticano II/);
-  assert.equal(tomorrow.saintVerification.biographySourceName, 'Santa Sede');
-  assert.match(tomorrow.saintVerification.biographySourceUrl || '', /^https:\/\/www\.vatican\.va\//);
+  assert.equal(tomorrow.saintVerification.biographyMethod, 'editorial');
+  assert.match(tomorrow.saint.fullBio, /Juan XXIII \(1881-1963\)/);
   const markup = renderToStaticMarkup(createElement(SaintSource, {
     verification: tomorrow.saintVerification,
   }));
-  assert.match(markup, /Biografía: Santa Sede/);
-  assert.doesNotMatch(markup, /pendiente de confirmar/i);
+  assert.match(markup, /Reseña editorial/);
+  assert.doesNotMatch(markup, /Santa Sede|pendiente|cotejo/i);
 });
 
 test('los nombres editoriales con variantes conservan la biografía local', () => {
@@ -72,35 +73,31 @@ test('los nombres editoriales con variantes conservan la biografía local', () =
 test('la revisión queda interna y cambiar de versión invalida la selección anterior', () => {
   const result = getEditorialSaint('2026-10-08');
   assert.equal(result.saintVerification.version, EDITORIAL_SANTORAL_VERSION);
-  assert.equal(renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification })), '');
+  const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
+  assert.match(markup, /Reseña editorial/);
+  assert.doesNotMatch(markup, /pendiente|cotejo|fuente:/i);
   assert.ok(!hasFreshSaintVerification({ ...result.saintVerification, version: 'old' }, '2026-10-08'));
   assert.ok(!hasFreshSaintVerification(result.saintVerification, '2026-10-09'));
 });
 
 test('consulta biografías por identidad para fechas arbitrarias y conserva la selección', async () => {
-  const dates = Object.keys(editorial.entries)
-    .filter(day => !hasSaintBiography(getEditorialSaint(`2028-${day}`))).slice(0, 3);
-  assert.equal(dates.length, 3);
-  for (const day of dates) {
-    for (const year of [2028, 2035]) {
-      const date = `${year}-${day}`;
-      const selected = getEditorialSaint(date);
-      const result = await fetchColombianSantoral(date, async name => {
-        assert.equal(name, selected.saint.name);
-        return {
-          fullBio: `${name}. ${'Resumen con hechos respaldados por las fuentes consultadas. '.repeat(5)}`,
-          sources: [{ url: 'https://www.vatican.va/biografia', title: 'Santa Sede' }],
-          checkedAt: '2026-10-11T01:00:00Z',
-        };
-      });
-      assert.equal(result.saint.name, selected.saint.name);
-      assert.equal(result.saintVerification.date, date);
-      assert.equal(result.saintVerification.biographyMethod, 'grounded');
-      assert.ok(hasSaintBiography(result));
-      const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
-      assert.match(markup, /Síntesis con búsqueda/);
-      assert.match(markup, /https:\/\/www.vatican.va\/biografia/);
-    }
+  for (const date of ['2028-02-29', '2036-02-29']) {
+    const selected = getEditorialSaint(date);
+    const result = await fetchColombianSantoral(date, async name => {
+      assert.equal(name, selected.saint.name);
+      return {
+        fullBio: `${name}. ${'Resumen con hechos respaldados por las fuentes consultadas. '.repeat(5)}`,
+        sources: [{ url: 'https://www.vatican.va/biografia', title: 'Santa Sede' }],
+        checkedAt: '2026-10-11T01:00:00Z',
+      };
+    });
+    assert.equal(result.saint.name, selected.saint.name);
+    assert.equal(result.saintVerification.date, date);
+    assert.equal(result.saintVerification.biographyMethod, 'grounded');
+    assert.ok(hasSaintBiography(result));
+    const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
+    assert.match(markup, /Síntesis con búsqueda/);
+    assert.match(markup, /https:\/\/www.vatican.va\/biografia/);
   }
 });
 
@@ -114,4 +111,50 @@ test('un fallo de consulta se muestra explícitamente con reintento', async () =
   }));
   assert.match(markup, /No se pudo obtener una biografía con fuentes/);
   assert.match(markup, /Reintentar biografía/);
+});
+
+test('usa las 365 reseñas editoriales por fecha e identidad sin consultar Gemini', async () => {
+  assert.equal(Object.keys(editorialBiographies.records).length, 365);
+  for (const [monthDay, review] of Object.entries(editorialBiographies.records)) {
+    const base = getEditorialSaint(`2026-${monthDay}`);
+    const expectedName = editorial.entries[monthDay].name;
+    assert.equal(review.name, expectedName);
+    assert.equal(base.saint.name, expectedName);
+    let lookupCount = 0;
+    for (const year of [2026, 2035]) {
+      const date = `${year}-${monthDay}`;
+      const result = await fetchColombianSantoral(date, async () => {
+        lookupCount++;
+        throw new Error('Una reseña del libro no debe consultar Gemini.');
+      });
+      assert.equal(result.saint.name, expectedName);
+      if (review.excluded) {
+        if (monthDay === '10-10') assert.match(result.saint.fullBio, /Daniel nació cerca de Samosata/);
+        else assert.equal(result.saint.fullBio, 'Biografía no disponible.');
+        assert.ok(isBiographyBlockedForReview(result));
+        const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
+        assert.doesNotMatch(markup, /ALERTA|corrección requerida|pendiente|cotejo/i);
+      } else {
+        assert.equal(result.saint.fullBio, review.text);
+        assert.equal(result.saintVerification.biographyMethod, 'editorial');
+        assert.equal(result.saintVerification.biographyEditorial?.version, EDITORIAL_BIOGRAPHIES_VERSION);
+        const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
+        assert.match(markup, /Reseña editorial/);
+        assert.doesNotMatch(markup, /ALERTA|corrección requerida|pendiente|cotejo|referencias indicadas/i);
+      }
+    }
+    assert.equal(lookupCount, 0);
+  }
+});
+
+test('las reseñas editoriales no incluyen estados o advertencias visibles de la hoja', () => {
+  const date = Object.keys(editorialBiographies.records).find(day =>
+    !editorialBiographies.records[day].excluded && day !== '10-10')!;
+  const selected = getEditorialSaint(`2026-${date}`);
+  assert.ok(hasSaintBiography(selected));
+  assert.equal(selected.saint.fullBio, editorialBiographies.records[date].text);
+  const markup = renderToStaticMarkup(createElement(SaintSource, { verification: selected.saintVerification }));
+  assert.doesNotMatch(markup, /REVISAR|identificación|pendiente|cotejo|Vatican News|Martirologio/i);
+  assert.equal('status' in editorialBiographies.records[date], false);
+  assert.equal('source' in editorialBiographies.records[date], false);
 });

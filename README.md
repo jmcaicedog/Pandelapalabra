@@ -34,15 +34,20 @@ de fuentes, migración de cachés, contratos HTTP y generación compartida.
   de coincidencia con Pan de la Palabra impreso: 174 entradas proceden del
   calendario y 192 del santoral complementario. En 2026 se usan 191 de estas últimas.
   La fuente y revisión se conservan internamente; no se muestran en las tarjetas.
-  Solo se reutilizan biografías locales por identidad exacta o alias explícito,
-  independientemente de la fecha de su registro. Si falta la biografía, el servidor
-  solicita una síntesis a Gemini con Google Search. Solo acepta segmentos con
-  referencias de búsqueda para esa identidad y muestra las fuentes. Esto no
-  equivale a una revisión histórica editorial ni garantiza cobertura de todos
-  los santos. No cambia lecturas, celebraciones ni colores.
-- Solo se importan nombres y metadatos del Excel. Vatican News se
-  enlaza, sin reproducir sus textos o imágenes. Su enlace al evangelio de hoy
-  no equivale a la fecha histórica o futura seleccionada.
+  Las reseñas históricas vienen de la hoja editorial «Reseñas biográficas» del
+  libro V1.0.4 y se usan localmente para el ciclo mes-día, si coincide la identidad
+  del santo. No generan llamadas a Gemini por esas fechas, no cambian lecturas,
+  celebraciones ni colores. La interfaz muestra solo la reseña y su carácter
+  editorial; los estados y notas de revisión del libro no se muestran. Una fila
+  marcada como atribución incorrecta no se usa; si ya había una reseña local con
+  fuente explícita, se conserva.
+  La hoja declara que sus reseñas no tienen cotejo individual certificado; no se
+  deben presentar como validación independiente de hechos. Para una fecha sin
+  reseña local coincidente, el servidor puede recurrir a Gemini con Google Search
+  y guarda el resultado en PostgreSQL para reutilizarlo.
+- Las reseñas locales son textos editoriales del libro aportado; no se presentan
+  como citas literales de Vatican News ni como verificación independiente de
+  esas fuentes. La selección de nombres sigue siendo independiente de la reseña.
 - Antes de una publicación comercial, confirmar los permisos de uso de las
   traducciones bíblicas, textos y recursos gráficos con sus titulares.
 
@@ -64,12 +69,28 @@ Para actualizar desde un libro con las mismas hojas, sin dependencias Python ext
 
 ```sh
 python3 scripts/import_santoral.py /ruta/al/libro.xlsx src/data/colombianEditorialSaints.json
+python3 scripts/import_biografias.py /ruta/al/libro.xlsx src/data/colombianEditorialBiographies.json
 ```
 
-El importador exige 366 claves válidas, únicas y con nombre. Tras la revisión,
-cambiar la versión de la base cuando cambie su contenido, ejecutar las pruebas
-y desplegar. Las cachés de lecturas anteriores conservan sus textos, pero su
-santo se sustituye por la selección editorial vigente, también sin conexión.
+El primer importador exige 366 claves válidas, únicas y con nombre; el segundo
+exige las 365 fechas únicas de 2026 y las seis columnas de reseña. Tras la
+revisión, cambiar la versión de la base si cambia su contenido, ejecutar las
+pruebas y desplegar. Las cachés de lecturas anteriores conservan sus textos,
+pero su santo se sustituye por la selección editorial vigente, también sin conexión.
+
+### Reseñas biográficas editoriales
+
+[colombianEditorialBiographies.json](./src/data/colombianEditorialBiographies.json)
+contiene las 365 filas de la hoja «Reseñas biográficas» del libro
+`Calendario_Liturgico_Colombia_2026_V1_0_4_Resenas_365.xlsx`. Se indexan por
+mes-día para los años consultados, únicamente si el nombre coincide con la
+selección del santoral vigente. El archivo de la app contiene las reseñas y solo
+una marca técnica para excluir una atribución errónea; no incluye ni muestra las
+notas, fuentes genéricas o estados de revisión del libro. La app no publica la
+fila que el documento identifica como corrección de atribución.
+La reseña local preexistente con fuente explícita se conserva para San Daniel el
+Estilita, porque el texto de esa fila describe a Daniel Comboni y señala una
+identificación errónea.
 
 ## Reflexión compartida, sin chat
 

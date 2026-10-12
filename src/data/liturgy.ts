@@ -2,7 +2,7 @@ import { buildCanonicalDay } from './canonicalLectionary.js';
 import { fetchEvangelizoDay } from './evangelizo.js';
 import {
   getEditorialSaint, hasFreshSaintVerification, hasFreshSaintBiography,
-  isBiographySourceUrl, pendingSaint, type SaintVerification,
+  isBiographySourceUrl, pendingSaint, EDITORIAL_BIOGRAPHIES_VERSION, type SaintVerification,
 } from './colombianSaints.js';
 import type { LiturgicalColor, LiturgicalSeason } from './liturgicalCalendar.js';
 import { matchesColombianTransfers, getLiturgicalCalendarInfo, resolveLiturgicalColor, getColorName } from './liturgicalCalendar.js';
@@ -78,7 +78,12 @@ export function isLiturgicalDay(value: unknown): value is LiturgicalDay {
       && typeof value.saintVerification.biographySourceName !== 'string')
     || (value.saintVerification.biographyError !== undefined
       && typeof value.saintVerification.biographyError !== 'string')
-    || (value.saintVerification.biographyMethod !== undefined && value.saintVerification.biographyMethod !== 'grounded')
+    || (value.saintVerification.biographyMethod !== undefined
+      && !['grounded', 'editorial'].includes(String(value.saintVerification.biographyMethod)))
+    || (value.saintVerification.biographyEditorial !== undefined
+      && (!record(value.saintVerification.biographyEditorial)
+        || !strings(value.saintVerification.biographyEditorial, ['version'])
+        || value.saintVerification.biographyEditorial.version !== EDITORIAL_BIOGRAPHIES_VERSION))
     || (value.saintVerification.biographyCheckedAt !== undefined
       && (typeof value.saintVerification.biographyCheckedAt !== 'string'
         || !Number.isFinite(Date.parse(value.saintVerification.biographyCheckedAt))))
@@ -115,7 +120,9 @@ export function withCurrentSaint(day: LiturgicalDay): LiturgicalDay {
   const editorial = getEditorialSaint(day.date);
   if (day.saint.name === editorial.saint.name
     && day.saintVerification?.version === editorial.saintVerification.version
-    && day.saintVerification.biographyMethod === 'grounded'
+    && ((day.saintVerification.biographyMethod === 'grounded')
+      || (day.saintVerification.biographyMethod === 'editorial'
+        && day.saintVerification.biographyEditorial?.version === EDITORIAL_BIOGRAPHIES_VERSION))
     && hasFreshSaintBiography({ saint: day.saint, saintVerification: day.saintVerification })) {
     const { biographyError: _error, ...verification } = day.saintVerification;
     return { ...day, saintVerification: { ...editorial.saintVerification, ...verification } };

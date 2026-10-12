@@ -24,6 +24,10 @@ test('Node ESM carga el JSON del santoral sin bundler ni loader TypeScript', asy
       new URL('../data/colombianEditorialSaints.json', import.meta.url),
       join(directory, 'data/colombianEditorialSaints.json'),
     );
+    await copyFile(
+      new URL('../data/colombianEditorialBiographies.json', import.meta.url),
+      join(directory, 'data/colombianEditorialBiographies.json'),
+    );
     const { stdout } = await promisify(execFile)(process.execPath, [
       '--input-type=module', '--eval',
       `import { getEditorialSaint } from './data/colombianSaints.js';

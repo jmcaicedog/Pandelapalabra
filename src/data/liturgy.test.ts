@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { buildCanonicalDay } from './canonicalLectionary.ts';
 import { cleanSaintText, mapEvangelizoDay } from './evangelizo.ts';
 import { fetchLiturgicalDay, getLiturgicalDay, withCurrentSaint } from './liturgy.ts';
-import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint } from './colombianSaints.ts';
+import { EDITORIAL_SANTORAL_VERSION, getEditorialSaint, isBiographyBlockedForReview } from './colombianSaints.ts';
 
 function officialFixture(date: string) {
   return {
@@ -43,6 +43,31 @@ test('conserva biografías con fuentes y descarta identidades o versiones distin
     day.saint.fullBio);
   assert.notEqual(withCurrentSaint({ ...day, saintVerification: { ...day.saintVerification!,
     version: 'old' } }).saint.fullBio, day.saint.fullBio);
+});
+
+test('descarta una biografía generada antigua para una selección editorial marcada', () => {
+  const date = '2040-03-12';
+  const editorial = getEditorialSaint(date);
+  const blocked = buildCanonicalDay(date);
+  blocked.saint = editorial.saint;
+  blocked.saintVerification = editorial.saintVerification;
+  assert.ok(isBiographyBlockedForReview({
+    saint: blocked.saint, saintVerification: blocked.saintVerification!,
+  }));
+  const oldGenerated = {
+    ...blocked,
+    saint: { ...blocked.saint, fullBio: 'Resumen anterior que no debe conservarse.' },
+    saintVerification: {
+      ...blocked.saintVerification,
+      biographyMethod: 'grounded' as const,
+      biographyCheckedAt: '2026-10-11T01:00:00Z',
+      biographySources: [{ url: 'https://www.vatican.va/biografia', title: 'Santa Sede' }],
+      biographySourceUrl: 'https://www.vatican.va/biografia',
+    },
+  };
+  const current = withCurrentSaint(oldGenerated);
+  assert.equal(current.saint.fullBio, 'Biografía no disponible.');
+  assert.notEqual(current.saintVerification.biographyMethod, 'grounded');
 });
 
 test('persiste biografías sin lecturas y las reutiliza en otro año sin perderlas por fallos de red', async t => {
