@@ -59,8 +59,7 @@ test('las biografías de hoy y mañana tienen fuente explícita', () => {
   const markup = renderToStaticMarkup(createElement(SaintSource, {
     verification: tomorrow.saintVerification,
   }));
-  assert.match(markup, /Reseña editorial/);
-  assert.doesNotMatch(markup, /Santa Sede|pendiente|cotejo/i);
+  assert.equal(markup, '');
 });
 
 test('los nombres editoriales con variantes conservan la biografía local', () => {
@@ -74,8 +73,7 @@ test('la revisión queda interna y cambiar de versión invalida la selección an
   const result = getEditorialSaint('2026-10-08');
   assert.equal(result.saintVerification.version, EDITORIAL_SANTORAL_VERSION);
   const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
-  assert.match(markup, /Reseña editorial/);
-  assert.doesNotMatch(markup, /pendiente|cotejo|fuente:/i);
+  assert.equal(markup, '');
   assert.ok(!hasFreshSaintVerification({ ...result.saintVerification, version: 'old' }, '2026-10-08'));
   assert.ok(!hasFreshSaintVerification(result.saintVerification, '2026-10-09'));
 });
@@ -139,8 +137,7 @@ test('usa las 365 reseñas editoriales por fecha e identidad sin consultar Gemin
         assert.equal(result.saintVerification.biographyMethod, 'editorial');
         assert.equal(result.saintVerification.biographyEditorial?.version, EDITORIAL_BIOGRAPHIES_VERSION);
         const markup = renderToStaticMarkup(createElement(SaintSource, { verification: result.saintVerification }));
-        assert.match(markup, /Reseña editorial/);
-        assert.doesNotMatch(markup, /ALERTA|corrección requerida|pendiente|cotejo|referencias indicadas/i);
+        assert.equal(markup, '');
       }
     }
     assert.equal(lookupCount, 0);
@@ -154,6 +151,7 @@ test('las reseñas editoriales no incluyen estados o advertencias visibles de la
   assert.ok(hasSaintBiography(selected));
   assert.equal(selected.saint.fullBio, editorialBiographies.records[date].text);
   const markup = renderToStaticMarkup(createElement(SaintSource, { verification: selected.saintVerification }));
+  assert.equal(markup, '');
   assert.doesNotMatch(markup, /REVISAR|identificación|pendiente|cotejo|Vatican News|Martirologio/i);
   assert.equal('status' in editorialBiographies.records[date], false);
   assert.equal('source' in editorialBiographies.records[date], false);

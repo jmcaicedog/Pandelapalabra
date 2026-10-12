@@ -4,9 +4,7 @@ export function SaintSource({ verification, onRetry }: {
   verification?: SaintVerification;
   onRetry?: () => void;
 }) {
-  if (verification?.biographyEditorial) {
-    return <p className="mt-2 text-[11px] text-amber-300/90">Reseña editorial.</p>;
-  }
+  if (verification?.biographyEditorial) return null;
   if (verification?.biographyError) {
     return <div className="mt-2 text-[11px] text-amber-300/90" role="status">
       <p>{verification.biographyError}</p>

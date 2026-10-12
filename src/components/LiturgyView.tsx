@@ -9,7 +9,6 @@ import {
   RefreshCw,
   Share2,
   BookOpen,
-  X,
   Check,
   BookmarkPlus
 } from 'lucide-react';
@@ -62,8 +61,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
       setSelectedDate(initialDate);
     }
   }, [initialDate]);
-  const [saintModalOpen, setSaintModalOpen] = useState(false);
-
   // Audio speech states
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPlayingSection, setCurrentPlayingSection] = useState<string | null>(null);
@@ -97,7 +94,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
     speechService.stop();
     setReflection(null);
     setReflectionError(null);
-    setSaintModalOpen(false);
     setActionError(null);
 
     // 1. Immediate synchronous resolution (no delay)
@@ -450,8 +446,7 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
         {/* 1. Card: Santo del Día */}
         <div
           id="card-santo-del-dia"
-          onClick={() => setSaintModalOpen(true)}
-          className="group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800/90 rounded-2xl p-4 transition-all duration-200 cursor-pointer shadow-md hover:border-amber-500/30"
+          className="relative bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-md"
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2.5 text-xs text-amber-400 font-medium mb-1">
@@ -460,7 +455,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
               </div>
               <span className="tracking-wide uppercase text-[11px]">Santo del Día</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
           </div>
 
           <h3 className="text-base font-serif font-bold text-slate-100 mt-1">
@@ -474,11 +468,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
             {dayData.saint.fullBio || dayData.saint.shortBio}
           </p>
           <SaintSource verification={dayData.saintVerification} onRetry={retryBiography} />
-
-          <div className="mt-3 flex items-center justify-between text-[11px] text-amber-400/90 font-medium">
-            <span>Toca para abrir biografía y oración</span>
-            <span className="text-slate-500 text-[10px]">Abrir →</span>
-          </div>
         </div>
 
         {/* 2. Card: Primera Lectura */}
@@ -800,61 +789,6 @@ export const LiturgyView: React.FC<LiturgyViewProps> = ({ user, initialDate, onN
           )}
         </div>
       </div>
-
-      {/* Modal: Biografía y Oración del Santo del Día */}
-      {saintModalOpen && (
-        <div
-          id="modal-santo-details"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
-        >
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl text-slate-100 relative">
-            <button
-              id="btn-close-saint-modal"
-              onClick={() => setSaintModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="text-center mb-4">
-              <span className="text-3xl mb-1 block">👤</span>
-              <h2 className="text-xl font-serif font-bold text-amber-300">{dayData.saint.name}</h2>
-              <p className="text-xs text-slate-400">{dayData.saint.title}</p>
-              {dayData.saint.patronage && (
-                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                  Patrono de: {dayData.saint.patronage}
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif">
-              <div>
-                <h4 className="font-semibold text-white uppercase text-xs tracking-wider mb-1">
-                  Vida y Testimonio
-                </h4>
-                <p className="reading-text whitespace-pre-line">{dayData.saint.fullBio}</p>
-                <SaintSource verification={dayData.saintVerification} onRetry={retryBiography} />
-              </div>
-
-              <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4">
-                <h4 className="font-serif font-bold text-amber-300 text-xs tracking-wide uppercase mb-1">
-                  Oración de Intercesión
-                </h4>
-                <p className="reading-text font-serif italic text-slate-200 leading-relaxed">
-                  «{dayData.saint.prayer}»
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSaintModalOpen(false)}
-              className="w-full mt-6 bg-slate-800 hover:bg-slate-750 text-slate-200 py-2.5 rounded-xl text-xs font-semibold"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
 
     </div>
   );
